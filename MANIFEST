@@ -7,8 +7,8 @@ demos/animals/files/protected.txt
 demos/animals/files/public.txt
 demos/animals/Owl.pm
 demos/animals/Panda.pm
-demos/animals/startup_manual.pl
-demos/animals/startup_suio.pl
+demos/animals/startup_cgi.pl
+demos/animals/startup_socket.pl
 demos/animals/Tiger.pm
 demos/bounce.pl
 demos/frameset/frameset.pl
@@ -35,6 +35,12 @@ demos/website/content/resume.html
 demos/website/start.pl
 demos/website/usage_prefs.pl
 lib/CGI/Portable.pm
+lib/CGI/Portable/AdapterCGI.pm
+lib/CGI/Portable/AdapterSocket.pm
+lib/CGI/Portable/Errors.pm
+lib/CGI/Portable/Files.pm
+lib/CGI/Portable/Request.pm
+lib/CGI/Portable/Response.pm
 lib/CGI/WPM/Base.pm
 lib/CGI/WPM/CountFile.pm
 lib/CGI/WPM/GuestBook.pm
@@ -42,7 +48,6 @@ lib/CGI/WPM/MailForm.pm
 lib/CGI/WPM/MultiPage.pm
 lib/CGI/WPM/Redirect.pm
 lib/CGI/WPM/SegTextDoc.pm
-lib/CGI/WPM/SimpleUserIO.pm
 lib/CGI/WPM/Static.pm
 lib/CGI/WPM/Usage.pm
 Makefile.PL

@@ -1,3 +1,67 @@
+2001-06-05   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 0.43.
+	
+	* CGI::Portable has been split into 5 modules, all of which are at version 
+	0.43.  The four new ones are [CGI::Portable::Errors, CGI::Portable::Files, 
+	CGI::Portable::Request, CGI::Portable::Response] and these handle most of 
+	the core functionality from the larger module before it.  The new 
+	CGI::Portable module is a subclass of the above four and adds the remaining 
+	functionality itself; you can still use CGI::Portable as you did before.  
+	The split of functionality is to emphasize that CGI::Portable is doing 
+	several tasks in parallel that are related but distinct, so you can now use 
+	each of them independently and not carry around the weight of others that 
+	you don't use.  Each module has the POD for all methods it implements.
+	
+	* The module CGI::WPM::SimpleUserIO has been rewritten and renamed to 
+	CGI::Portable::AdapterCGI.  The new module has the same primary purpose but 
+	a simplified interface.  The two methods which took CGI::Portable objects as 
+	arguments have been renamed to fetch_user_input() and send_user_output().  
+	All of the other methods were removed except the send_quick_*() ones.  
+	Unlike before, it is fetch_user_input() that does the actual data gathering, 
+	whereas before it had to be done earlier with a separate method like new().  
+	Unlike before, AdapterCGI sends all "http *" properties, including cookies.  
+	You will need to make slight changes to any "config shell" code that used 
+	the old module in order to stay compatible.  All of the demo scripts and the 
+	Synopsis POD in the CGI::WPM::* modules have been updated for the new version.
+	
+	* Added module CGI::Portable::AdapterSocket which is like AdapterCGI except 
+	that it talks to an IO::Socket::INET object instead of a CGI environment, so 
+	the means is now provided for you to skip web servers altogether if you just 
+	need a lightweight Perl-only server.  There is also a new demo script named 
+	startup_socket.pl which complements startup_cgi.pl in which they do the 
+	exact same thing (animals demo) but under different servers.  However, this 
+	Sockets demo is fairly lightweight and doesn't have things like threading 
+	that the big servers do, so you would want to improve on it if you are 
+	operating in a heavy-use environment.
+	
+	* The "http cookies" property and associated methods that are now in 
+	CGI::Portable::Response have been greatly simplified so that they are easier 
+	to use and to eliminate external dependencies.  While the property is still 
+	an array, each element is now a scalar instead of a MultiValuedHash object.  
+	It is assumed that users would encode cookies ahead of time and just insert 
+	them as strings; that is, the Adapter modules will send them literally.  
+	These methods have been removed: get_http_cookie_refs(), get_http_cookie(), 
+	get_http_cookie_ref().  The method get_http_cookies_ref() has been added to 
+	replace the first one, and it returns a reference to the whole list.  These 
+	methods continue to work as they did before: get_http_cookies(), 
+	add_http_cookies(), delete_http_cookies().
+	
+	* Added 8 new scalar properties to CGI::Portable::Request which hold extra 
+	miscellaneous HTTP request details: [request_method(), virtual_host(), 
+	server_port(), script_name(), referer(), user_agent(), remote_addr(), 
+	remote_host()].  AdapterCGI has been updated to feed them as well.  
+	Related to this change, [CGI::WPM::Usage, MailForm, GuestBook] have been 
+	updated to use these properties rather than looking in %ENV themselves, which 
+	wouldn't work if they were running in a non-CGI environment.
+	
+	* Updated CGI::WPM::Usage to lowercase all search engine keywords, and to 
+	do case-insensitive matching when determining search engine domains.  The 
+	latter would be considered a bug fixed since other domain checks were c-i.
+	
+	* Some demo modules now require version 2.01 of HTML::FormTemplate since that 
+	version has some bug fixes.
+
 2001-05-08   Darren Duncan <perl@DarrenDuncan.net>
 
 	* Release 0.42.

@@ -9,9 +9,9 @@ use Cwd;
 $globals->file_path_root( cwd() );  # let us default to current working dir
 $globals->file_path_delimiter( $^O=~/Mac/i ? ":" : $^O=~/Win/i ? "\\" : "/" );
 
-require CGI::WPM::SimpleUserIO;
-my $io = CGI::WPM::SimpleUserIO->new( 1 );
-$io->give_user_input_to_cgi_portable( $globals );
+require CGI::Portable::AdapterCGI;
+my $io = CGI::Portable::AdapterCGI->new();
+$io->fetch_user_input( $globals );
 
 if( $globals->user_query_param( 'debugging' ) eq 'on' ) {
 	$globals->is_debug( 1 );
@@ -48,6 +48,6 @@ $globals->search_and_replace_page_body( {
 } );
 $globals->search_and_replace_url_path_tokens( '__url_path__' );
 
-$io->send_user_output_from_cgi_portable( $globals );
+$io->send_user_output( $globals );
 
 1;

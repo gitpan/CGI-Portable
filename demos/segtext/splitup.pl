@@ -9,9 +9,9 @@ use Cwd;
 $globals->file_path_root( cwd() );  # let us default to current working dir
 $globals->file_path_delimiter( $^O=~/Mac/i ? ":" : $^O=~/Win/i ? "\\" : "/" );
 
-require CGI::WPM::SimpleUserIO;
-my $io = CGI::WPM::SimpleUserIO->new( 1 );
-$io->give_user_input_to_cgi_portable( $globals );
+require CGI::Portable::AdapterCGI;
+my $io = CGI::Portable::AdapterCGI->new();
+$io->fetch_user_input( $globals );
 
 my %CONFIG = (
 	title => 'Index of the World',
@@ -26,6 +26,6 @@ $globals->current_user_path_level( 1 );
 $globals->set_prefs( \%CONFIG );
 $globals->call_component( 'CGI::WPM::SegTextDoc' );
 
-$io->send_user_output_from_cgi_portable( $globals );
+$io->send_user_output( $globals );
 
 1;

@@ -17,6 +17,7 @@ my $rh_prefs = {
 						name => 'words',
 						'values' => ['eenie', 'meenie', 'minie', 'moe'],
 						default => ['eenie', 'minie'],
+						rows => 2,
 					}, {
 						visible_title => "What's your favorite colour?",
 						type => 'popup_menu',

@@ -6,16 +6,17 @@ require CGI::Portable;
 my $globals = CGI::Portable->new();
 
 use Cwd;
-$globals->file_path_root( cwd() );  # let us default to current working dir
+$globals->file_path_root( cwd() );  # let us default to current working directory
 $globals->file_path_delimiter( $^O=~/Mac/i ? ":" : $^O=~/Win/i ? "\\" : "/" );
 
-my %CONFIG = ( filename => 'showself.pl', is_text => 1 );
-
-$globals->set_prefs( \%CONFIG );
-$globals->call_component( 'CGI::WPM::Static' );
+$globals->set_prefs( 'config.pl' );
+$globals->current_user_path_level( 1 );
 
 require CGI::Portable::AdapterCGI;
 my $io = CGI::Portable::AdapterCGI->new();
+
+$io->fetch_user_input( $globals );
+$globals->call_component( 'Aardvark' );
 $io->send_user_output( $globals );
 
 1;

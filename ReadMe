@@ -15,7 +15,10 @@ CONTENTS
 
 PREFACE
 
-This distribution features the Perl 5 module named "CGI::Portable".
+This distribution features the Perl 5 module named "CGI::Portable" as well as 
+6 other modules that are required by it: [CGI::Portable::Errors, Files, Request, 
+Response, AdapterCGI, AdapterSocket].  That is, the first 4 are subclassed by 
+CGI::Portable, and the last 2 are recommended for use but not required.
 
 It also includes 10 other modules that are designed to be used with it; these
 10 are all in the temporary name space CGI::WPM::*.  Eight of them are
@@ -23,7 +26,7 @@ demo "application components", one performs user input and output, and one
 encapsulates a file format for counting events.  By looking at those you should
 have a better idea what CGI::Portable can do for you.
 
-This distribution now has a "demos" folder containing 40 files and folders 
+This distribution now has a "demos" folder containing 46+ files and folders 
 which are ready-to-use example scripts and data files that exercise 
 CGI::Portable and all of the CGI::WPM::* modules.  Many of these are exactly 
 the same as the *new* Synopsis POD for particular modules.  Some have minor 
@@ -77,16 +80,16 @@ HTML-EasyTags-1.05.tar.gz
 	- HTML::EasyTags 1.05 is required by:
 		- CGI::Portable (assembles the pieces of a new HTML page)
 
-MultiValuedHash-1.07.tar.gz
+MultiValuedHash-1.0702.tar.gz
 	- by Darren Duncan (DUNCAND)
 	- Data::MultiValuedHash 1.07 is required by:
 		- CGI::Portable (stores new cookies prior to output)
 	- CGI::MultiValuedHash 1.07 is required by:
 		- CGI::Portable (stores and url-decodes user queries, posts, cookies)
 
-HTML-FormTemplate-2.0.tar.gz
+HTML-FormTemplate-2.01.tar.gz
 	- by Darren Duncan (DUNCAND)
-	- HTML::FormTemplate 2.0 is required by:
+	- HTML::FormTemplate 2.01 is required by:
 		- CGI::WPM::MailForm (for making input forms and form reports)
 		- CGI::WPM::GuestBook (for making input forms and form reports)
 
@@ -121,9 +124,9 @@ If you are on a Mac system and/or you are otherwise having problems with the
 Makefile, you can still install this module the old fashioned way, by copying.
 
 The file "Portable.pm" goes inside the "CGI" folder which is in the "lib" 
-folder that came with your Perl 5 distribution.  All of the other .pm modules 
-go inside the temporary folder "WPM", which is inside "CGI", which is in the 
-"lib" folder that came with your Perl 5 distribution.
+folder that came with your Perl 5 distribution.  The .pm modules that come in 
+a "Portable" or "WPM" subfolder of this distribution's "lib" directory go into 
+their corresponding locations in the "lib" folder of your Perl distribution.
 
 Or alternately, put it anywhere you want, but you will need to have that 
 location added to your include path by your main program using something like 

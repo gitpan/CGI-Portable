@@ -18,7 +18,7 @@ require 5.004;
 
 use strict;
 use vars qw($VERSION @ISA);
-$VERSION = '0.41';
+$VERSION = '0.43';
 
 ######################################################################
 
@@ -34,7 +34,7 @@ $VERSION = '0.41';
 
 =head2 Nonstandard Modules
 
-	CGI::Portable 0.41
+	CGI::Portable 0.43
 	CGI::WPM::Base 0.41
 	CGI::WPM::CountFile 0.41
 
@@ -42,7 +42,7 @@ $VERSION = '0.41';
 
 ######################################################################
 
-use CGI::Portable 0.41;
+use CGI::Portable 0.43;
 use CGI::WPM::Base 0.41;
 @ISA = qw(CGI::WPM::Base);
 use CGI::WPM::CountFile 0.41;
@@ -63,9 +63,9 @@ use CGI::WPM::CountFile 0.41;
 	$globals->file_path_root( cwd() );  # let us default to current working dir
 	$globals->file_path_delimiter( $^O=~/Mac/i ? ":" : $^O=~/Win/i ? "\\" : "/" );
 
-	require CGI::WPM::SimpleUserIO;
-	my $io = CGI::WPM::SimpleUserIO->new( 1 );
-	$io->give_user_input_to_cgi_portable( $globals );
+	require CGI::Portable::AdapterCGI;
+	my $io = CGI::Portable::AdapterCGI->new();
+	$io->fetch_user_input( $globals );
 
 	if( $globals->user_query_param( 'debugging' ) eq 'on' ) {
 		$globals->is_debug( 1 );
@@ -102,7 +102,7 @@ __endquote
 	} );
 	$globals->search_and_replace_url_path_tokens( '__url_path__' );
 
-	$io->send_user_output_from_cgi_portable( $globals );
+	$io->send_user_output( $globals );
 
 	1;
 
@@ -460,7 +460,7 @@ sub update_referrer_counts {
 	my (@ref_norm, @ref_sear, @ref_keyw, @ref_disc);
 
 	SWITCH: {
-		my $referer = $self->_http_referer();
+		my $referer = $globals->referer();
 		my ($ref_filename, $query) = split( /\?/, $referer, 2 );
 		$ref_filename =~ s|/$||;     # lose trailing "/"s
 		$referer = ($query =~ /[a-zA-Z0-9]/) ? 
@@ -491,7 +491,7 @@ sub update_referrer_counts {
 		
 		# else check if the referring domain is a search engine
 		foreach my $dom_frag (keys %{$rh_engines}) {
-			if( ".$domain." =~ m|[/\.]$dom_frag\.| ) {
+			if( ".$domain." =~ m|[/\.]$dom_frag\.|i ) { # CHANGED THIS LINE 0.43
 				my $se_query = CGI::MultiValuedHash->new( 1, $query );
 				my @se_keywords;
 				
@@ -505,6 +505,7 @@ sub update_referrer_counts {
 				foreach my $kw (@se_keywords) {
 					$kw =~ s/^[^a-zA-Z0-9]+//;  # remove framing junk
 					$kw =~ s/[^a-zA-Z0-9]+$//;
+					$kw = lc( $kw ); # ADDED THIS LINE 0.43
 				}
 
 				# save both the file name and the search words used
@@ -652,15 +653,6 @@ sub _today_date_utc {
 
 ######################################################################
 
-sub _http_referer {
-	my $str = $ENV{'HTTP_REFERER'};
-	$str =~ tr/+/ /;
-	$str =~ s/%([0-9a-fA-F]{2})/pack("c",hex($1))/ge;
-	return( $str );
-}
-
-######################################################################
-
 1;
 __END__
 
@@ -682,6 +674,6 @@ Address comments, suggestions, and bug reports to B<perl@DarrenDuncan.net>.
 =head1 SEE ALSO
 
 perl(1), CGI::Portable, CGI::WPM::Base, CGI::WPM::CountFile, Net::SMTP, 
-CGI::WPM::SimpleUserIO.
+CGI::Portable::AdapterCGI.
 
 =cut

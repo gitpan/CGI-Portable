@@ -14,8 +14,8 @@ my %CONFIG = ( filename => 'static.html' );
 $globals->set_prefs( \%CONFIG );
 $globals->call_component( 'CGI::WPM::Static' );
 
-require CGI::WPM::SimpleUserIO;
-my $io = CGI::WPM::SimpleUserIO->new();
-$io->send_user_output_from_cgi_portable( $globals );
+require CGI::Portable::AdapterCGI;
+my $io = CGI::Portable::AdapterCGI->new();
+$io->send_user_output( $globals );
 
 1;

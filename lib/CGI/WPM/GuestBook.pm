@@ -18,7 +18,7 @@ require 5.004;
 
 use strict;
 use vars qw($VERSION @ISA);
-$VERSION = '0.41';
+$VERSION = '0.43';
 
 ######################################################################
 
@@ -36,10 +36,10 @@ $VERSION = '0.41';
 
 =head2 Nonstandard Modules
 
-	CGI::Portable 0.41
+	CGI::Portable 0.43
 	CGI::WPM::Base 0.41
 	CGI::MultiValuedHash 1.07
-	HTML::FormTemplate 2.0
+	HTML::FormTemplate 2.01
 
 =cut
 
@@ -47,11 +47,11 @@ $VERSION = '0.41';
 
 use Fcntl qw(:DEFAULT :flock);
 use Symbol;
-use CGI::Portable 0.41;
+use CGI::Portable 0.43;
 use CGI::WPM::Base 0.41;
 @ISA = qw(CGI::WPM::Base);
 use CGI::MultiValuedHash 1.07;
-use HTML::FormTemplate 2.0;
+use HTML::FormTemplate 2.01;
 
 ######################################################################
 
@@ -69,9 +69,9 @@ use HTML::FormTemplate 2.0;
 	$globals->file_path_root( cwd() );  # let us default to current working dir
 	$globals->file_path_delimiter( $^O=~/Mac/i ? ":" : $^O=~/Win/i ? "\\" : "/" );
 
-	require CGI::WPM::SimpleUserIO;
-	my $io = CGI::WPM::SimpleUserIO->new( 1 );
-	$io->give_user_input_to_cgi_portable( $globals );
+	require CGI::Portable::AdapterCGI;
+	my $io = CGI::Portable::AdapterCGI->new();
+	$io->fetch_user_input( $globals );
 
 	$globals->default_application_title( 'Demo Guest Book' );
 	$globals->default_maintainer_name( 'Tony Simons' );
@@ -85,7 +85,7 @@ use HTML::FormTemplate 2.0;
 	$globals->set_prefs( \%CONFIG );
 	$globals->call_component( 'CGI::WPM::GuestBook' );
 
-	$io->send_user_output_from_cgi_portable( $globals );
+	$io->send_user_output( $globals );
 
 	1;
 
@@ -620,7 +620,7 @@ sub send_mail_to_me {
 		<<__endquote.
 It is the result of a form submission from a site visitor, 
 "@{[$globals->user_post_param( $FFN_NAMEREAL )]}" <@{[$globals->user_post_param( $FFN_EMAIL )]}>.
-From: @{[$self->_remote_addr()]} @{[$self->_remote_host()]}.
+From: @{[$globals->remote_addr()]} @{[$globals->remote_host()]}.
 __endquote
 		($globals->user_post_param( $FFN_WANTCOPY ) ? 
 		"The visitor also requested a copy be sent to them.\n" : 
@@ -673,7 +673,7 @@ sub sign_guest_book {
 	my $new_posting = $globals->user_post();
 	$new_posting->store( $LFN_SUBMIT_DATE, $self->_today_date_utc() );
 	$new_posting->store( $LFN_SUBMIT_DOMAIN, 
-		$self->_remote_addr().':'.$self->_remote_host() );
+		$globals->remote_addr().':'.$globals->remote_host() );
 
 	my $filename = $globals->pref( $PKEY_FN_MESSAGES );
 	$self->_append_new_records( $filename, $new_posting );
@@ -758,7 +758,7 @@ sub send_mail_to_writer {
 		<<__endquote,
 It is the result of a form submission from a site visitor, 
 "@{[$globals->user_post_param( $FFN_NAMEREAL )]}" <@{[$globals->user_post_param( $FFN_EMAIL )]}>.
-From: @{[$self->_remote_addr()]} @{[$self->_remote_host()]}.
+From: @{[$globals->remote_addr()]} @{[$globals->remote_host()]}.
 __endquote
 	);
 
@@ -972,11 +972,6 @@ sub _today_date_utc {
 
 ######################################################################
 
-sub _remote_addr { $ENV{'REMOTE_ADDR'} || '127.0.0.1' }
-sub _remote_host { $ENV{'REMOTE_HOST'} || $ENV{'REMOTE_ADDR'} || 'localhost' }
-
-######################################################################
-
 1;
 __END__
 
@@ -998,6 +993,6 @@ Address comments, suggestions, and bug reports to B<perl@DarrenDuncan.net>.
 =head1 SEE ALSO
 
 perl(1), CGI::Portable, CGI::WPM::Base, HTML::FormTemplate, 
-CGI::MultiValuedHash, Net::SMTP, Fcntl, Symbol, Boulder, CGI::WPM::SimpleUserIO.
+CGI::MultiValuedHash, Net::SMTP, Fcntl, Symbol, Boulder, CGI::Portable::AdapterCGI.
 
 =cut

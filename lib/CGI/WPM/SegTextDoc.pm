@@ -18,7 +18,7 @@ require 5.004;
 
 use strict;
 use vars qw($VERSION @ISA);
-$VERSION = '0.41';
+$VERSION = '0.4101';
 
 ######################################################################
 
@@ -62,9 +62,9 @@ use CGI::WPM::Base 0.41;
 	$globals->file_path_root( cwd() );  # let us default to current working dir
 	$globals->file_path_delimiter( $^O=~/Mac/i ? ":" : $^O=~/Win/i ? "\\" : "/" );
 
-	require CGI::WPM::SimpleUserIO;
-	my $io = CGI::WPM::SimpleUserIO->new( 1 );
-	$io->give_user_input_to_cgi_portable( $globals );
+	require CGI::Portable::AdapterCGI;
+	my $io = CGI::Portable::AdapterCGI->new();
+	$io->fetch_user_input( $globals );
 
 	my %CONFIG = (
 		title => 'Index of the World',
@@ -79,7 +79,7 @@ use CGI::WPM::Base 0.41;
 	$globals->set_prefs( \%CONFIG );
 	$globals->call_component( 'CGI::WPM::SegTextDoc' );
 
-	$io->send_user_output_from_cgi_portable( $globals );
+	$io->send_user_output( $globals );
 
 	1;
 
@@ -296,6 +296,6 @@ Address comments, suggestions, and bug reports to B<perl@DarrenDuncan.net>.
 
 =head1 SEE ALSO
 
-perl(1), CGI::Portable, CGI::WPM::Base, CGI::WPM::Static, CGI::WPM::SimpleUserIO.
+perl(1), CGI::Portable, CGI::WPM::Base, CGI::WPM::Static, CGI::Portable::AdapterCGI.
 
 =cut

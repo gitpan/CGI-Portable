@@ -17,7 +17,7 @@ require 5.004;
 
 use strict;
 use vars qw($VERSION);
-$VERSION = '0.42';
+$VERSION = '0.4201';
 
 ######################################################################
 
@@ -275,6 +275,6 @@ Address comments, suggestions, and bug reports to B<perl@DarrenDuncan.net>.
 
 perl(1), CGI::Portable, CGI::WPM::GuestBook, CGI::WPM::MailForm, 
 CGI::WPM::MultiPage, CGI::WPM::Redirect, CGI::WPM::SegTextDoc, CGI::WPM::Static, 
-and CGI::WPM::Usage, CGI::WPM::SimpleUserIO.
+and CGI::WPM::Usage, CGI::Portable::AdapterCGI.
 
 =cut

@@ -20,13 +20,22 @@ This distribution features the Perl 5 module named "CGI::Portable" as well as
 Response, AdapterCGI, AdapterSocket].  That is, the first 4 are subclassed by 
 CGI::Portable, and the last 2 are recommended for use but not required.
 
-It also includes 10 other modules that are designed to be used with it; these
-10 are all in the temporary name space CGI::WPM::*.  Eight of them are
-demo "application components", one performs user input and output, and one
-encapsulates a file format for counting events.  By looking at those you should
-have a better idea what CGI::Portable can do for you.
+All of my modules have complete POD inside of them, so please refer to that for a
+description of the module itself.
 
-This distribution now has a "demos" folder containing 46+ files and folders 
+This Read Me document concerns itself mainly with installation and support
+issues, and also includes any "To Do" lists.
+
+This distribution also includes 8 other modules, in the temporary name space 
+CGI::WPM::*, that are designed to be used with CGI::Portable.  Each of these is 
+included as a demo "application component", and by looking at them, you should 
+have a better idea what CGI::Portable can do for you.  Unlike ordinary demos, 
+however, these are a lot more mature and are being used effectively in multiple 
+production environments.  For all intents and purposes, you should treat them 
+like "scripts" rather than "modules" as far as when you use them, due to their 
+more proprietary nature.
+
+This distribution now has a "demos" folder containing 52 files and folders 
 which are ready-to-use example scripts and data files that exercise 
 CGI::Portable and all of the CGI::WPM::* modules.  Many of these are exactly 
 the same as the *new* Synopsis POD for particular modules.  Some have minor 
@@ -37,16 +46,9 @@ make it an order of magnitude easier for you to adopt my modules and put
 them to work in a productive manner.  The provided demos include: a multi-page 
 web site with usage tracking, guest books, mail and survey forms, static html 
 and plain text pages, segmented text file display, redirection, and a few 
-other strange modules that don't do anything useful but play with features.
-
-All of my modules have complete POD inside of them, so please refer to that for a
-description of the module itself.  Although the POD with this set isn't as
-complete as I would like, it should still be suitable.  Mostly what is lacking 
-is descriptions of each "preference" and what effect it has.  Hopefully the 
-detailed Synopsis and demos will be self-explanatory on what the prefs do.
-	
-This Read Me document concerns itself mainly with installation and support
-issues, and also includes any "To Do" lists.
+other strange modules that don't do anything useful but play with features.  
+Any actual modules in the demos folder are very immature and should not be used 
+as is; rather, learn from them.  They intentionally have no POD.
 
 KEEPING UP TO DATE
 
@@ -87,6 +89,10 @@ MultiValuedHash-1.0702.tar.gz
 	- CGI::MultiValuedHash 1.07 is required by:
 		- CGI::Portable (stores and url-decodes user queries, posts, cookies)
 
+mod_perl-1.24_01.tar.gz (older versions may work):
+	- Apache 1.27 is required by:
+		- CGI::Portable::AdapterCGI (when running under mod_perl)
+
 HTML-FormTemplate-2.01.tar.gz
 	- by Darren Duncan (DUNCAND)
 	- HTML::FormTemplate 2.01 is required by:
@@ -100,44 +106,47 @@ libnet-1.0703.tar.gz (older versions may work):
 		- CGI::WPM::GuestBook (when sending e-mails of form data)
 		- CGI::WPM::Usage (when sending e-mails of usage data)
 
-mod_perl-1.24_01.tar.gz (older versions may work):
-	- Apache 1.27 is required by:
-		- CGI::WPM::SimpleUserIO (when running under mod_perl)
-
 GD (any version I suppose) is required by the "image" demo.
 
 INSTALLATION
 
-To install this module, cd to the directory that contains all of the extracted 
+To install these modules, cd to the directory that contains all of the extracted 
 distribution files, including this ReadMe file, and type the following:
 
-	perl Makefile.PL
-	make
-	make test
-	make install
+        perl Makefile.PL
+        make
+        make test
+        make install
 
 The last step probably won't work if you are not the administrator of your 
 machine; in that case you either need to get your administrator to install this 
 for you, or put it in a your own local directory instead.
 
+The Makefile.PL can do this for you if you substitute something like the 
+following for the first line above:
+
+        perl Makefile.PL PREFIX=/tmp/myperl5
+        
+or:
+
+        perl Makefile.PL PREFIX=/home/me/myperl5
+
 If you are on a Mac system and/or you are otherwise having problems with the 
 Makefile, you can still install this module the old fashioned way, by copying.
 
-The file "Portable.pm" goes inside the "CGI" folder which is in the "lib" 
-folder that came with your Perl 5 distribution.  The .pm modules that come in 
-a "Portable" or "WPM" subfolder of this distribution's "lib" directory go into 
-their corresponding locations in the "lib" folder of your Perl distribution.
+Every file in the "lib" folder of this distribution goes in its corresponding 
+location within the "lib" folder that came with your Perl 5 distribution.
 
-Or alternately, put it anywhere you want, but you will need to have that 
+Or alternately, put them anywhere you want, but you will need to have that 
 location added to your include path by your main program using something like 
 this:
 
-	use lib '/users/me/www_files/lib';
+        use lib '/home/me/myperl5/lib';
 
 Then you would want to run the included test program to make sure the module is 
 installed correctly.  Call it with:
 
-	perl test.pl
+        perl test.pl
 
 Any existing POD is embedded in the module itself.  The Makefile probably 
 extracted it for you in the usual manner, or you can run a POD extractor on it 

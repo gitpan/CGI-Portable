@@ -35,6 +35,7 @@ $usage->http_redirect_url( $globals->http_redirect_url() );
 $usage->navigate_file_path( $globals->is_debug() ? 'usage_debug' : 'usage' );
 $usage->set_prefs( '../usage_prefs.pl' );
 $usage->call_component( 'CGI::WPM::Usage' );
+$globals->take_context_output( $usage, 1, 1 );
 
 if( $globals->is_debug() ) {
 	$globals->append_page_body( <<__endquote );

@@ -18,7 +18,7 @@ require 5.004;
 
 use strict;
 use vars qw($VERSION @ISA);
-$VERSION = '0.43';
+$VERSION = '0.44';
 
 ######################################################################
 
@@ -37,7 +37,7 @@ $VERSION = '0.43';
 =head2 Nonstandard Modules
 
 	CGI::Portable 0.43
-	CGI::WPM::Base 0.41
+	CGI::WPM::Base 0.44
 	CGI::MultiValuedHash 1.07
 	HTML::FormTemplate 2.01
 
@@ -48,7 +48,7 @@ $VERSION = '0.43';
 use Fcntl qw(:DEFAULT :flock);
 use Symbol;
 use CGI::Portable 0.43;
-use CGI::WPM::Base 0.41;
+use CGI::WPM::Base 0.44;
 @ISA = qw(CGI::WPM::Base);
 use CGI::MultiValuedHash 1.07;
 use HTML::FormTemplate 2.01;
@@ -425,7 +425,7 @@ sub get_question_field_defs {
 	}
 	
 	# we will now get questions from a simple Boulder formatted file
-	return( $self->_fetch_all_records( $field_defn ) || [] );
+	return( $self->fetch_all_records( $field_defn ) || [] );
 }
 
 ######################################################################
@@ -447,7 +447,7 @@ what caused this problem:</P>
 
 <P>@{[$globals->get_error()]}</P>
 
-@{[$self->_get_amendment_message()]}
+@{[$self->get_amendment_message()]}
 __endquote
 }
 
@@ -469,7 +469,7 @@ sub read_guest_book {
 	my $globals = $self->{$KEY_SITE_GLOBALS};
 
 	my $filename = $globals->pref( $PKEY_FN_MESSAGES );
-	my @message_list = $self->_fetch_all_records( $filename, 1 );
+	my @message_list = $self->fetch_all_records( $filename, 1 );
 
 	if( my $err_msg = $globals->get_error() ) {
 		$globals->page_title( "Error Reading GuestBook Postings" );
@@ -483,7 +483,7 @@ show you any.</P>
 
 <P>details: $err_msg</P>
 
-@{[$self->_get_amendment_message()]}
+@{[$self->get_amendment_message()]}
 __endquote
 
 		return( 0 );
@@ -609,7 +609,7 @@ sub send_mail_to_me {
 	my ($self, $form) = @_;
 	my $globals = $self->{$KEY_SITE_GLOBALS};
 
-	my $err_msg = $self->_send_email_message(
+	my $err_msg = $self->send_email_message(
 		$globals->default_maintainer_name(),
 		$globals->default_maintainer_email_address(),
 		$globals->user_post_param( $FFN_NAMEREAL ),
@@ -646,7 +646,7 @@ if that is the problem by checking the following error string:</P>
 
 <P>$err_msg</P>
 
-@{[$self->_get_amendment_message()]}
+@{[$self->get_amendment_message()]}
 
 @{$form->make_html_input_form( 1, 1 )}
 
@@ -671,12 +671,12 @@ sub sign_guest_book {
 	my $globals = $self->{$KEY_SITE_GLOBALS};
 
 	my $new_posting = $globals->user_post();
-	$new_posting->store( $LFN_SUBMIT_DATE, $self->_today_date_utc() );
+	$new_posting->store( $LFN_SUBMIT_DATE, $self->today_date_utc() );
 	$new_posting->store( $LFN_SUBMIT_DOMAIN, 
 		$globals->remote_addr().':'.$globals->remote_host() );
 
 	my $filename = $globals->pref( $PKEY_FN_MESSAGES );
-	$self->_append_new_records( $filename, $new_posting );
+	$self->append_new_records( $filename, $new_posting );
 
 	if( my $err_msg = $globals->get_error() ) {
 		$globals->add_error( $err_msg );
@@ -693,7 +693,7 @@ e-mailed to me.</P>
 
 <P>details: $err_msg</P>
 
-@{[$self->_get_amendment_message()]}
+@{[$self->get_amendment_message()]}
 
 @{$form->make_html_input_form( 1, 1 )}
 
@@ -747,7 +747,7 @@ sub send_mail_to_writer {
 	my ($self, $form) = @_;
 	my $globals = $self->{$KEY_SITE_GLOBALS};
 
-	my $err_msg = $self->_send_email_message(
+	my $err_msg = $self->send_email_message(
 		$globals->user_post_param( $FFN_NAMEREAL ),
 		$globals->user_post_param( $FFN_EMAIL ),
 		$globals->default_maintainer_name(),
@@ -780,13 +780,13 @@ __endquote
 
 ######################################################################
 
-sub _fetch_all_records {
+sub fetch_all_records {
 	my ($self, $filename, $read_and_write) = @_;
 	my $globals = $self->{$KEY_SITE_GLOBALS};
 	
 	my $fh = gensym;
 	
-	$self->_open_and_lock( $fh, $filename, $read_and_write ) or return( undef );
+	$self->open_and_lock( $fh, $filename, $read_and_write ) or return( undef );
 
 	seek( $fh, 0, 0 ) or do {
 		$globals->add_virtual_filename_error( "seek start of", $filename );
@@ -798,14 +798,14 @@ sub _fetch_all_records {
 		return( undef );
 	};
 
-	$self->_unlock_and_close( $fh, $filename ) or return( undef );
+	$self->unlock_and_close( $fh, $filename ) or return( undef );
 
 	return( wantarray ? @{$ra_record_list} : $ra_record_list );
 }
 
 ######################################################################
 
-sub _append_new_records {
+sub append_new_records {
 	my $self = shift( @_ );
 	my $filename = shift( @_ );
 	my $ra_record_list = (ref( $_[0] ) eq 'ARRAY') ? $_[0] : [@_];
@@ -813,7 +813,7 @@ sub _append_new_records {
 	
 	my $fh = gensym;
 	
-	$self->_open_and_lock( $fh, $filename, 1 ) or return( undef );
+	$self->open_and_lock( $fh, $filename, 1 ) or return( undef );
 
 	seek( $fh, 0, 2 ) or do {
 		$globals->add_virtual_filename_error( "seek end of", $filename );
@@ -825,14 +825,14 @@ sub _append_new_records {
 		return( undef );
 	};
 
-	$self->_unlock_and_close( $fh, $filename ) or return( undef );
+	$self->unlock_and_close( $fh, $filename ) or return( undef );
 
 	return( 1 );
 }
 
 ######################################################################
 
-sub _open_and_lock {
+sub open_and_lock {
 	my ($self, $fh, $filename, $read_and_write) = @_;
 	my $globals = $self->{$KEY_SITE_GLOBALS};
 	
@@ -855,7 +855,7 @@ sub _open_and_lock {
 
 ######################################################################
 
-sub _unlock_and_close {
+sub unlock_and_close {
 	my ($self, $fh, $filename) = @_;
 	my $globals = $self->{$KEY_SITE_GLOBALS};
 	
@@ -874,7 +874,7 @@ sub _unlock_and_close {
 
 ######################################################################
 
-sub _send_email_message {
+sub send_email_message {
 	my ($self, $to_name, $to_email, $from_name, $from_email, 
 		$subject, $body, $body_head_addition) = @_;
 	my $globals = $self->{$KEY_SITE_GLOBALS};
@@ -888,7 +888,7 @@ sub _send_email_message {
 	
 	my $body_header = <<__endquote.
 --------------------------------------------------
-This e-mail was sent at @{[$self->_today_date_utc()]} 
+This e-mail was sent at @{[$self->today_date_utc()]} 
 by the web site "@{[$globals->default_application_title()]}", 
 which is located at "@{[$globals->url_base()]}".
 __endquote
@@ -962,7 +962,7 @@ __endquote
 
 ######################################################################
 
-sub _today_date_utc {
+sub today_date_utc {
 	my ($sec, $min, $hour, $mday, $mon, $year) = gmtime(time);
 	$year += 1900;  # year counts from 1900 AD otherwise
 	$mon += 1;      # ensure January is 1, not 0

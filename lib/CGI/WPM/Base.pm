@@ -17,7 +17,7 @@ require 5.004;
 
 use strict;
 use vars qw($VERSION);
-$VERSION = '0.4201';
+$VERSION = '0.44';
 
 ######################################################################
 
@@ -139,7 +139,7 @@ amend_msg doesn't apply to any of the above rules.
 
 I<This POD is coming when I get the time to write it.>
 
-	_get_amendment_message()
+	get_amendment_message()
 
 =cut
 
@@ -238,7 +238,7 @@ __endquote
 
 ######################################################################
 
-sub _get_amendment_message {
+sub get_amendment_message {
 	my ($self) = shift( @_ );
 	my $globals = $self->{$KEY_SITE_GLOBALS};
 	return( $globals->pref( $PKEY_AMEND_MSG ) || <<__endquote );

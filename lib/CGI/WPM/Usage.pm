@@ -18,7 +18,7 @@ require 5.004;
 
 use strict;
 use vars qw($VERSION @ISA);
-$VERSION = '0.43';
+$VERSION = '0.44';
 
 ######################################################################
 
@@ -30,22 +30,22 @@ $VERSION = '0.43';
 
 =head2 Standard Modules
 
+	Fcntl
+	Symbol
 	Net::SMTP 2.15 (earlier versions may work)
 
 =head2 Nonstandard Modules
 
 	CGI::Portable 0.43
-	CGI::WPM::Base 0.41
-	CGI::WPM::CountFile 0.41
+	CGI::WPM::Base 0.44
 
 =cut
 
 ######################################################################
 
 use CGI::Portable 0.43;
-use CGI::WPM::Base 0.41;
+use CGI::WPM::Base 0.44;
 @ISA = qw(CGI::WPM::Base);
-use CGI::WPM::CountFile 0.41;
 
 ######################################################################
 
@@ -89,6 +89,7 @@ use CGI::WPM::CountFile 0.41;
 	$usage->navigate_file_path( $globals->is_debug() ? 'usage_debug' : 'usage' );
 	$usage->set_prefs( '../usage_prefs.pl' );
 	$usage->call_component( 'CGI::WPM::Usage' );
+	$globals->take_context_output( $usage, 1, 1 );
 
 	if( $globals->is_debug() ) {
 		$globals->append_page_body( <<__endquote );
@@ -306,13 +307,9 @@ sub email_and_reset_counts_if_new_day {
 
 	$rh_prefs->{$PKEY_EMAIL_LOGS} or return( 1 );
 
-	$globals->add_no_error();
-	my $dcm_file = CGI::WPM::CountFile->new( 
-		$globals->physical_filename( $rh_prefs->{$PKEY_FN_DCM} ), 1 );
-	$dcm_file->open_and_lock( 1 ) or do {
-		$globals->add_error( $dcm_file->is_error() );
-		return( 0 );
-	};
+	my $dcm_file = 
+		CGI::WPM::Usage::CountFile->new( $globals, $rh_prefs->{$PKEY_FN_DCM} );
+	$dcm_file->open_and_lock( 1 ) or return( undef );
 	$dcm_file->read_all_records();
 	if( $dcm_file->key_was_incremented_today( 
 			$rh_prefs->{$PKEY_TOKEN_TOTAL} ) ) {
@@ -337,10 +334,10 @@ sub email_and_reset_counts_if_new_day {
 
 		foreach my $filename (@{$ra_filenames}) {
 			$filename or next;
-			my $count_file = CGI::WPM::CountFile->new( 
-				$globals->physical_filename( $filename ), 1 );
+			my $count_file = 
+				CGI::WPM::Usage::CountFile->new( $globals, $filename );
 			$count_file->open_and_lock( 1 ) or do {
-				push( @mail_body, "\n\n".$count_file->is_error()."\n" );
+				push( @mail_body, "\n\n".$globals->get_error()."\n" );
 				next;
 			};
 			$count_file->read_all_records();
@@ -355,11 +352,11 @@ sub email_and_reset_counts_if_new_day {
 			$count_file->unlock_and_close();
 		}
 
-		my ($today_str) = ($self->_today_date_utc() =~ m/^(\S+)/ );
+		my ($today_str) = ($self->today_date_utc() =~ m/^(\S+)/ );
 		my $subject_unique = $rh_mail_pref->{$MKEY_SUBJECT_UNIQUE};
 		defined( $subject_unique) or $subject_unique = ' -- usage to ';
 
-		my $err_msg = $self->_send_email_message(
+		my $err_msg = $self->send_email_message(
 			$globals->default_maintainer_name(),
 			$globals->default_maintainer_email_address(),
 			$globals->default_maintainer_name(),
@@ -539,9 +536,9 @@ sub update_one_count_file {
 
 	push( @keys_to_inc, $rh_prefs->{$PKEY_TOKEN_TOTAL} );
 
-	my $count_file = CGI::WPM::CountFile->new( 
-		$globals->physical_filename( $filename ), 1 );
-	$count_file->open_and_lock( 1 ) or return( 0 );
+	my $count_file = 
+		CGI::WPM::Usage::CountFile->new( $globals, $filename );
+	$count_file->open_and_lock( 1 ) or return( undef );
 	$count_file->read_all_records();
 
 	foreach my $key (@keys_to_inc) {
@@ -555,7 +552,7 @@ sub update_one_count_file {
 
 ######################################################################
 
-sub _send_email_message {
+sub send_email_message {
 	my ($self, $to_name, $to_email, $from_name, $from_email, 
 		$subject, $body, $body_head_addition) = @_;
 	my $globals = $self->{$KEY_SITE_GLOBALS};
@@ -569,7 +566,7 @@ sub _send_email_message {
 	
 	my $body_header = <<__endquote.
 --------------------------------------------------
-This e-mail was sent at @{[$self->_today_date_utc()]} 
+This e-mail was sent at @{[$self->today_date_utc()]} 
 by the web site "@{[$globals->default_application_title()]}", 
 which is located at "@{[$globals->url_base()]}".
 __endquote
@@ -643,7 +640,206 @@ __endquote
 
 ######################################################################
 
-sub _today_date_utc {
+sub today_date_utc {
+	my ($sec, $min, $hour, $mday, $mon, $year) = gmtime(time);
+	$year += 1900;  # year counts from 1900 AD otherwise
+	$mon += 1;      # ensure January is 1, not 0
+	my @parts = ($year, $mon, $mday, $hour, $min, $sec);
+	return( sprintf( "%4.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d UTC", @parts ) );
+}
+
+######################################################################
+
+package CGI::WPM::Usage::CountFile;
+use Fcntl qw(:DEFAULT :flock);
+use Symbol;
+
+# Names of properties for objects of this class are declared here:
+#my $KEY_SITE_GLOBALS = 'site_globals';  # hold global site values
+my $KEY_FILEHANDLE = 'filehandle';  # stores the filehandle
+my $KEY_FILENAME  = 'filename';   # external name of this file
+my $KEY_FILE_LINES = 'file_lines';  # hold content of file when open
+
+# Indexes into array of record fields:
+my $IND_KEY_TO_COUNT   = 0;  # name of what we are counting
+my $IND_DATE_ACC_FIRST = 1;  # date of first access
+my $IND_DATE_ACC_LAST  = 2;  # date of last access
+my $IND_COUNT_ACC_ALL  = 3;  # count of accesses btwn first and last
+my $IND_COUNT_ACC_DAY  = 4;  # count of accesses today only
+
+# Constant values used in this class go here:
+my $DELIM_RECORDS = "\n";     # this is standard
+my $DELIM_FIELDS = "\t";  # this is a standard
+my $BYTES_TO_KILL = '[\00-\31]';  # remove all control characters
+
+sub new {
+	my $class = shift( @_ );
+	my $self = bless( {}, ref($class) || $class );
+	$self->{$KEY_SITE_GLOBALS} = shift( @_ );
+	$self->{$KEY_FILEHANDLE} = gensym;
+	$self->{$KEY_FILENAME} = shift( @_ );
+	return( $self );
+}
+
+sub open_and_lock {
+	my ($self, $read_and_write) = @_;
+	my $globals = $self->{$KEY_SITE_GLOBALS};
+	my $fh = $self->{$KEY_FILEHANDLE};
+	my $filename = $self->{$KEY_FILENAME};
+	
+	my $physical_path = $globals->physical_filename( $filename );
+	my $flags = $read_and_write ? O_RDWR|O_CREAT : O_RDONLY;
+	my $perms = 0666;
+
+	$globals->add_no_error();
+
+	sysopen( $fh, $physical_path, $flags, $perms ) or do {
+		$globals->add_virtual_filename_error( "open", $filename );
+		return( undef );
+	};
+
+	flock( $fh, $read_and_write ? LOCK_EX : LOCK_SH ) or do {
+		$globals->add_virtual_filename_error( "lock", $filename );
+		return( undef );
+	};
+
+	return( 1 );
+}
+
+sub unlock_and_close {
+	my ($self) = @_;
+	my $globals = $self->{$KEY_SITE_GLOBALS};
+	my $fh = $self->{$KEY_FILEHANDLE};
+	my $filename = $self->{$KEY_FILENAME};
+	
+	$globals->add_no_error();
+
+	flock( $fh, LOCK_UN ) or do {
+		$globals->add_virtual_filename_error( "unlock", $filename );
+		return( undef );
+	};
+
+	close( $fh ) or do {
+		$globals->add_virtual_filename_error( "close", $filename );
+		return( undef );
+	};
+
+	return( 1 );
+}
+
+sub read_all_records {
+	my ($self) = @_;
+	my $globals = $self->{$KEY_SITE_GLOBALS};
+	my $fh = $self->{$KEY_FILEHANDLE};
+	my $filename = $self->{$KEY_FILENAME};
+	
+	$globals->add_no_error();
+
+	seek( $fh, 0, 0 ) or do {
+		$globals->add_virtual_filename_error( "seek start of", $filename );
+		return( undef );
+	};
+
+	local $/ = undef;
+
+	defined( my $file_content = <$fh> ) or do {
+		$globals->add_virtual_filename_error( "read records from", $filename );
+		return( undef );
+	};
+	
+	my @record_list = split( $DELIM_RECORDS, $file_content );
+	my %record_hash = ();
+	
+	foreach my $record_str (@record_list) {
+		my $key = substr( $record_str, 0, index( 
+			$record_str, $DELIM_FIELDS ) );  # faster then reg exp?
+		$record_hash{$key} = $record_str;
+	}
+
+	$self->{$KEY_FILE_LINES} = \%record_hash;
+	
+	return( 1 );
+}
+
+sub write_all_records {
+	my ($self) = @_;
+	my $globals = $self->{$KEY_SITE_GLOBALS};
+	my $fh = $self->{$KEY_FILEHANDLE};
+	my $filename = $self->{$KEY_FILENAME};
+	
+	my @record_list = values %{$self->{$KEY_FILE_LINES}};
+	my $file_content = join( $DELIM_RECORDS, @record_list );
+	
+	$globals->add_no_error();
+
+	seek( $fh, 0, 0 ) or do {
+		$globals->add_virtual_filename_error( "seek start of", $filename );
+		return( undef );
+	};
+
+	truncate( $fh, 0 ) or do {
+		$globals->add_virtual_filename_error( "truncate to start of", $filename );
+		return( undef );
+	};
+
+	local $\ = undef;
+
+	print $fh "$file_content" or do {
+		$globals->add_virtual_filename_error( "write records to", $filename );
+		return( undef );
+	};
+	
+	return( 1 );
+}
+
+sub key_increment {
+	my ($self, $key) = @_;
+	$key =~ s/$BYTES_TO_KILL//;
+	my @fields = split( $DELIM_FIELDS, $self->{$KEY_FILE_LINES}->{$key} );
+	
+	my $today_str = $self->today_date_utc();
+
+	$fields[$IND_KEY_TO_COUNT] = $key;
+	if( $fields[$IND_COUNT_ACC_ALL] == 0 ) {
+		$fields[$IND_DATE_ACC_FIRST] = $today_str;
+	}
+	$fields[$IND_DATE_ACC_LAST] = $today_str;
+	$fields[$IND_COUNT_ACC_ALL]++;
+	$fields[$IND_COUNT_ACC_DAY]++;  # call different method to reset
+
+	$self->{$KEY_FILE_LINES}->{$key} = join( $DELIM_FIELDS, @fields );
+	return( wantarray ? @fields : \@fields );
+}
+
+sub delete_all_keys {
+	my ($self) = @_;
+	$self->{$KEY_FILE_LINES} = {};
+}
+
+sub key_was_incremented_today {
+	my ($self, $key) = @_;
+	$key =~ s/$BYTES_TO_KILL//;
+	my @fields = split( $DELIM_FIELDS, $self->{$KEY_FILE_LINES}->{$key} );
+	my ($today) = ($self->today_date_utc() =~ m/^(\S+)/ );
+	my ($last_acc) = ($fields[$IND_DATE_ACC_LAST] =~ m/^(\S+)/ );
+	return( $last_acc eq $today );
+}
+
+sub set_all_day_counts_to_zero {
+	my ($self) = @_;
+	my $rh_file_lines = $self->{$KEY_FILE_LINES};
+	foreach my $key (keys %{$rh_file_lines}) {
+		my @fields = split( $DELIM_FIELDS, $rh_file_lines->{$key} );
+		$fields[$IND_COUNT_ACC_DAY] = 0;
+		$rh_file_lines->{$key} = join( $DELIM_FIELDS, @fields );
+	}
+}
+
+sub get_sorted_file_content {
+	return( join( "\n", sort values %{$_[0]->{$KEY_FILE_LINES}} ) );
+}
+
+sub today_date_utc {
 	my ($sec, $min, $hour, $mday, $mon, $year) = gmtime(time);
 	$year += 1900;  # year counts from 1900 AD otherwise
 	$mon += 1;      # ensure January is 1, not 0
@@ -673,7 +869,7 @@ Address comments, suggestions, and bug reports to B<perl@DarrenDuncan.net>.
 
 =head1 SEE ALSO
 
-perl(1), CGI::Portable, CGI::WPM::Base, CGI::WPM::CountFile, Net::SMTP, 
+perl(1), CGI::Portable, CGI::WPM::Base, Net::SMTP, Fcntl, Symbol, 
 CGI::Portable::AdapterCGI.
 
 =cut

@@ -42,7 +42,6 @@ lib/CGI/Portable/Files.pm
 lib/CGI/Portable/Request.pm
 lib/CGI/Portable/Response.pm
 lib/CGI/WPM/Base.pm
-lib/CGI/WPM/CountFile.pm
 lib/CGI/WPM/GuestBook.pm
 lib/CGI/WPM/MailForm.pm
 lib/CGI/WPM/MultiPage.pm

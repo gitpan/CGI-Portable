@@ -17,7 +17,7 @@ require 5.004;
 
 use strict;
 use vars qw($VERSION @ISA);
-$VERSION = '0.4101';
+$VERSION = '0.44';
 
 ######################################################################
 
@@ -34,14 +34,14 @@ $VERSION = '0.4101';
 =head2 Nonstandard Modules
 
 	CGI::Portable 0.41
-	CGI::WPM::Base 0.41
+	CGI::WPM::Base 0.44
 
 =cut
 
 ######################################################################
 
 use CGI::Portable 0.41;
-use CGI::WPM::Base 0.41;
+use CGI::WPM::Base 0.44;
 @ISA = qw(CGI::WPM::Base);
 
 ######################################################################
@@ -142,7 +142,7 @@ can't redirect you to it.  If you got this error while clicking
 on one of the links on this website, then the problem is likely 
 on this end.  In the latter case...</P>
 
-@{[$self->_get_amendment_message()]}
+@{[$self->get_amendment_message()]}
 __endquote
 
 		return( 1 );

@@ -1,3 +1,38 @@
+2001-06-11   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 0.44.
+	
+	* This release does not update any of the core modules having "CGI::Portable" 
+	in their names.  It focuses on updates for the other modules instead.
+	
+	* CGI::WPM::Usage and CGI::WPM::CountFile have been merged into a single 
+	module, keeping the name CGI::WPM::Usage.  This mainly consisted of copying 
+	about 6K of code into Usage and deleting the rest of CountFile entirely.  
+	CGI::WPM::Usage was further edited so that the new code integrated cleanly.  
+	The deleted module didn't really belong in the CGI::WPM::* name space, but 
+	was put there to get it out of the way of the generic name spaces, and 
+	because Usage depended on it.  So there are now 8 CGI::WPM::* modules down 
+	from 9, and all of the remaining belong together.
+	
+	* All CGI::WPM::* modules have been updated to version 0.44.  Most of the 
+	modules have had only minor tweaks that consist of renaming a few private 
+	methods (any leading "_" was removed for consistency).  They should all work 
+	the same as they did before.
+	
+	* The ReadMe file was updated in several places, and there were other minor 
+	documentation updates.
+	
+	* Added demo SmartHouse - A Web-based X10 Device Controller in Perl.
+	This demo is based on a college lab assignment.  It doesn't actually 
+	control any hardware, but is a simple web interface for such a program 
+	should one want to extend it in that manner.  This is meant to show how 
+	CGI::Portable can be used in a wide variety of environments, not just 
+	ordinary database or web sites.  If you wanted to extend it then you 
+	should use modules like ControlX10::CM17, ControlX10::CM11, or 
+	Device::SerialPort.  On the other hand, if you want a very complete 
+	(and complicated) Perl solution then you can download Bruce Winter's 
+	free open-source MisterHouse instead at "http://www.misterhouse.net".
+
 2001-06-05   Darren Duncan <perl@DarrenDuncan.net>
 
 	* Release 0.43.

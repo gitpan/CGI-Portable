@@ -1,4 +1,4 @@
-package Aardvark;
+package DemoAardvark;
 use strict;
 use warnings;
 use CGI::Portable;

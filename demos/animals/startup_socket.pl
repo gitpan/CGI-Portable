@@ -35,7 +35,7 @@ while( my $client = $server->accept() ) {
 	my $content = $globals->make_new_context();
 
 	$io->fetch_user_input( $content, $client );
-	$content->call_component( 'Aardvark' );
+	$content->call_component( 'DemoAardvark' );
 	$io->send_user_output( $content, $client );
 
 	close $client;

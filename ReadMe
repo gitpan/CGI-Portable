@@ -33,24 +33,22 @@ have a better idea what CGI::Portable can do for you.  Unlike ordinary demos,
 however, these are a lot more mature and are being used effectively in multiple 
 production environments.  For all intents and purposes, you should treat them 
 like "scripts" rather than "modules" as far as when you use them, due to their 
-more proprietary nature.
+more proprietary nature.  They are in "lib" along with the feature modules.
 
-This distribution now has a "demos" folder containing 46 files (including the
-above 5 in a folder named "shared") which are ready-to-use example scripts and
-data files that exercise CGI::Portable and all of the Demo* modules.  Many of
-these are exactly the same as the *new* Synopsis POD for particular modules. 
-Some have minor adjustments or demonstrate the Synopsis examples that make use
-of the most features of the particular modules.  Many demos have extra files in
-them that never appeared in Synopsis.  It is my hope that these demos will make
-it an order of magnitude easier for you to adopt my modules and put them to
-work in a productive manner.  The provided demos include: a multi-page web site
-with usage tracking, guest books, mail and survey forms, static html and plain
-text pages, segmented text file display, redirection, and a few other strange
-modules that don't do anything useful but play with features. Any actual
-modules in the demos folder are very immature and should not be used as is;
-rather, learn from them.  They intentionally have no POD.  However, the modules
-mentioned in the previous paragraph, in the "shared" folder, are more mature
-and are ok to use productively, with the caveat that they will change.
+This distribution now has a "demos" folder containing 41 files which are
+ready-to-use example scripts and data files that exercise CGI::Portable and all
+of the Demo* modules.  Many of these are exactly the same as the Synopsis POD
+for particular modules.  Some have minor adjustments or demonstrate the
+Synopsis examples that make use of the most features of the particular modules.
+ Many demos have extra files in them that never appeared in Synopsis.  It is my
+hope that these demos will make it an order of magnitude easier for you to
+adopt my modules and put them to work in a productive manner.  The provided
+demos include: a multi-page web site with usage tracking, guest books, mail and
+survey forms, static html and plain text pages, segmented text file display,
+redirection, and a few other strange modules that don't do anything useful but
+play with features.  Any actual modules in the demos folder are very immature
+and should not be used as is; rather, learn from them.  They intentionally have
+no POD and are not versioned.
 
 KEEPING UP TO DATE
 

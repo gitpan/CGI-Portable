@@ -1,4 +1,4 @@
-package Tiger;
+package DemoTiger;
 use strict;
 use warnings;
 use CGI::Portable;

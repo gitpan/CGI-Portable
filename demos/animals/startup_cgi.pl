@@ -17,7 +17,7 @@ require CGI::Portable::AdapterCGI;
 my $io = CGI::Portable::AdapterCGI->new();
 
 $io->fetch_user_input( $globals );
-$globals->call_component( 'Aardvark' );
+$globals->call_component( 'DemoAardvark' );
 $io->send_user_output( $globals );
 
 1;

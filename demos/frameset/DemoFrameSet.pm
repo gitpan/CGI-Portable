@@ -1,4 +1,4 @@
-package FrameSet;
+package DemoFrameSet;
 use strict;
 use warnings;
 use CGI::Portable;
@@ -15,7 +15,7 @@ sub main {
 	 		$globals->set_page_frameset( [map { 
 	 			{ name => $_, src => $globals->url_as_string( $_ ), } 
 	 			} qw( upper_left upper_right lower_left lower_right )] );
-			$globals->set_page_title( 'This Is The FrameSet Demo' );
+			$globals->set_page_title( 'This Is The DemoFrameSet Demo' );
 			$globals->set_page_style_code( 'BODY {background-color: white}' );
 			$globals->set_page_body( "<H1>Your Browser Doesn't Do Frames</H1>" );
 	 		last SWITCH;

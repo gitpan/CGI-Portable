@@ -20,7 +20,7 @@ require 5.004;
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.50';
+$VERSION = '0.51';
 
 ######################################################################
 
@@ -71,7 +71,7 @@ use CGI::MultiValuedHash 1.09;
 	my $io = CGI::Portable::AdapterCGI->new();
 
 	$io->fetch_user_input( $globals );
-	$globals->call_component( 'Aardvark' );
+	$globals->call_component( 'DemoAardvark' );
 	$io->send_user_output( $globals );
 
 	1;
@@ -114,7 +114,7 @@ use CGI::MultiValuedHash 1.09;
 		my $content = $globals->make_new_context();
 
 		$io->fetch_user_input( $content, $client );
-		$content->call_component( 'Aardvark' );
+		$content->call_component( 'DemoAardvark' );
 		$io->send_user_output( $content, $client );
 
 		close $client;
@@ -129,12 +129,12 @@ use CGI::MultiValuedHash 1.09;
 =head2 Content of settings file "config.pl"
 
 	my $rh_prefs = {
-		title => 'Welcome to Aardvark',
+		title => 'Welcome to DemoAardvark',
 		credits => '<p>This program copyright 2001 Darren Duncan.</p>',
 		screens => {
 			one => {
 				'link' => 'Fill Out A Form',
-				mod_name => 'Tiger',
+				mod_name => 'DemoTiger',
 				mod_prefs => {
 					field_defs => [
 						{
@@ -161,14 +161,14 @@ use CGI::MultiValuedHash 1.09;
 			},
 			two => {
 				'link' => 'Fly Away',
-				mod_name => 'Owl',
+				mod_name => 'DemoOwl',
 				mod_prefs => {
 					fly_to => 'http://www.perl.com',
 				},
 			}, 
 			three => {
 				'link' => 'Don\'t Go Here',
-				mod_name => 'Camel',
+				mod_name => 'DemoCamel',
 				mod_subdir => 'files',
 				mod_prefs => {
 					priv => 'private.txt',
@@ -178,7 +178,7 @@ use CGI::MultiValuedHash 1.09;
 			},
 			four => {
 				'link' => 'Look At Some Files',
-				mod_name => 'Panda',
+				mod_name => 'DemoPanda',
 				mod_prefs => {
 					food => 'plants',
 					color => 'black and white',
@@ -190,11 +190,11 @@ use CGI::MultiValuedHash 1.09;
 		},
 	};
 
-=head2 Content of fat main program component "Aardvark.pm"
+=head2 Content of fat main program component "DemoAardvark.pm"
 
 I<This module acts sort of like CGI::Portable::AppMultiScreen.>
 
-	package Aardvark;
+	package DemoAardvark;
 	use strict;
 	use warnings;
 	use CGI::Portable;
@@ -229,11 +229,11 @@ I<This module acts sort of like CGI::Portable::AppMultiScreen.>
 
 	1;
 
-=head2 Content of component module "Tiger.pm"
+=head2 Content of component module "DemoTiger.pm"
 
 I<This module acts sort of like DemoMailForm without the emailing.>
 
-	package Tiger;
+	package DemoTiger;
 	use strict;
 	use warnings;
 	use CGI::Portable;
@@ -267,11 +267,11 @@ I<This module acts sort of like DemoMailForm without the emailing.>
 
 	1;
 
-=head2 Content of component module "Owl.pm"
+=head2 Content of component module "DemoOwl.pm"
 
 I<This module acts sort of like DemoRedirect.>
 
-	package Owl;
+	package DemoOwl;
 	use strict;
 	use warnings;
 	use CGI::Portable;
@@ -285,11 +285,11 @@ I<This module acts sort of like DemoRedirect.>
 
 	1;
 
-=head2 Content of component module "Camel.pm"
+=head2 Content of component module "DemoCamel.pm"
 
-I<This module acts sort of like DemoStatic.>
+I<This module acts sort of like DemoTextFile.>
 
-	package Camel;
+	package DemoCamel;
 	use strict;
 	use warnings;
 	use CGI::Portable;
@@ -325,11 +325,11 @@ I<This module acts sort of like DemoStatic.>
 
 	1;
 
-=head2 Content of component module "Panda.pm"
+=head2 Content of component module "DemoPanda.pm"
 
 I<This module acts sort of like nothing I've ever seen.>
 
-	package Panda;
+	package DemoPanda;
 	use strict;
 	use warnings;
 	use CGI::Portable;
@@ -653,7 +653,7 @@ this module, don't have graphics, then that is purely my own preference as a way
 to make them load faster and use less bandwidth, not due to any lack of the 
 ability to use pictures.
 
-=head1 A DIFFERENT OVERVIEW
+=head1 A DIFFERENT MASTER OVERVIEW
 
 This class is designed primarily as a data structure that intermediates between 
 your large central program logic and the small shell part of your code that knows 
@@ -3424,13 +3424,13 @@ body" property.  The nature of this search and replace allows you to to embed
 "url paths" in static portions of your application, such as data files, and then 
 replace them with complete self-referencing urls that go to the application 
 screen that each url path corresponds to.  How it works is that your data files 
-are formatted like '<a href="__url_path__=/pics/green">green pics</a>' or 
-'<a href="__url_path__=../texts">texts page</a>' or 
-'<a href="__url_path__=/jump&url=http://www.cpan.org">CPAN</a>' and the scalar 
+are formatted like 'E<lt>a href="__url_path__=/pics/green">green picsE<lt>/a>' or 
+'E<lt>a href="__url_path__=../texts">texts pageE<lt>/a>' or 
+'E<lt>a href="__url_path__=/jump&url=http://www.cpan.org">CPANE<lt>/a>' and the scalar 
 argument TOKEN is equal to '__url_path__' (that is its default value also).  
 This method will search for text like in the above formats, specifically the parts between the double-quotes, and substitute in self-referencing urls like 
-'<a href="http://www.aardvark.net/it.pl/pics/green">green pics</a>' or 
-'<a href="http://www.aardvark.net/it.pl/jump?url=http://www.cpan.org">CPAN</a>'.  
+'E<lt>a href="http://www.aardvark.net/it.pl/pics/green">green picsE<lt>/a>' or 
+'E<lt>a href="http://www.aardvark.net/it.pl/jump?url=http://www.cpan.org">CPANE<lt>/a>'.  
 New urls are constructed in a similar fashion to what url_as_string() makes, and 
 incorporates your existing url base, query string, and so
 on.  Any query string you provide in the source text is added to the url query 
@@ -3453,7 +3453,7 @@ sub search_and_replace_url_path_tokens {
 	my $_pri = '?'; # SIMPLIFIED THIS 0-45
 	my $_que = $self->url_query_string();
 	$_que and $_que = "&$_que";
-	$body =~ s/"$token=([^&^"]*)&?(.*?)"/"$_ple\1$_pri\2$_que"/g;
+	$body =~ s/"$token=([^&^"]*)&?(.*?)"/"$_ple$1$_pri$2$_que"/g;
 	$body =~ s/\?&/\?/g; # ADDED THIS LINE 0-43
 	$body =~ s/\?"/"/g; # ADDED THIS LINE 0-46
 

@@ -1,10 +1,10 @@
 my $rh_prefs = {
-	title => 'Welcome to Aardvark',
+	title => 'Welcome to DemoAardvark',
 	credits => '<P>This program copyright 2001 Darren Duncan.</P>',
 	screens => {
 		one => {
 			'link' => 'Fill Out A Form',
-			mod_name => 'Tiger',
+			mod_name => 'DemoTiger',
 			mod_prefs => {
 				field_defs => [
 					{
@@ -31,14 +31,14 @@ my $rh_prefs = {
 		},
 		two => {
 			'link' => 'Fly Away',
-			mod_name => 'Owl',
+			mod_name => 'DemoOwl',
 			mod_prefs => {
 				fly_to => 'http://www.perl.com',
 			},
 		}, 
 		three => {
 			'link' => 'Don\'t Go Here',
-			mod_name => 'Camel',
+			mod_name => 'DemoCamel',
 			mod_subdir => 'files',
 			mod_prefs => {
 				priv => 'private.txt',
@@ -48,7 +48,7 @@ my $rh_prefs = {
 		},
 		four => {
 			'link' => 'Look At Some Files',
-			mod_name => 'Panda',
+			mod_name => 'DemoPanda',
 			mod_prefs => {
 				food => 'plants',
 				color => 'black and white',

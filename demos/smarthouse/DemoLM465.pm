@@ -9,7 +9,7 @@
 # (and complicated) Perl solution then you can download Bruce Winter's 
 # free open-source MisterHouse instead at "http://www.misterhouse.net".
 
-package LM465;
+package DemoLM465;
 use strict;
 use warnings;
 use CGI::Portable;

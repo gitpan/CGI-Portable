@@ -1,4 +1,4 @@
-package DrawImage;
+package DemoDrawImage;
 use strict;
 use warnings;
 use CGI::Portable;

@@ -11,7 +11,7 @@ my $io = CGI::Portable::AdapterCGI->new();
 $io->fetch_user_input( $globals );
 
 $globals->current_user_path_level( 1 );
-$globals->call_component( 'FrameSet' );
+$globals->call_component( 'DemoFrameSet' );
 
 $io->send_user_output( $globals );
 

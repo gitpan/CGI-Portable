@@ -1,4 +1,4 @@
-package Owl;
+package DemoOwl;
 use strict;
 use warnings;
 use CGI::Portable;

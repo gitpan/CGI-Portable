@@ -8,12 +8,17 @@
 
 BEGIN { $| = 1; print "1..2\n"; }
 END {print "not ok 1\n" unless $loaded;}
-use CGI::Portable 0.50;
+use CGI::Portable 0.51;
 use CGI::Portable::AdapterCGI 0.50;
 use CGI::Portable::AdapterSocket 0.50;
 use CGI::Portable::AppStatic 0.50;
 use CGI::Portable::AppMultiScreen 0.50;
 use CGI::Portable::AppSplitScreen 0.50;
+use DemoGuestBook 0.50;
+use DemoMailForm 0.50;
+use DemoRedirect 0.50;
+use DemoTextFile 0.50;
+use DemoUsage 0.51;
 $loaded = 1;
 print "ok 1\n";
 use strict;

@@ -1,3 +1,29 @@
+2004-06-07   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 0.51.
+
+	* This is primarily a bug fix and/or compatability release.
+
+	* Renamed all demo/example modules besides the core 5 so that their names
+	all start with 'Demo'.  These demo/example modules all had/have top-level
+	names, and after the change there should not be any name conflicts with
+	other CPAN modules that should have the original top-level names.  All
+	references to these module names in other files were also updated.
+
+	* Moved the 5 'main' demo modules (which I actually use in production) into
+	the 'lib' folder: "Demo[GuestBook|MailForm|Redirect|TextFile|Usage]".  Now 
+	they are also test-compiled by CGI-Portable.t.
+
+	* Several documentation fixes or changes in CGI::Portable (now v0.51).
+
+	* Fixed a couple "\1 better written as $1" warnings in the
+	search_and_replace_url_path_tokens() method of CGI::Portable.
+
+	* Removed unused "@ISA" global var declaration from DemoUsage (now v0.51).
+
+	* Since no one should be actually using the renamed demo modules, this 
+	release is completely backwards compatible.
+
 2004-06-06   Darren Duncan <perl@DarrenDuncan.net>
 
 	* Release 0.50.

@@ -9,7 +9,7 @@
 # (and complicated) Perl solution then you can download Bruce Winter's 
 # free open-source MisterHouse instead at "http://www.misterhouse.net".
 
-package X10;
+package DemoX10;
 use strict;
 use warnings;
 use CGI::Portable;

@@ -1,4 +1,4 @@
-package Panda;
+package DemoPanda;
 use strict;
 use warnings;
 use CGI::Portable;

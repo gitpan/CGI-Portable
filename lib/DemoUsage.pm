@@ -20,8 +20,8 @@ require 5.004;
 
 use strict;
 use warnings;
-use vars qw($VERSION @ISA);
-$VERSION = '0.50';
+use vars qw($VERSION);
+$VERSION = '0.51';
 
 ######################################################################
 

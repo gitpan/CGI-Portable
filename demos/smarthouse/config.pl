@@ -13,17 +13,17 @@ my $rh_prefs = {
 	handlers => {
 		bed_lamp => {
 			menu_name => 'Bed Room Lamp',
-			mod_name => 'LM465',
+			mod_name => 'DemoLM465',
 			mod_prefs => { address => 'A2', },
 		},
 		shop_lamp => {
 			menu_name => 'Workshop Light',
-			mod_name => 'LM465',
+			mod_name => 'DemoLM465',
 			mod_prefs => { address => 'A5', },
 		},
 		living_lamp => {
 			menu_name => 'Living Room Lamp',
-			mod_name => 'LM465',
+			mod_name => 'DemoLM465',
 			mod_prefs => { address => 'A6', },
 		},
 	},

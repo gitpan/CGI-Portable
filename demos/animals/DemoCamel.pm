@@ -1,4 +1,4 @@
-package Camel;
+package DemoCamel;
 use strict;
 use warnings;
 use CGI::Portable;

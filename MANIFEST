@@ -11,7 +11,11 @@ demos/animals/startup_manual.pl
 demos/animals/startup_suio.pl
 demos/animals/Tiger.pm
 demos/bounce.pl
+demos/frameset/frameset.pl
+demos/frameset/FrameSet.pm
 demos/guestbook.pl
+demos/image/drawimage.pl
+demos/image/DrawImage.pm
 demos/segtext/jv_world/jv_world_001.txt
 demos/segtext/jv_world/jv_world_002.txt
 demos/segtext/jv_world/jv_world_003.txt

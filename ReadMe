@@ -72,9 +72,9 @@ File-VirtualPath-1.0.tar.gz
 	- File::VirtualPath 1.0 is required by:
 		- CGI::Portable (stores file-system and url related paths)
 
-HTML-EasyTags-1.04.tar.gz
+HTML-EasyTags-1.05.tar.gz
 	- by Darren Duncan (DUNCAND)
-	- HTML::EasyTags 1.04 is required by:
+	- HTML::EasyTags 1.05 is required by:
 		- CGI::Portable (assembles the pieces of a new HTML page)
 
 MultiValuedHash-1.07.tar.gz
@@ -97,14 +97,11 @@ libnet-1.0703.tar.gz (older versions may work):
 		- CGI::WPM::GuestBook (when sending e-mails of form data)
 		- CGI::WPM::Usage (when sending e-mails of usage data)
 
-libwww-perl-5.48.tar.gz (older versions may work):
-	- by Gisle Aas (GAAS)
-	- HTTP::Headers 1.37 is required by:
-		- CGI::WPM::SimpleUserIO (when outputting http headers to the user)
-
 mod_perl-1.24_01.tar.gz (older versions may work):
 	- Apache 1.27 is required by:
 		- CGI::WPM::SimpleUserIO (when running under mod_perl)
+
+GD (any version I suppose) is required by the "image" demo.
 
 INSTALLATION
 

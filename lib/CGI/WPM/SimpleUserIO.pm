@@ -17,7 +17,7 @@ require 5.004;
 
 use strict;
 use vars qw($VERSION @ISA);
-$VERSION = '0.41';
+$VERSION = '0.42';
 
 ######################################################################
 
@@ -30,11 +30,10 @@ $VERSION = '0.41';
 =head2 Standard Modules
 
 	Apache (when running under mod_perl only)
-	HTTP::Headers 1.36 (when assembling and sending user output)
 
 =head2 Nonstandard Modules
 
-	CGI::Portable 0.41 (when using the *_cgi_portable() methods)
+	CGI::Portable 0.42 (when using the *_cgi_portable() methods)
 
 =head1 SYNOPSIS
 
@@ -284,84 +283,19 @@ sub url_base {
 
 ######################################################################
 
-=head2 make_http_headers([ STATUS[, CONTENT_TYPE[, REDIRECT_URL]] ])
+=head2 server_is_mod_perl()
 
-This method constructs a new HTTP::Headers object that is suitable for using in
-the start of HTTP responses.  It uses all 3 arguments if they are provided in the
-new headers object.  The first two result in "Status" and "Content-type" headers
-respectively, and the third results in both "Uri" and "Location" headers. STATUS
-defaults to "200 OK" if not defined, and likewise CONTENT_TYPE defaults to
-"text/html"; these are suitable for a normal HTML page response.  If you want a
-redirect response then you need to provide something like "301 Moved" as the
-STATUS as this is not set automatically.
+This method returns true if we seem to be running under mod_perl and false 
+otherwise.  To determine that fact, we check $ENV{'GATEWAY_INTERFACE'} to see 
+if it begins with "CGI-Perl"; mod_perl is guaranteed to set this, according to 
+the documentation.
 
 =cut
 
 ######################################################################
 
-sub make_http_headers {
-	my ($self, $status, $content_type, $redirect_url) = @_;
-	$status ||= '200 OK';
-	$content_type ||= 'text/html';
-
-	require HTTP::Headers;
-	my $http = HTTP::Headers->new();
-
-	$http->header( 
-		status => $status,
-		content_type => $content_type,
-	);
-
-	if( $redirect_url ) {
-		$http->header( 
-			uri => $redirect_url,
-			location => $redirect_url,
-		);
-	}
-
-	return( $http );  # return HTTP headers object
-}
-
-######################################################################
-
-=head2 send_user_output([ HTTP[, CONTENT[, IS_BINARY]] ])
-
-This method will send several types of user output to the user as a complete HTTP
-response. The argument HTTP is an HTTP::Headers object that is already
-initialized with Status and anything else to be sent.  If this argument is not a
-valid HTTP::Headers object then it defaults to being initialized by a call to
-make_http_headers() with no arguments; suitable for an HTML page.  The argument
-CONTENT is a scalar containing our HTTP body content; this is probably empty if
-we are sending a redirect response.  This method checks if it is running under
-mod_perl by seeing if $ENV{GATEWAY_INTERFACE} starts with "CGI-Perl" and if it
-isn't then it assumes it is running as a CGI.  When running under mod_perl this
-method will send HTTP headers using the cgi_header_out() method of a new
-Apache->request() object; otherwise, the headers are printed to STDOUT.  The HTTP
-body are then printed to STDOUT regardless of how we are running.  If the
-argument IS_BINARY is true then we binmode() STDOUT before sending the HTTP body.
-
-=cut
-
-######################################################################
-
-sub send_user_output {
-	my ($self, $http, $content, $is_binary) = @_;
-
-	ref( $http ) eq 'HTTP::Headers' or $http = $self->make_http_headers();
-
-	if( $ENV{'GATEWAY_INTERFACE'} =~ /^CGI-Perl/ ) {
-		require Apache;
-		$| = 1;
-		my $req = Apache->request();
-		$http->scan( sub { $req->cgi_header_out( @_ ); } );
-
-	} else {
-		my $endl = "\015\012";  # cr + lf
-		print STDOUT $http->as_string( $endl ).$endl;
-	}
-	
-	$is_binary and binmode( STDOUT );
-	print STDOUT $content;
+sub server_is_mod_perl {
+	return( $ENV{'GATEWAY_INTERFACE'} =~ /^CGI-Perl/ );
 }
 
 ######################################################################
@@ -411,15 +345,33 @@ sub give_user_input_to_cgi_portable {
 
 =head2 send_user_output_from_cgi_portable( GLOBALS )
 
-This method takes a CGI::Portable object as its first argument, GLOBALS, and 
-sends as much user output as possible to the user.  This method can handle many 
-of the output details that CGI::Portable stores, but not all of them; in 
-particular, the http cookies and miscellaneous headers are not handled currently.  
-Whereas, the status code, content type, redirect url, http body (binary or not) 
-and all parts of an html page response are handled by this method.  This method 
-is implemented using the make_http_headers() and send_user_output() methods.  
-By using this method, you stand to cut down a fair bit on the config shell 
-code you need to run CGI::Portable with.
+This method takes a CGI::Portable object as its first argument, GLOBALS, and
+sends as much user output as possible to the user.  This method can handle all of
+the output details that CGI::Portable stores except for http cookies, and the
+misc headers support is limited.  Whereas, the status code, window target,
+content type, redirect url, http body (binary or not), miscellaneous headers and
+all parts of an html page response are handled by this method.  The status code
+and content type default to '200 OK' and 'text/html' if not defined respectively.
+However, the content type is not output if there is a redirect url.  If this
+script is running under mod_perl then this method uses the Apache Request
+object's send_cgi_header() method to send all the http headers; otherwise they
+are printed to STDOUT.  The http body is printed to STDOUT regardless. This
+method does not support NPH responses at this time, but should later. By using
+this method, you stand to cut down a fair bit on the config shell code you need
+to run CGI::Portable with.
+
+=head2 send_quick_html_response( CONTENT )
+
+This method takes a string containing an HTML document as its first argument, 
+CONTENT, and sends an http response appropriate for an HTML document which 
+includes CONTENT as the http body.  This method works under mod_perl and cgi 
+but does not support NPH currently.
+
+=head2 send_quick_redirect_response( URL )
+
+This method takes a string containing an url as its first argument, URL, and 
+sends an http redirection header to send the client browser to that url.  
+This method works under mod_perl and cgi but does not support NPH currently.
 
 =cut
 
@@ -427,10 +379,53 @@ code you need to run CGI::Portable with.
 
 sub send_user_output_from_cgi_portable {
 	my ($self, $globals) = @_;
-	my $http = $self->make_http_headers( $globals->http_status_code(), 
-		$globals->http_content_type(), $globals->http_redirect_url() );
-	$self->send_user_output( $http, $globals->http_body() || 
-		$globals->page_as_string(), $globals->http_body_is_binary() );
+	my $status = $globals->http_status_code() || '200 OK';
+	my $target = $globals->http_window_target();
+	my $type = $globals->http_content_type() || 'text/html';
+	my $url = $globals->http_redirect_url();
+	my %misc = $globals->get_http_headers();
+	my $content = $globals->http_body() || $globals->page_as_string();
+	my $bin = $globals->http_body_is_binary();
+	$self->_send_output( $status, $type, $url, \%misc, $target, $content, $bin );
+}
+
+sub send_quick_html_response {
+	my ($self, $content) = @_;
+	$self->_send_output( '200 OK', 'text/html', undef, {}, undef, $content );
+}
+
+sub send_quick_redirect_response {
+	my ($self, $url) = @_;
+	$self->_send_output( '301 Moved', undef, $url, {} );
+}
+
+# _send_output( STATUS, TYPE, [URL], MISC, [TARGET[, CONTENT[, IS_BINARY]]] )
+# This private method is used to implement all the send_*() methods above, 
+# and works under both mod_perl and cgi.  It currently does not support NPH 
+# responses but that should be added in the future.
+
+sub _send_output {
+	my ($self, $status, $type, $url, $misc, $target, $content, $is_binary) = @_;
+
+	my @header = ("Status: $status");
+	$target and push( @header, "Window-Target: $target" );
+	push( @header, $url ? "Location: $url" : "Content-Type: $type" );
+	%{$misc} and push( @header, map { "$_: $misc->{$_}" } sort keys %{$misc} );
+	my $endl = "\015\012";  # cr + lf
+	my $header = join( $endl, @header ).$endl.$endl;
+
+	if( $self->server_is_mod_perl() ) {
+		require Apache;
+		$| = 1;
+		my $req = Apache->request();
+		$req->send_cgi_header( $header );
+	
+	} else {
+		print STDOUT $header;
+	}
+	
+	$is_binary and binmode( STDOUT );
+	print STDOUT $content;
 }
 
 ######################################################################
@@ -455,6 +450,6 @@ Address comments, suggestions, and bug reports to B<perl@DarrenDuncan.net>.
 
 =head1 SEE ALSO
 
-perl(1), CGI::Portable, HTTP::Headers, Apache.
+perl(1), CGI::Portable, Apache.
 
 =cut

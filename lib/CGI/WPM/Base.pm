@@ -17,7 +17,7 @@ require 5.004;
 
 use strict;
 use vars qw($VERSION);
-$VERSION = '0.41';
+$VERSION = '0.42';
 
 ######################################################################
 
@@ -33,13 +33,13 @@ $VERSION = '0.41';
 
 =head2 Nonstandard Modules
 
-	CGI::Portable 0.41
+	CGI::Portable 0.42
 
 =cut
 
 ######################################################################
 
-use CGI::Portable 0.41;
+use CGI::Portable 0.42;
 
 ######################################################################
 
@@ -98,7 +98,26 @@ have finished and you can get its user output from the CGI::Portable object.
 
 I<This POD is coming when I get the time to write it.>
 
+All of the properties below can be used with any subclass of Base, but are not 
+mentioned separately in any of those modules.
+
+Most of the preferences below correspond directly to CGI::Portable output
+properties.  Any properties that are already defined by the subclass of this 
+class have higher precedence and if they are set then the properties below are 
+not applied; these properties are applied if the subclass does not set them.  
+
+page_body, on the other hand, has high precedence.  If it is set then the 
+subclass is never called at all; useful for when you want static html content 
+that is defined in your preferences.
+
+page_header and page_footer and page_replace are always used since they don't 
+replace the existing html body but add to it or search and replace in it.
+
+amend_msg doesn't apply to any of the above rules.
+
 	amend_msg  # personalized html appears on error page instead of default msg
+
+	http_target   # window target that our output goes in
 
 	page_body    # if defined, no subclass is used and this literal used instead
 
@@ -110,7 +129,7 @@ I<This POD is coming when I get the time to write it.>
 	page_css_src   # stylesheet urls to link in
 	page_css_code  # css code to embed in head
 	page_body_attr # params to put in <BODY>
-	page_replace   # replacements to perform
+	page_replace   # search and replacements to perform
 
 =head1 METHOD TO OVERRIDE BY SUBCLASSES
 
@@ -131,6 +150,8 @@ my $KEY_SITE_GLOBALS = 'site_globals';  # hold global site values
 
 # Keys for items in site page preferences:
 my $PKEY_AMEND_MSG = 'amend_msg';  # personalized html appears on error page
+
+my $PKEY_HTTP_TARGET = 'http_target';  # window target that our output goes in
 
 my $PKEY_PAGE_BODY = 'page_body';  # if defined, use literally *as* content
 
@@ -164,6 +185,8 @@ sub main {
 	
 	my $rh_prefs = $globals->get_prefs_ref();
 		# note that we don't see parent prefs here, only current level
+
+	$globals->http_window_target() or $globals->http_window_target( $rh_prefs->{$PKEY_HTTP_TARGET} );
 
 	$globals->prepend_page_body( $rh_prefs->{$PKEY_PAGE_HEADER} );
 	$globals->append_page_body( $rh_prefs->{$PKEY_PAGE_FOOTER} );

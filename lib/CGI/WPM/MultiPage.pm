@@ -20,7 +20,7 @@ require 5.004;
 
 use strict;
 use vars qw($VERSION @ISA);
-$VERSION = '0.41';
+$VERSION = '0.4101';
 
 ######################################################################
 
@@ -128,7 +128,7 @@ __endquote
 		vrp_handlers => {
 			external => {
 				wpm_module => 'CGI::WPM::Redirect',
-				wpm_prefs => {},
+				wpm_prefs => { http_target => 'external_link_window' },
 			},
 			frontdoor => {
 				wpm_module => 'CGI::WPM::Static',

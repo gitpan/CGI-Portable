@@ -27,7 +27,7 @@ description of the module itself.
 This Read Me document concerns itself mainly with installation and support
 issues, and also includes any "To Do" lists.
 
-This distribution also includes 6 other modules, in the temporary name space 
+This distribution also includes 5 other modules, in the temporary name space 
 Demo*, that are designed to be used with CGI::Portable.  Each of these is 
 included as a demo "application component", and by looking at them, you should 
 have a better idea what CGI::Portable can do for you.  Unlike ordinary demos, 
@@ -36,8 +36,8 @@ production environments.  For all intents and purposes, you should treat them
 like "scripts" rather than "modules" as far as when you use them, due to their 
 more proprietary nature.
 
-This distribution now has a "demos" folder containing 60 files and folders 
-(including the above 6 in a folder named "shared") 
+This distribution now has a "demos" folder containing 59 files and folders 
+(including the above 5 in a folder named "shared") 
 which are ready-to-use example scripts and data files that exercise 
 CGI::Portable and all of the Demo* modules.  Many of these are exactly 
 the same as the *new* Synopsis POD for particular modules.  Some have minor 
@@ -86,7 +86,7 @@ HTML-EasyTags-1.05.tar.gz
 	- HTML::EasyTags 1.05 is required by:
 		- CGI::Portable (assembles the pieces of a new HTML page)
 
-MultiValuedHash-1.0702.tar.gz
+MultiValuedHash-1.0703.tar.gz
 	- by Darren Duncan (DUNCAND)
 	- Data::MultiValuedHash 1.07 is required by:
 		- CGI::Portable (stores new cookies prior to output)

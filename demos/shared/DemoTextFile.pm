@@ -1,13 +1,13 @@
 =head1 NAME
 
-DemoSegTextDoc - Demo of CGI::Portable that displays a static text 
-page, which can be in multiple segments.
+DemoTextFile - Demo of CGI::Portable that displays the content of a 
+static html or text file, which can be in multiple segments.
 
 =cut
 
 ######################################################################
 
-package DemoSegTextDoc;
+package DemoTextFile;
 require 5.004;
 
 # Copyright (c) 1999-2001, Darren R. Duncan. All rights reserved. This module is
@@ -18,7 +18,7 @@ require 5.004;
 
 use strict;
 use vars qw($VERSION @ISA);
-$VERSION = '0.46';
+$VERSION = '0.47';
 
 ######################################################################
 
@@ -36,7 +36,6 @@ $VERSION = '0.46';
 
 	CGI::Portable 0.46
 	CGI::Portable::AppStatic 0.46
-	DemoStatic 0.46
 
 =cut
 
@@ -50,7 +49,7 @@ use CGI::Portable::AppStatic 0.46;
 
 =head1 SYNOPSIS
 
-=head2 Display A Text File In Multiple Segments
+=head2 Display An HTML File By Itself
 
 	#!/usr/bin/perl
 	use strict;
@@ -62,9 +61,22 @@ use CGI::Portable::AppStatic 0.46;
 	$globals->file_path_root( cwd() );  # let us default to current working dir
 	$globals->file_path_delimiter( $^O=~/Mac/i ? ":" : $^O=~/Win/i ? "\\" : "/" );
 
+	my %CONFIG = ( filename => 'intro.html' );
+
+	$globals->set_prefs( \%CONFIG );
+	$globals->call_component( 'DemoTextFile' );
+
 	require CGI::Portable::AdapterCGI;
 	my $io = CGI::Portable::AdapterCGI->new();
-	$io->fetch_user_input( $globals );
+	$io->send_user_output( $globals );
+
+	1;
+
+=head2 Display A Plain Text File By Itself -- HTML Escaped
+
+	my %CONFIG = ( filename => 'mycode.txt', is_text => 1 );
+
+=head2 Display A Text File In Multiple Segments With Headings
 
 	my %CONFIG = (
 		title => 'Index of the World',
@@ -73,20 +85,13 @@ use CGI::Portable::AppStatic 0.46;
 		updated => 'Version 3.1, last modified 2000 November 18',
 		filename => 'jv_world.txt',
 		segments => 24,
+		is_text => 1,
 	);
-
-	$globals->current_user_path_level( 1 );
-	$globals->set_prefs( \%CONFIG );
-	$globals->call_component( 'DemoSegTextDoc' );
-
-	$io->send_user_output( $globals );
-
-	1;
 
 I<You need to have a subdirectory named "jv_world" that contains the 24 files 
 that correspond to the segments, named "jv_world_001.txt" through "...024.txt".>
 
-=head2 Display A Text File All On One Page
+=head2 Display A Text File All On One Page With Headings
 
 	my %CONFIG = (
 		title => 'Pizza Joints In New York',
@@ -95,6 +100,7 @@ that correspond to the segments, named "jv_world_001.txt" through "...024.txt".>
 		updated => 'Version 1.2, last modified 1998 March 8',
 		filename => 'ow_pizza.txt',
 		segments => 1,  # also the default
+		is_text => 1,
 	);
 
 I<You need to have a single file named "ow_pizza.txt", not in a subdirectory.>
@@ -131,11 +137,12 @@ have finished and you can get its user output from the CGI::Portable object.
 
 I<This POD is coming when I get the time to write it.>
 
+	filename # common part of filename for pieces
+	is_text  # true if file is not html, but text
 	title    # title of the document
 	author   # who made the document
 	created  # date and number of first version
 	updated  # date and number of newest version
-	filename # common part of filename for pieces
 	segments # number of pieces doc is in
 
 =cut
@@ -146,11 +153,12 @@ I<This POD is coming when I get the time to write it.>
 my $KEY_SITE_GLOBALS = 'site_globals';  # hold global site values
 
 # Keys for items in site page preferences:
-my $PKEY_TITLE = 'title';        # title of the document
-my $PKEY_AUTHOR = 'author';      # who made the document
-my $PKEY_CREATED = 'created';    # date and number of first version
-my $PKEY_UPDATED = 'updated';    # date and number of newest version
 my $PKEY_FILENAME = 'filename';  # common part of filename for pieces
+my $PKEY_IS_TEXT  = 'is_text';   # true if file is not html, but text
+my $PKEY_TITLE    = 'title';     # title of the document
+my $PKEY_AUTHOR   = 'author';    # who made the document
+my $PKEY_CREATED  = 'created';   # date and number of first version
+my $PKEY_UPDATED  = 'updated';   # date and number of newest version
 my $PKEY_SEGMENTS = 'segments';  # number of pieces doc is in
 
 ######################################################################
@@ -192,7 +200,9 @@ sub main_dispatch {
 	if( $segments > 1 ) {
 		$self->attach_document_navbar();
 	}
-	$self->attach_document_header();
+	if( $rh_prefs->{$PKEY_TITLE} ) {
+		$self->attach_document_header();
+	}
 }
 
 ######################################################################
@@ -207,16 +217,62 @@ sub get_curr_seg_content {
 	my $seg_num_str = $is_multi_segmented ?
 		'_'.sprintf( "%3.3d", $globals->current_user_path_element() ) : '';
 
-	my $wpm_prefs = {
-		filename => "$base$seg_num_str$ext",
-		is_text => 1,
-	};
+	my $filename = "$base$seg_num_str$ext";
 	
-	my $wpm_context = $globals->make_new_context();
-	$is_multi_segmented and $wpm_context->navigate_file_path( $base );
-	$wpm_context->set_prefs( $wpm_prefs );
-	$wpm_context->call_component( 'DemoStatic' );
-	$globals->take_context_output( $wpm_context, 1 );
+	my $physical_path = $globals->physical_filename( 
+		$is_multi_segmented ? [$base, $filename] : $filename );
+
+	SWITCH: {
+		$globals->add_no_error();
+
+		open( STATIC, "<$physical_path" ) or do {
+			$globals->add_virtual_filename_error( "open", $filename );
+			last SWITCH;
+		};
+		local $/ = undef;
+		defined( my $file_content = <STATIC> ) or do {
+			$globals->add_virtual_filename_error( "read from", $filename );
+			last SWITCH;
+		};
+		close( STATIC ) or do {
+			$globals->add_virtual_filename_error( "close", $filename );
+			last SWITCH;
+		};
+		
+		if( $rh_prefs->{$PKEY_IS_TEXT} ) {
+			$file_content =~ s/&/&amp;/g;  # do some html escaping
+			$file_content =~ s/\"/&quot;/g;
+			$file_content =~ s/>/&gt;/g;
+			$file_content =~ s/</&lt;/g;
+		
+			$globals->set_page_body( 
+				[ "\n<pre>\n", $file_content, "\n</pre>\n" ] );
+		
+		} elsif( $file_content =~ m|<body[^>]*>(.*)</body>|si ) {
+			$globals->set_page_body( $1 );
+			if( $file_content =~ m|<title>(.*)</title>|si ) {
+				$globals->page_title( $1 );
+			}
+		} else {
+			$globals->set_page_body( $file_content );
+		}	
+	}
+
+	if( $globals->get_error() ) {
+		$globals->page_title( 'Error Opening Page' );
+		$globals->set_page_body( <<__endquote );
+<h1>@{[$globals->page_title()]}</h1>
+
+<p>I'm sorry, but an error has occurred while trying to open 
+the page you requested, which is in the file "$filename".</p>  
+
+@{[$self->get_amendment_message()]}
+
+<p>Details: @{[$globals->get_error()]}</p>
+__endquote
+
+		$globals->add_no_error();
+	}
 }
 
 ######################################################################
@@ -295,6 +351,20 @@ __endquote
 
 ######################################################################
 
+sub get_amendment_message {
+	my ($self) = shift( @_ );
+	my $globals = $self->{$KEY_SITE_GLOBALS};
+	return( <<__endquote );
+<p>This should be temporary, the result of a transient server problem or an 
+update being performed at the moment.  Click @{[$globals->recall_html('here')]} 
+to automatically try again.  If the problem persists, please try again later, 
+or send an @{[$globals->maintainer_email_html('e-mail')]} message about the 
+problem, so it can be fixed.</p>
+__endquote
+}
+
+######################################################################
+
 1;
 __END__
 
@@ -315,6 +385,6 @@ Address comments, suggestions, and bug reports to B<perl@DarrenDuncan.net>.
 
 =head1 SEE ALSO
 
-perl(1), CGI::Portable, CGI::Portable::AppStatic, DemoStatic, CGI::Portable::AdapterCGI.
+perl(1), CGI::Portable, CGI::Portable::AppStatic, CGI::Portable::AdapterCGI.
 
 =cut

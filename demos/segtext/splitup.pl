@@ -20,11 +20,12 @@ my %CONFIG = (
 	updated => 'Version 3.1, last modified 2000 November 18',
 	filename => 'jv_world.txt',
 	segments => 5,
+	is_text => 1,
 );
 
 $globals->current_user_path_level( 1 );
 $globals->set_prefs( \%CONFIG );
-$globals->call_component( 'DemoSegTextDoc' );
+$globals->call_component( 'DemoTextFile' );
 
 $io->send_user_output( $globals );
 

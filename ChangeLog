@@ -1,3 +1,42 @@
+2001-11-04   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 0.47.
+	
+	* Updated CGI::Portable::Request so that it now stores all raw http request 
+	details, rather than just some of them.  To implement this, two properties 
+	named "request head" and "request body" were added; the first is a hash and 
+	the second is a scalar.  Their format and accessor methods are designed to 
+	mirror those for the "http head" and "http body" in Response.  Therefore, 5 
+	new accessor methods were added: get_request_headers_ref(), 
+	[get/set/add]_request_headers(), request_body().  The older methods 
+	referer() and user_agent() have been re-implemented to retrieve and set 
+	certain key/value pairs in "request head" rather than have their own 
+	properties, which were deleted.  Many property accessor groups, other 
+	functions, and their POD were rearranged into a more logical order, starting 
+	with raw connection and request details, then parsed user input, then 
+	functions for making new call-back urls.  Despite this, no existing code 
+	was changed, so all the existing functions work the same as before.
+	This Request version 0.47 should be backwards-compatible with version 0.46.
+	Much of the overview POD was rewritten to be easier to understand, so you 
+	should have a better idea what the features represent.
+	Note that all "user path/query/post/cookies" properties are parsed copies 
+	of various "request" properties, which are the raw versions; both can be 
+	stored to give you maximum flexability.
+	
+	* The two demo modules named DemoStatic and DemoSegTextDoc have been merged 
+	into a single module named DemoTextFile, at version 0.47.  Any of your 
+	scripts that used DemoStatic can use DemoTextFile with no changes besides 
+	the name of the module called.  Scripts that use DemoSegTextDoc will need 
+	to, in addition to the rename, pass an extra preference of "is_text => 1" 
+	in order to replicate the old behaviour.  The new module is more flexible 
+	than its predecessors by letting you have multi-part documents that are 
+	either plain text or html (not plain text only).  In addition, extra title 
+	and creator and date information is only displayed if the preference "title" 
+	has a value, so you can have multi-part documents without extra headers now.  
+	Any demos have been updated where necessary to the new module name.
+	
+	* No other files were changed, and are still at version 0.46.
+
 2001-09-30   Darren Duncan <perl@DarrenDuncan.net>
 
 	* Release 0.46.

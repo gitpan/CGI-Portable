@@ -25,8 +25,7 @@ demos/segtext/splitup.pl
 demos/shared/DemoGuestBook.pm
 demos/shared/DemoMailForm.pm
 demos/shared/DemoRedirect.pm
-demos/shared/DemoSegTextDoc.pm
-demos/shared/DemoStatic.pm
+demos/shared/DemoTextFile.pm
 demos/shared/DemoUsage.pm
 demos/statics/showhtml.pl
 demos/statics/showself.pl

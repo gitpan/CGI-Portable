@@ -10,7 +10,7 @@ BEGIN { $| = 1; print "1..1\n"; }
 END {print "not ok 1\n" unless $loaded;}
 use CGI::Portable::Errors 0.46;
 use CGI::Portable::Files 0.46;
-use CGI::Portable::Request 0.46;
+use CGI::Portable::Request 0.47;
 use CGI::Portable::Response 0.46;
 use CGI::Portable 0.46;
 use CGI::Portable::AdapterCGI 0.46;

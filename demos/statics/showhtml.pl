@@ -12,7 +12,7 @@ $globals->file_path_delimiter( $^O=~/Mac/i ? ":" : $^O=~/Win/i ? "\\" : "/" );
 my %CONFIG = ( filename => 'static.html' );
 
 $globals->set_prefs( \%CONFIG );
-$globals->call_component( 'DemoStatic' );
+$globals->call_component( 'DemoTextFile' );
 
 require CGI::Portable::AdapterCGI;
 my $io = CGI::Portable::AdapterCGI->new();

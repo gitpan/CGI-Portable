@@ -20,15 +20,15 @@ my $rh_preferences = {
 						preferences => { low_http_window_target => 'external_link_window' },
 					},
 					frontdoor => {
-						module_name => 'DemoStatic',
+						module_name => 'DemoTextFile',
 						preferences => { filename => 'frontdoor.html' },
 					},
 					resume => {
-						module_name => 'DemoStatic',
+						module_name => 'DemoTextFile',
 						preferences => { filename => 'resume.html' },
 					},
 					mysites => {
-						module_name => 'DemoStatic',
+						module_name => 'DemoTextFile',
 						preferences => { filename => 'mysites.html' },
 					},
 					mailme => {
@@ -45,7 +45,7 @@ my $rh_preferences = {
 						},
 					},
 					links => {
-						module_name => 'DemoStatic',
+						module_name => 'DemoTextFile',
 						preferences => { filename => 'links.html' },
 					},
 				},

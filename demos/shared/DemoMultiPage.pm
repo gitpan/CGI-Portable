@@ -1,6 +1,6 @@
 =head1 NAME
 
-CGI::WPM::MultiPage - Demo of CGI::Portable that resolves navigation for one 
+DemoMultiPage - Demo of CGI::Portable that resolves navigation for one 
 level in the web site page hierarchy from a parent node to its children, 
 encapsulates and returns its childrens' returned web page components, and can 
 make a navigation bar to child pages.
@@ -9,7 +9,7 @@ make a navigation bar to child pages.
 
 ######################################################################
 
-package CGI::WPM::MultiPage;
+package DemoMultiPage;
 require 5.004;
 
 # Copyright (c) 1999-2001, Darren R. Duncan. All rights reserved. This module is
@@ -20,7 +20,7 @@ require 5.004;
 
 use strict;
 use vars qw($VERSION @ISA);
-$VERSION = '0.44';
+$VERSION = '0.45';
 
 ######################################################################
 
@@ -36,16 +36,16 @@ $VERSION = '0.44';
 
 =head2 Nonstandard Modules
 
-	CGI::Portable 0.41
-	CGI::WPM::Base 0.44
+	CGI::Portable 0.45
+	CGI::Portable::AppStatic 0.45
 
 =cut
 
 ######################################################################
 
-use CGI::Portable 0.41;
-use CGI::WPM::Base 0.44;
-@ISA = qw(CGI::WPM::Base);
+use CGI::Portable 0.45;
+use CGI::Portable::AppStatic 0.45;
+@ISA = qw(CGI::Portable::AppStatic);
 
 ######################################################################
 
@@ -81,14 +81,14 @@ use CGI::WPM::Base 0.44;
 	$content->current_user_path_level( 1 );
 	$content->navigate_file_path( 'content' );
 	$content->set_prefs( 'content_prefs.pl' );
-	$content->call_component( 'CGI::WPM::MultiPage' );
+	$content->call_component( 'DemoMultiPage' );
 	$globals->take_context_output( $content );
 
 	my $usage = $globals->make_new_context();
 	$usage->http_redirect_url( $globals->http_redirect_url() );
 	$usage->navigate_file_path( $globals->is_debug() ? 'usage_debug' : 'usage' );
 	$usage->set_prefs( '../usage_prefs.pl' );
-	$usage->call_component( 'CGI::WPM::Usage' );
+	$usage->call_component( 'DemoUsage' );
 	$globals->take_context_output( $usage, 1, 1 );
 
 	if( $globals->is_debug() ) {
@@ -110,16 +110,16 @@ __endquote
 =head2 Content of settings file "content_prefs.pl"
 
 	my $rh_preferences = { 
-		page_header => <<__endquote,
+		prepend_page_body => <<__endquote,
 	__endquote
-		page_footer => <<__endquote,
+		append_page_body => <<__endquote,
 	<P><EM>Demo Web Site was created and is maintained for personal use by 
 	<A HREF="__mailme_url__">Tony Simons</A>.  All content and source code was 
 	created by me, unless otherwise stated.  Content that I did not create is 
 	used with permission from the creators, who are appropriately credited where 
 	it is used and in the Works Cited section of this site.</EM></P>
 	__endquote
-		page_css_code => [
+		add_page_style_code => [
 			'BODY {background-color: white; background-image: none}'
 		],
 		page_replace => {
@@ -128,40 +128,40 @@ __endquote
 		},
 		vrp_handlers => {
 			external => {
-				wpm_module => 'CGI::WPM::Redirect',
-				wpm_prefs => { http_target => 'external_link_window' },
+				wpm_module => 'DemoRedirect',
+				wpm_prefs => { low_http_window_target => 'external_link_window' },
 			},
 			frontdoor => {
-				wpm_module => 'CGI::WPM::Static',
+				wpm_module => 'DemoStatic',
 				wpm_prefs => { filename => 'frontdoor.html' },
 			},
 			intro => {
-				wpm_module => 'CGI::WPM::Static',
+				wpm_module => 'DemoStatic',
 				wpm_prefs => { filename => 'intro.html' },
 			},
 			whatsnew => {
-				wpm_module => 'CGI::WPM::Static',
+				wpm_module => 'DemoStatic',
 				wpm_prefs => { filename => 'whatsnew.html' },
 			},
 			timelines => {
-				wpm_module => 'CGI::WPM::Static',
+				wpm_module => 'DemoStatic',
 				wpm_prefs => { filename => 'timelines.html' },
 			},
 			indexes => {
-				wpm_module => 'CGI::WPM::Static',
+				wpm_module => 'DemoStatic',
 				wpm_prefs => { filename => 'indexes.html' },
 			},
 			cited => {
-				wpm_module => 'CGI::WPM::MultiPage',
+				wpm_module => 'DemoMultiPage',
 				wpm_subdir => 'cited',
 				wpm_prefs => 'cited_prefs.pl',
 			},
 			mailme => {
-				wpm_module => 'CGI::WPM::MailForm',
+				wpm_module => 'DemoMailForm',
 				wpm_prefs => {},
 			},
 			guestbook => {
-				wpm_module => 'CGI::WPM::GuestBook',
+				wpm_module => 'DemoGuestBook',
 				wpm_prefs => {
 					custom_fd => 1,
 					field_defn => 'guestbook_questions.txt',
@@ -170,11 +170,11 @@ __endquote
 				},
 			},
 			links => {
-				wpm_module => 'CGI::WPM::Static',
+				wpm_module => 'DemoStatic',
 				wpm_prefs => { filename => 'links.html' },
 			},
 			webrings => {
-				wpm_module => 'CGI::WPM::Static',
+				wpm_module => 'DemoStatic',
 				wpm_prefs => { filename => 'webrings.html' },
 			},
 		},
@@ -235,8 +235,8 @@ __endquote
 
 =head2 Content of settings file "usage_prefs.pl"
 
-I<Please see the POD for CGI::WPM::Usage for this file; that Synopsis POD is 
-being made in conjunction with the POD for CGI::WPM::MultiPage.>
+I<Please see the POD for DemoUsage for this file; that Synopsis POD is 
+being made in conjunction with the POD for DemoMultiPage.>
 
 =head1 DESCRIPTION
 
@@ -320,7 +320,26 @@ my $MKEY_MENU_PATH = 'menu_path';  # vrp used in url for menu item
 my $MKEY_IS_ACTIVE = 'is_active';  # is menu item enabled or not?
 
 ######################################################################
-# This is provided so CGI::WPM::Base->main() can call it.
+
+sub main {
+	my ($class, $globals) = @_;
+	my $self = bless( {}, ref($class) || $class );
+
+	UNIVERSAL::isa( $globals, 'CGI::Portable' ) or 
+		die "initializer is not a valid CGI::Portable object";
+
+	$self->set_static_low_replace( $globals );
+
+	$self->{$KEY_SITE_GLOBALS} = $globals;
+	$self->main_dispatch();
+
+	$self->set_static_high_replace( $globals );
+	$self->set_static_attach_unordered( $globals );
+	$self->set_static_attach_ordered( $globals );
+	$self->set_static_miscellaneous( $globals );
+}
+
+######################################################################
 
 sub main_dispatch {
 	my $self = shift( @_ );
@@ -355,7 +374,7 @@ sub get_inner_wpm_content {
 		$globals->page_title( '404 Page Not Found' );
 
 		$globals->set_page_body( <<__endquote );
-<H2 ALIGN="center">@{[$globals->page_title()]}</H2>
+<H1>@{[$globals->page_title()]}</H1>
 
 <P>I'm sorry, but the page you requested, 
 "@{[$globals->user_path_string()]}", doesn't seem to exist.  
@@ -500,6 +519,20 @@ sub make_page_menu_table {
 
 ######################################################################
 
+sub get_amendment_message {
+	my ($self) = shift( @_ );
+	my $globals = $self->{$KEY_SITE_GLOBALS};
+	return( <<__endquote );
+<P>This should be temporary, the result of a transient server problem or an 
+update being performed at the moment.  Click @{[$globals->recall_html('here')]} 
+to automatically try again.  If the problem persists, please try again later, 
+or send an @{[$globals->maintainer_email_html('e-mail')]} message about the 
+problem, so it can be fixed.</P>
+__endquote
+}
+
+######################################################################
+
 1;
 __END__
 
@@ -520,6 +553,6 @@ Address comments, suggestions, and bug reports to B<perl@DarrenDuncan.net>.
 
 =head1 SEE ALSO
 
-perl(1), CGI::Portable, CGI::WPM::Base, CGI::Portable::AdapterCGI.
+perl(1), CGI::Portable, CGI::Portable::AppStatic, CGI::Portable::AdapterCGI.
 
 =cut

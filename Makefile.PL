@@ -3,7 +3,7 @@ use ExtUtils::MakeMaker;
 # the contents of the Makefile that is written.
 WriteMakefile(
 	NAME	=> 'CGI::Portable',
-	VERSION => 0.43,
+	VERSION => 0.45,
 	PREREQ_PM => {
 		'File::VirtualPath' => 1.0,
 		'HTML::EasyTags' => 1.05,

@@ -12,7 +12,7 @@ $globals->file_path_delimiter( $^O=~/Mac/i ? ":" : $^O=~/Win/i ? "\\" : "/" );
 my %CONFIG = ( filename => 'showself.pl', is_text => 1 );
 
 $globals->set_prefs( \%CONFIG );
-$globals->call_component( 'CGI::WPM::Static' );
+$globals->call_component( 'DemoStatic' );
 
 require CGI::Portable::AdapterCGI;
 my $io = CGI::Portable::AdapterCGI->new();

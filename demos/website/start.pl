@@ -27,14 +27,14 @@ my $content = $globals->make_new_context();
 $content->current_user_path_level( 1 );
 $content->navigate_file_path( 'content' );
 $content->set_prefs( 'content_prefs.pl' );
-$content->call_component( 'CGI::WPM::MultiPage' );
+$content->call_component( 'DemoMultiPage' );
 $globals->take_context_output( $content );
 
 my $usage = $globals->make_new_context();
 $usage->http_redirect_url( $globals->http_redirect_url() );
 $usage->navigate_file_path( $globals->is_debug() ? 'usage_debug' : 'usage' );
 $usage->set_prefs( '../usage_prefs.pl' );
-$usage->call_component( 'CGI::WPM::Usage' );
+$usage->call_component( 'DemoUsage' );
 $globals->take_context_output( $usage, 1, 1 );
 
 if( $globals->is_debug() ) {

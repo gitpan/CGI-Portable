@@ -51,7 +51,7 @@ while( my $client = $server->accept() ) {
 	close $client;
 
 	printf "%s http://%s:%s%s %s\n", $content->request_method, 
-		$content->virtual_host, $content->server_port, 
+		$content->server_domain, $content->server_port, 
 		$content->user_path_string, $content->http_status_code;
 }
 

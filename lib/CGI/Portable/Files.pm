@@ -17,7 +17,7 @@ require 5.004;
 
 use strict;
 use vars qw($VERSION @ISA);
-$VERSION = '0.43';
+$VERSION = '0.45';
 
 ######################################################################
 
@@ -34,14 +34,14 @@ $VERSION = '0.43';
 =head2 Nonstandard Modules
 
 	File::VirtualPath 1.0
-	CGI::Portable::Errors 0.43
+	CGI::Portable::Errors 0.45
 
 =cut
 
 ######################################################################
 
 use File::VirtualPath 1.0;
-use CGI::Portable::Errors 0.43;
+use CGI::Portable::Errors 0.45;
 @ISA = qw( CGI::Portable::Errors );
 
 ######################################################################

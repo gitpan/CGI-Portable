@@ -16,9 +16,10 @@ CONTENTS
 PREFACE
 
 This distribution features the Perl 5 module named "CGI::Portable" as well as 
-6 other modules that are required by it: [CGI::Portable::Errors, Files, Request, 
-Response, AdapterCGI, AdapterSocket].  That is, the first 4 are subclassed by 
-CGI::Portable, and the last 2 are recommended for use but not required.
+7 other modules that are required by it: [CGI::Portable::Errors, Files, Request, 
+Response, AdapterCGI, AdapterSocket, AppStatic].  That is, the first 4 are 
+subclassed by CGI::Portable, and the last 3 are recommended for use but not 
+required.
 
 All of my modules have complete POD inside of them, so please refer to that for a
 description of the module itself.
@@ -26,8 +27,8 @@ description of the module itself.
 This Read Me document concerns itself mainly with installation and support
 issues, and also includes any "To Do" lists.
 
-This distribution also includes 8 other modules, in the temporary name space 
-CGI::WPM::*, that are designed to be used with CGI::Portable.  Each of these is 
+This distribution also includes 7 other modules, in the temporary name space 
+Demo*, that are designed to be used with CGI::Portable.  Each of these is 
 included as a demo "application component", and by looking at them, you should 
 have a better idea what CGI::Portable can do for you.  Unlike ordinary demos, 
 however, these are a lot more mature and are being used effectively in multiple 
@@ -37,7 +38,7 @@ more proprietary nature.
 
 This distribution now has a "demos" folder containing 52 files and folders 
 which are ready-to-use example scripts and data files that exercise 
-CGI::Portable and all of the CGI::WPM::* modules.  Many of these are exactly 
+CGI::Portable and all of the Demo* modules.  Many of these are exactly 
 the same as the *new* Synopsis POD for particular modules.  Some have minor 
 adjustments or demonstrate the Synopsis examples that make use of the most 
 features of the particular modules.  Many demos have extra files in them 
@@ -96,15 +97,15 @@ mod_perl-1.24_01.tar.gz (older versions may work):
 HTML-FormTemplate-2.01.tar.gz
 	- by Darren Duncan (DUNCAND)
 	- HTML::FormTemplate 2.01 is required by:
-		- CGI::WPM::MailForm (for making input forms and form reports)
-		- CGI::WPM::GuestBook (for making input forms and form reports)
+		- DemoMailForm (for making input forms and form reports)
+		- DemoGuestBook (for making input forms and form reports)
 
 libnet-1.0703.tar.gz (older versions may work):
 	- by Graham Barr (GBARR)
 	- Net::SMTP 2.15 is required by:
-		- CGI::WPM::MailForm (when sending e-mails of form data)
-		- CGI::WPM::GuestBook (when sending e-mails of form data)
-		- CGI::WPM::Usage (when sending e-mails of usage data)
+		- DemoMailForm (when sending e-mails of form data)
+		- DemoGuestBook (when sending e-mails of form data)
+		- DemoUsage (when sending e-mails of usage data)
 
 GD (any version I suppose) is required by the "image" demo.
 
@@ -162,6 +163,18 @@ support issues later, so that users of my modules can help each other with them.
 
 TO DO
 
+	* Add feature that lets one export a CGI::Portable application to a set of 
+	static html files that can be used independantly of any script, except that 
+	they would still call the script to process any forms.  This would consist 
+	mainly of changing the self-referencing hyperlinks in generated screens.  
+	Advantages are greatly improved performance for applications with mostly 
+	static screens, including the initial page for forms.
+	* Add feature that lets one have separate "development" and "production" 
+	directories for application components or config files whereby equivalent 
+	files in the production directory are used by default, but copies in the 
+	development directory are used instead if they exist.  This makes it easier 
+	for someone to change the application while it is in use without normal 
+	users seeing the new version while it is being tested.
 	* Add a battery of ok / not ok tests.
 	* Improve the documentation.
 	* I have few more ideas in this regard, but am open to suggestions.

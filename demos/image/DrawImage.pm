@@ -45,7 +45,7 @@ sub main {
 		$globals->page_title( "The GD Synopsis PNG" );
 	
 		$globals->set_page_body( <<__endquote );
-<H2>The GD Synopsis PNG</H2>
+<H1>The GD Synopsis PNG</H1>
 
 <P>Here is the sample image from the Synopsis of GD.pm.  You need to have the 
 GD module installed to see it propertly, or you'll get a broken image link.  

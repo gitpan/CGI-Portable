@@ -17,7 +17,7 @@ require 5.004;
 
 use strict;
 use vars qw($VERSION);
-$VERSION = '0.43';
+$VERSION = '0.45';
 
 ######################################################################
 
@@ -409,15 +409,16 @@ internally as this class assumes you will encode each cookie prior to insertion.
 This method returns a list containing "http cookies" list elements.  This list 
 is returned literally in list context and as an array ref in scalar context.
 
+=head2 set_http_cookies( VALUE )
+
+This method allows you to set or replace the current "http cookies" list with a 
+new one.  The argument VALUE can be either an array ref or scalar or literal list.
+
 =head2 add_http_cookies( VALUES )
 
 This method will take a list of encoded cookies in the argument VALUES and 
 append them to the internal "http cookies" list property.  VALUES can be either 
 an array ref or a literal list.
-
-=head2 delete_http_cookies()
-
-This method deletes all of the internally stored outgoing "http cookies".
 
 =cut
 
@@ -428,18 +429,20 @@ sub get_http_cookies_ref {
 }
 
 sub get_http_cookies {
-	my @cookies = @{$_[0]->{$KEY_HTTP_COOK}};
-	return( wantarray ? @cookies : \@cookies );
+	my @list_copy = @{$_[0]->{$KEY_HTTP_COOK}};
+	return( wantarray ? @list_copy : \@list_copy );
+}
+
+sub set_http_cookies {
+	my $self = shift( @_ );
+	my $ra_values = ref( $_[0] ) eq 'ARRAY' ? $_[0] : \@_;
+	@{$self->{$KEY_HTTP_COOK}} = @{$ra_values};
 }
 
 sub add_http_cookies {
 	my $self = shift( @_ );
-	my @cookies = ref( $_[0] ) eq 'ARRAY' ? @{$_[0]} : @_;
-	push( @{$self->{$KEY_HTTP_COOK}}, @cookies );
-}
-
-sub delete_http_cookies {
-	$_[0]->{$KEY_HTTP_COOK} = [];
+	my $ra_values = ref( $_[0] ) eq 'ARRAY' ? $_[0] : \@_;
+	push( @{$self->{$KEY_HTTP_COOK}}, @{$ra_values} );
 }
 
 ######################################################################
@@ -467,6 +470,15 @@ object. If KEY is a valid HASH ref then all the existing headers information is
 replaced with the new hash keys and values.  If KEY is defined but it is not a
 Hash ref, then KEY and VALUE are inserted together into the existing hash.
 
+=head2 add_http_headers( KEY[, VALUE] )
+
+This method allows you to add key/value pairs to the "misc http headers" 
+hash property of this object.  If KEY is a valid HASH ref then the keys and 
+values it contains are inserted into the existing hash property; any like-named 
+keys will overwrite existing ones, but different-named ones will coexist.
+If KEY is defined but it is not a Hash ref, then KEY and VALUE are inserted 
+together into the existing hash.
+
 =cut
 
 ######################################################################
@@ -489,6 +501,17 @@ sub set_http_headers {
 	if( defined( $first ) ) {
 		if( ref( $first ) eq 'HASH' ) {
 			$self->{$KEY_HTTP_HEAD} = {%{$first}};
+		} else {
+			$self->{$KEY_HTTP_HEAD}->{$first} = $second;
+		}
+	}
+}
+
+sub add_http_headers {
+	my ($self, $first, $second) = @_;
+	if( defined( $first ) ) {
+		if( ref( $first ) eq 'HASH' ) {
+			@{$self->{$KEY_HTTP_HEAD}}{keys %{$first}} = values %{$first};
 		} else {
 			$self->{$KEY_HTTP_HEAD}->{$first} = $second;
 		}
@@ -612,6 +635,15 @@ If KEY is a valid HASH ref then all the existing meta information is replaced
 with the new hash keys and values.  If KEY is defined but it is not a Hash ref, 
 then KEY and VALUE are inserted together into the existing hash.
 
+=head2 add_page_meta( KEY[, VALUE] )
+
+This method allows you to add key/value pairs to the "page meta" 
+hash property of this object.  If KEY is a valid HASH ref then the keys and 
+values it contains are inserted into the existing hash property; any like-named 
+keys will overwrite existing ones, but different-named ones will coexist.
+If KEY is defined but it is not a Hash ref, then KEY and VALUE are inserted 
+together into the existing hash.
+
 =cut
 
 ######################################################################
@@ -640,6 +672,17 @@ sub set_page_meta {
 	}
 }
 
+sub add_page_meta {
+	my ($self, $first, $second) = @_;
+	if( defined( $first ) ) {
+		if( ref( $first ) eq 'HASH' ) {
+			@{$self->{$KEY_PAGE_META}}{keys %{$first}} = values %{$first};
+		} else {
+			$self->{$KEY_PAGE_META}->{$first} = $second;
+		}
+	}
+}
+
 ######################################################################
 
 =head2 get_page_style_sources_ref()
@@ -662,6 +705,12 @@ is returned literally in list context and as an array ref in scalar context.
 This method allows you to set or replace the current "page style sources" 
 definitions.  The argument VALUE can be either an array ref or literal list.
 
+=head2 add_page_style_sources( VALUES )
+
+This method will take a list of "page style sources" definitions 
+and add them to the internally stored list of the same.  VALUES can be either 
+an array ref or a literal list.
+
 =cut
 
 ######################################################################
@@ -679,6 +728,12 @@ sub set_page_style_sources {
 	my $self = shift( @_ );
 	my $ra_values = ref( $_[0] ) eq 'ARRAY' ? $_[0] : \@_;
 	@{$self->{$KEY_PAGE_CSSR}} = @{$ra_values};
+}
+
+sub add_page_style_sources {
+	my $self = shift( @_ );
+	my $ra_values = ref( $_[0] ) eq 'ARRAY' ? $_[0] : \@_;
+	push( @{$self->{$KEY_PAGE_CSSR}}, @{$ra_values} );
 }
 
 ######################################################################
@@ -703,6 +758,12 @@ is returned literally in list context and as an array ref in scalar context.
 This method allows you to set or replace the current "page style code" 
 definitions.  The argument VALUE can be either an array ref or literal list.
 
+=head2 add_page_style_code( VALUES )
+
+This method will take a list of "page style code" definitions 
+and add them to the internally stored list of the same.  VALUES can be either 
+an array ref or a literal list.
+
 =cut
 
 ######################################################################
@@ -720,6 +781,12 @@ sub set_page_style_code {
 	my $self = shift( @_ );
 	my $ra_values = ref( $_[0] ) eq 'ARRAY' ? $_[0] : \@_;
 	@{$self->{$KEY_PAGE_CSSC}} = @{$ra_values};
+}
+
+sub add_page_style_code {
+	my $self = shift( @_ );
+	my $ra_values = ref( $_[0] ) eq 'ARRAY' ? $_[0] : \@_;
+	push( @{$self->{$KEY_PAGE_CSSC}}, @{$ra_values} );
 }
 
 ######################################################################
@@ -809,6 +876,15 @@ this object.  If KEY is a valid HASH ref then all the existing attrib informatio
 is replaced with the new hash keys and values.  If KEY is defined but it is not a
 Hash ref, then KEY and VALUE are inserted together into the existing hash.
 
+=head2 add_page_frameset_attributes( KEY[, VALUE] )
+
+This method allows you to add key/value pairs to the "page frameset attributes" 
+hash property of this object.  If KEY is a valid HASH ref then the keys and 
+values it contains are inserted into the existing hash property; any like-named 
+keys will overwrite existing ones, but different-named ones will coexist.
+If KEY is defined but it is not a Hash ref, then KEY and VALUE are inserted 
+together into the existing hash.
+
 =cut
 
 ######################################################################
@@ -831,6 +907,17 @@ sub set_page_frameset_attributes {
 	if( defined( $first ) ) {
 		if( ref( $first ) eq 'HASH' ) {
 			$self->{$KEY_PAGE_FATR} = {%{$first}};
+		} else {
+			$self->{$KEY_PAGE_FATR}->{$first} = $second;
+		}
+	}
+}
+
+sub add_page_frameset_attributes {
+	my ($self, $first, $second) = @_;
+	if( defined( $first ) ) {
+		if( ref( $first ) eq 'HASH' ) {
+			@{$self->{$KEY_PAGE_FATR}}{keys %{$first}} = values %{$first};
 		} else {
 			$self->{$KEY_PAGE_FATR}->{$first} = $second;
 		}
@@ -925,6 +1012,15 @@ object.  If KEY is a valid HASH ref then all the existing attrib information is
 replaced with the new hash keys and values.  If KEY is defined but it is not a 
 Hash ref, then KEY and VALUE are inserted together into the existing hash.
 
+=head2 add_page_body_attributes( KEY[, VALUE] )
+
+This method allows you to add key/value pairs to the "page body attributes" 
+hash property of this object.  If KEY is a valid HASH ref then the keys and 
+values it contains are inserted into the existing hash property; any like-named 
+keys will overwrite existing ones, but different-named ones will coexist.
+If KEY is defined but it is not a Hash ref, then KEY and VALUE are inserted 
+together into the existing hash.
+
 =cut
 
 ######################################################################
@@ -947,6 +1043,17 @@ sub set_page_body_attributes {
 	if( defined( $first ) ) {
 		if( ref( $first ) eq 'HASH' ) {
 			$self->{$KEY_PAGE_BATR} = {%{$first}};
+		} else {
+			$self->{$KEY_PAGE_BATR}->{$first} = $second;
+		}
+	}
+}
+
+sub add_page_body_attributes {
+	my ($self, $first, $second) = @_;
+	if( defined( $first ) ) {
+		if( ref( $first ) eq 'HASH' ) {
+			@{$self->{$KEY_PAGE_BATR}}{keys %{$first}} = values %{$first};
 		} else {
 			$self->{$KEY_PAGE_BATR}->{$first} = $second;
 		}

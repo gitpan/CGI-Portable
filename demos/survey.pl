@@ -52,7 +52,7 @@ __endquote
 );
 
 $globals->set_prefs( \%CONFIG );
-$globals->call_component( 'CGI::WPM::MailForm' );
+$globals->call_component( 'DemoMailForm' );
 
 $io->send_user_output( $globals );
 

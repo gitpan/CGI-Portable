@@ -1,13 +1,13 @@
 =head1 NAME
 
-CGI::WPM::SegTextDoc - Demo of CGI::Portable that displays a static text 
+DemoSegTextDoc - Demo of CGI::Portable that displays a static text 
 page, which can be in multiple segments.
 
 =cut
 
 ######################################################################
 
-package CGI::WPM::SegTextDoc;
+package DemoSegTextDoc;
 require 5.004;
 
 # Copyright (c) 1999-2001, Darren R. Duncan. All rights reserved. This module is
@@ -18,7 +18,7 @@ require 5.004;
 
 use strict;
 use vars qw($VERSION @ISA);
-$VERSION = '0.44';
+$VERSION = '0.45';
 
 ######################################################################
 
@@ -34,17 +34,17 @@ $VERSION = '0.44';
 
 =head2 Nonstandard Modules
 
-	CGI::Portable 0.41
-	CGI::WPM::Base 0.44
-	CGI::WPM::Static 0.41
+	CGI::Portable 0.45
+	CGI::Portable::AppStatic 0.45
+	DemoStatic 0.45
 
 =cut
 
 ######################################################################
 
-use CGI::Portable 0.41;
-use CGI::WPM::Base 0.44;
-@ISA = qw(CGI::WPM::Base);
+use CGI::Portable 0.45;
+use CGI::Portable::AppStatic 0.45;
+@ISA = qw(CGI::Portable::AppStatic);
 
 ######################################################################
 
@@ -77,7 +77,7 @@ use CGI::WPM::Base 0.44;
 
 	$globals->current_user_path_level( 1 );
 	$globals->set_prefs( \%CONFIG );
-	$globals->call_component( 'CGI::WPM::SegTextDoc' );
+	$globals->call_component( 'DemoSegTextDoc' );
 
 	$io->send_user_output( $globals );
 
@@ -154,7 +154,26 @@ my $PKEY_FILENAME = 'filename';  # common part of filename for pieces
 my $PKEY_SEGMENTS = 'segments';  # number of pieces doc is in
 
 ######################################################################
-# This is provided so CGI::WPM::Base->main() can call it.
+
+sub main {
+	my ($class, $globals) = @_;
+	my $self = bless( {}, ref($class) || $class );
+
+	UNIVERSAL::isa( $globals, 'CGI::Portable' ) or 
+		die "initializer is not a valid CGI::Portable object";
+
+	$self->set_static_low_replace( $globals );
+
+	$self->{$KEY_SITE_GLOBALS} = $globals;
+	$self->main_dispatch();
+
+	$self->set_static_high_replace( $globals );
+	$self->set_static_attach_unordered( $globals );
+	$self->set_static_attach_ordered( $globals );
+	$self->set_static_miscellaneous( $globals );
+}
+
+######################################################################
 
 sub main_dispatch {
 	my $self = shift( @_ );
@@ -196,7 +215,7 @@ sub get_curr_seg_content {
 	my $wpm_context = $globals->make_new_context();
 	$is_multi_segmented and $wpm_context->navigate_file_path( $base );
 	$wpm_context->set_prefs( $wpm_prefs );
-	$wpm_context->call_component( 'CGI::WPM::Static' );
+	$wpm_context->call_component( 'DemoStatic' );
 	$globals->take_context_output( $wpm_context );
 }
 
@@ -266,7 +285,7 @@ sub attach_document_header {
 	$globals->page_title( $title );
 
 	$globals->prepend_page_body( <<__endquote );
-<H2>@{[$globals->page_title()]}</H2>
+<H1>@{[$globals->page_title()]}</H1>
 
 <P>Author: $author<BR>
 Created: $created<BR>
@@ -296,6 +315,6 @@ Address comments, suggestions, and bug reports to B<perl@DarrenDuncan.net>.
 
 =head1 SEE ALSO
 
-perl(1), CGI::Portable, CGI::WPM::Base, CGI::WPM::Static, CGI::Portable::AdapterCGI.
+perl(1), CGI::Portable, CGI::Portable::AppStatic, DemoStatic, CGI::Portable::AdapterCGI.
 
 =cut

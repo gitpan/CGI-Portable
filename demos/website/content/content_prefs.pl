@@ -1,36 +1,36 @@
 my $rh_preferences = { 
-	page_header => undef,
-	page_footer => <<__endquote,
+	prepend_page_body => undef,
+	append_page_body => <<__endquote,
 <P><EM>This site is a simple example of what can be done with CGI::Portable and 
 the Dynamic Website Generator collection of Perl 5 modules, copyright (c) 
 1999-2001, Darren R. Duncan.</EM></P>
 __endquote
-	page_css_code => [
+	add_page_style_code => [
 		'BODY {background-color: white; background-image: none}'
 	],
 	vrp_handlers => {
 		external => {
-			wpm_module => 'CGI::WPM::Redirect',
-			wpm_prefs => { http_target => 'external_link_window' },
+			wpm_module => 'DemoRedirect',
+			wpm_prefs => { low_http_window_target => 'external_link_window' },
 		},
 		frontdoor => {
-			wpm_module => 'CGI::WPM::Static',
+			wpm_module => 'DemoStatic',
 			wpm_prefs => { filename => 'frontdoor.html' },
 		},
 		resume => {
-			wpm_module => 'CGI::WPM::Static',
+			wpm_module => 'DemoStatic',
 			wpm_prefs => { filename => 'resume.html' },
 		},
 		mysites => {
-			wpm_module => 'CGI::WPM::Static',
+			wpm_module => 'DemoStatic',
 			wpm_prefs => { filename => 'mysites.html' },
 		},
 		mailme => {
-			wpm_module => 'CGI::WPM::MailForm',
+			wpm_module => 'DemoMailForm',
 			wpm_prefs => {},
 		},
 		guestbook => {
-			wpm_module => 'CGI::WPM::GuestBook',
+			wpm_module => 'DemoGuestBook',
 			wpm_prefs => {
 				fn_messages => 'guestbook_messages.txt',
 				custom_fd => 1,
@@ -39,7 +39,7 @@ __endquote
 			},
 		},
 		links => {
-			wpm_module => 'CGI::WPM::Static',
+			wpm_module => 'DemoStatic',
 			wpm_prefs => { filename => 'links.html' },
 		},
 	},

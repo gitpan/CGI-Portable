@@ -12,7 +12,7 @@ $io->fetch_user_input( $globals );
 my %CONFIG = ();
 
 $globals->set_prefs( \%CONFIG );
-$globals->call_component( 'CGI::WPM::Redirect' );
+$globals->call_component( 'DemoRedirect' );
 
 $io->send_user_output( $globals );
 

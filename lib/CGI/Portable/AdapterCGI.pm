@@ -17,7 +17,7 @@ require 5.004;
 
 use strict;
 use vars qw($VERSION);
-$VERSION = '0.43';
+$VERSION = '0.45';
 
 ######################################################################
 
@@ -33,7 +33,7 @@ $VERSION = '0.43';
 
 =head2 Nonstandard Modules
 
-	CGI::Portable 0.43
+	CGI::Portable 0.45
 
 =head1 SYNOPSIS
 
@@ -120,20 +120,26 @@ if you want it to be from a query param then you can update it yourself later.
 sub fetch_user_input {
 	my ($self, $globals) = @_;
 
-	my $host = $ENV{'HTTP_HOST'} || $ENV{'SERVER_NAME'} || 'localhost';
-	my $port = $ENV{'SERVER_PORT'} || 80;
-	my $script = $self->_uri_unescape( $ENV{'SCRIPT_NAME'} );
-	$globals->url_base( 'http://'.$host.($port != 80 ? ":$port" : '').$script );
+	$globals->server_ip( '127.0.0.1' );  # there is no ENV for this, is there?
+	$globals->server_domain( $ENV{'HTTP_HOST'} || $ENV{'SERVER_NAME'} || 
+		'localhost' );
+	$globals->server_port( $ENV{'SERVER_PORT'} || 80 );
+	$globals->client_ip( $ENV{'REMOTE_ADDR'} || '127.0.0.1' );
+	$globals->client_domain( $ENV{'REMOTE_HOST'} || $ENV{'REMOTE_ADDR'} || 
+		'localhost' );
+	$globals->client_port( $ENV{'REMOTE_PORT'} );
+
+	my $host = $globals->server_domain();
+	my $port = $globals->server_port();
+	$globals->url_base( 'http://'.$host.($port != 80 ? ":$port" : '').
+		$self->_uri_unescape( $ENV{'SCRIPT_NAME'} ) );
 
 	$globals->request_method( $ENV{'REQUEST_METHOD'} || 'GET' );
-	$globals->virtual_host( $host );
-	$globals->server_port( $port );
-	$globals->script_name( $script );
+	$globals->request_uri( $ENV{'REQUEST_URI'} || '/' );
+	$globals->request_protocol( $ENV{'SERVER_PROTOCOL'} || 'HTTP/1.0' );
+
 	$globals->referer( $self->_uri_unescape( $ENV{'HTTP_REFERER'} ) );
 	$globals->user_agent( $ENV{'HTTP_USER_AGENT'} );
-	$globals->remote_addr( $ENV{'REMOTE_ADDR'} || '127.0.0.1' );
-	$globals->remote_host( $ENV{'REMOTE_HOST'} || $ENV{'REMOTE_ADDR'} || 
-		'localhost' );
 
 	my ($path_info, $query, $post, $oversize, $cookies);
 

@@ -1,3 +1,82 @@
+2001-08-26   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 0.45.
+	
+	* In summary, this release adds a new module, CGI::Portable::AppStatic, 
+	removes a now-redundant existing one, CGI::WPM::Base, adds some methods to 
+	other modules (mostly Response), deletes a few methods (mostly Request), 
+	renames a number of methods (about 10% of Request), and renames the main 
+	demo modules (all CGI::WPM::* became Demo*).  These changes were done to 
+	further streamline the modules, and prepare for large feature additions in 
+	subsequent releases.  Some of your code may break due to the changes, but 
+	a simple search-and-replace should be all that's necessary to fix it.
+	
+	* All files had versions changed to 0.45 whether changes were made or not.
+	
+	* Updated CGI::Portable::Request to delete the following 3 methods along 
+	with their associated properties: url_path_is_in_path_info(), 
+	url_path_is_in_query(), url_path_query_param_name().  There were related 
+	simplifications made to the module set such that it is expected that the 
+	"user path" or "url path" are always stored as the "path info"; the option 
+	to store it as a "query string" argument instead has been removed.  
+	You should not need to change your code to reflect the above change, as the 
+	public interface of the url-making methods were not changed.  However, you 
+	probably want to reset your app if you used the query string store because 
+	any web screens currently served would then have invalid hyperlinks in them.
+	
+	* Renamed several methods that store request details: virtual_host() became 
+	server_domain(), remote_addr() became client_ip(), remote_host() became 
+	client_domain().  These methods were added: server_ip(), client_port().  To 
+	round out the six-method set, server_port() was kept unchanged from before.  
+	Also, the methods request_uri() and request_protocol() were added to 
+	complement request_method(), which remained as before; the script_name() 
+	method was removed since it became partially redundant with request_path().  
+	Accordingly, CGI::Portable::Request, CGI::Portable::AdapterSocket, 
+	CGI::Portable::AdapterCGI, and all "CGI::WPM::*" modules were updated.
+	
+	* Updated CGI::Portable::Response by adding these methods: set_http_cookies(), 
+	add_http_headers(), add_page_meta(), add_page_style_sources(), 
+	add_page_style_code(), add_page_frameset_attributes(), 
+	add_page_body_attributes().  The delete_http_cookies() method was deleted, 
+	but its effect can be simulated by calling set_http_cookies() with an empty 
+	array ref argument.
+	
+	* Added module CGI::Portable::AppStatic, an "application component" that 
+	lets you define whole response screens within a config file.  This module is 
+	meant as a non-proprietary replacement for CGI::WPM::Base; the latter module 
+	was deleted.  The preferences handled by CGI::WPM::Base were renamed as 
+	follows: "http_target" to "low_http_window_target", "page_body" to 
+	"high_page_body", "page_header" to "prepend_page_body", "page_footer" to 
+	"append_page_body", "page_title" to "low_page_title", "page_author" to 
+	"low_page_author", "page_meta" to "add_page_meta", "page_css_src" to 
+	"add_page_style_sources", "page_css_code" to "add_page_style_code", 
+	"page_body_attr" to "add_page_body_attributes".  Any modules that used 
+	CGI::WPM::Base have been updated to use CGI::Portable::AppStatic instead; 
+	the exception is CGI::WPM::Usage, which now uses neither of them.  The new 
+	module does not yet have an elegant replacement for the older "page_replace" 
+	property, so it continues to support that property as a deprecated feature.
+	
+	* Renamed all "CGI::WPM::*" modules to "Demo*" since they truly belong with 
+	the demos.  If you use any of these then you will need to search-and-replace 
+	any calls to the module name.  They otherwise work the same way as before.
+	
+	* Removed support of the "amend_msg" preference from all "Demo*" modules.  
+	This preference had allowed one to customize the text for a portion of 
+	most error screens, so that portion is no longer customizable.
+
+	* Removed support of the "url" preference in the DemoRedirect module.  
+	This preference had allowed DemoRedirect to always use the same target url, 
+	rather than getting it from the query string parameter named "url".  Now, 
+	the query string is the only place that DemoRedirect looks.  However, you 
+	can now use CGI::Portable::AppStatic directly (and not use DemoRedirect) to 
+	replace the lost functionality.  Then, you set the high_http_status_code 
+	preference to "301 Moved" and "high_http_redirect_url" to the destination.
+	
+	* Updated CGI::Portable and many of the demo modules to make them more 
+	XHTML-compliant.  Specifically, all main screen headers are now '<H1></H1>' 
+	rather than '<H2 ALIGN="center"></H2>'.  Users who want their headings to 
+	appear a specific way, like centered, should use a stylesheet to say so.
+
 2001-06-11   Darren Duncan <perl@DarrenDuncan.net>
 
 	* Release 0.44.

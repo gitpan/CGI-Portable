@@ -8,21 +8,14 @@
 
 BEGIN { $| = 1; print "1..1\n"; }
 END {print "not ok 1\n" unless $loaded;}
-use CGI::Portable::Errors 0.43;
-use CGI::Portable::Files 0.43;
-use CGI::Portable::Request 0.43;
-use CGI::Portable::Response 0.43;
-use CGI::Portable 0.43;
-use CGI::Portable::AdapterCGI 0.43;
-use CGI::Portable::AdapterSocket 0.43;
-use CGI::WPM::Base 0.44;
-use CGI::WPM::MultiPage 0.44;
-use CGI::WPM::Static 0.44;
-use CGI::WPM::MailForm 0.44;
-use CGI::WPM::GuestBook 0.44;
-use CGI::WPM::SegTextDoc 0.44;
-use CGI::WPM::Redirect 0.44;
-use CGI::WPM::Usage 0.44;
+use CGI::Portable::Errors 0.45;
+use CGI::Portable::Files 0.45;
+use CGI::Portable::Request 0.45;
+use CGI::Portable::Response 0.45;
+use CGI::Portable 0.45;
+use CGI::Portable::AdapterCGI 0.45;
+use CGI::Portable::AdapterSocket 0.45;
+use CGI::Portable::AppStatic 0.45;
 $loaded = 1;
 print "ok 1\n";
 use strict;

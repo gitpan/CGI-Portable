@@ -17,7 +17,7 @@ require 5.004;
 
 use strict;
 use vars qw($VERSION);
-$VERSION = '0.43';
+$VERSION = '0.45';
 
 ######################################################################
 
@@ -141,11 +141,6 @@ Under a CGI environment these would correspond to various %ENV keys.
 
 # Names of properties for objects of this class are declared here:
 
-# These properties say how to interperet user input and how to make new urls
-my $KEY_URL_PIPI = 'url_pipi';  # boolean - true if path goes in PATH_INFO
-my $KEY_URL_PIQU = 'url_piqu';  # boolean - true if path goes in a query param
-my $KEY_URL_PQPN = 'url_pqpn';  # string - if path in query; this is param name
-
 # These properties are used when making new self-referencing urls in output
 my $KEY_URL_BASE = 'url_base';  # string - stores joined host, script_name, etc
 my $KEY_URL_PATH = 'url_path';  # FVP - virtual path used in s-r urls
@@ -158,14 +153,17 @@ my $KEY_UI_POST = 'ui_post';  # CMVH - stores parsed user input post (http body)
 my $KEY_UI_COOK = 'ui_cook';  # CMVH - stores parsed user input cookies
 
 # These properties are from the http request also
-my $KEY_UI_METH = 'ui_meth';  # string - stores request method (GET/POST/HEAD)
-my $KEY_UI_HOST = 'ui_host';  # string - stores virtual host domain of server
-my $KEY_UI_PORT = 'ui_port';  # number - stores server port
-my $KEY_UI_SCRI = 'ui_scri';  # string - stores base part of uri having filename
-my $KEY_UI_REFE = 'ui_refe';  # string - stores referring url
-my $KEY_UI_AGEN = 'ui_agen';  # string - stores user agent web browser
-my $KEY_UI_RADD = 'ui_radd';  # string - stores remote IP address of web user
-my $KEY_UI_RHOS = 'ui_rhos';  # string - stores remote host domain of web user
+my $KEY_REQ_SEIP = 'req_seip';  # string
+my $KEY_REQ_SEDO = 'req_sedo';  # string - stores virtual host domain of server
+my $KEY_REQ_SEPO = 'req_sepo';  # number - stores server port
+my $KEY_REQ_CLIP = 'req_clip';  # string - stores remote IP address of web user
+my $KEY_REQ_CLDO = 'req_cldo';  # string - stores remote host domain of web user
+my $KEY_REQ_CLPO = 'req_clpo';  # number
+my $KEY_REQ_METH = 'req_meth';  # string - stores request method (GET/POST/HEAD)
+my $KEY_REQ_URIX = 'req_urix';  # string - stores base part of uri having filename
+my $KEY_REQ_PROT = 'req_prot';  # string
+my $KEY_REQ_REFE = 'req_refe';  # string - stores referring url
+my $KEY_REQ_AGEN = 'req_agen';  # string - stores user agent web browser
 
 ######################################################################
 
@@ -242,10 +240,6 @@ sub new {
 sub initialize {
 	my ($self) = @_;
 
-	$self->{$KEY_URL_PIPI} = 1;
-	$self->{$KEY_URL_PIQU} = undef;
-	$self->{$KEY_URL_PQPN} = 'path';
-
 	$self->{$KEY_URL_BASE} = 'http://localhost/';
 	$self->{$KEY_URL_PATH} = File::VirtualPath->new();
 	$self->{$KEY_URL_QUER} = CGI::MultiValuedHash->new();
@@ -255,23 +249,22 @@ sub initialize {
 	$self->{$KEY_UI_POST} = CGI::MultiValuedHash->new();
 	$self->{$KEY_UI_COOK} = CGI::MultiValuedHash->new();
 
-	$self->{$KEY_UI_METH} = 'GET';
-	$self->{$KEY_UI_HOST} = 'localhost';
-	$self->{$KEY_UI_PORT} = 80;
-	$self->{$KEY_UI_SCRI} = undef;
-	$self->{$KEY_UI_REFE} = undef;
-	$self->{$KEY_UI_AGEN} = undef;
-	$self->{$KEY_UI_RADD} = '127.0.0.1';
-	$self->{$KEY_UI_RHOS} = 'localhost';
+	$self->{$KEY_REQ_SEIP} = '127.0.0.1';
+	$self->{$KEY_REQ_SEDO} = 'localhost';
+	$self->{$KEY_REQ_SEPO} = 80;
+	$self->{$KEY_REQ_CLIP} = '127.0.0.1';
+	$self->{$KEY_REQ_CLDO} = 'localhost';
+	$self->{$KEY_REQ_CLPO} = undef;
+	$self->{$KEY_REQ_METH} = 'GET';
+	$self->{$KEY_REQ_URIX} = '/';
+	$self->{$KEY_REQ_PROT} = 'HTTP/1.0';
+	$self->{$KEY_REQ_REFE} = undef;
+	$self->{$KEY_REQ_AGEN} = undef;
 }
 
 sub clone {
 	my ($self, $clone) = @_;
 	ref($clone) eq ref($self) or $clone = bless( {}, ref($self) );
-
-	$clone->{$KEY_URL_PIPI} = $self->{$KEY_URL_PIPI};
-	$clone->{$KEY_URL_PIQU} = $self->{$KEY_URL_PIQU};
-	$clone->{$KEY_URL_PQPN} = $self->{$KEY_URL_PQPN};
 
 	$clone->{$KEY_URL_BASE} = $self->{$KEY_URL_BASE};
 	$clone->{$KEY_URL_PATH} = $self->{$KEY_URL_PATH}->clone();
@@ -282,25 +275,24 @@ sub clone {
 	$clone->{$KEY_UI_POST} = $self->{$KEY_UI_POST}->clone();
 	$clone->{$KEY_UI_COOK} = $self->{$KEY_UI_COOK}->clone();
 
-	$clone->{$KEY_UI_METH} = $self->{$KEY_UI_METH};
-	$clone->{$KEY_UI_HOST} = $self->{$KEY_UI_HOST};
-	$clone->{$KEY_UI_PORT} = $self->{$KEY_UI_PORT};
-	$clone->{$KEY_UI_SCRI} = $self->{$KEY_UI_SCRI};
-	$clone->{$KEY_UI_REFE} = $self->{$KEY_UI_REFE};
-	$clone->{$KEY_UI_AGEN} = $self->{$KEY_UI_AGEN};
-	$clone->{$KEY_UI_RADD} = $self->{$KEY_UI_RADD};
-	$clone->{$KEY_UI_RHOS} = $self->{$KEY_UI_RHOS};
-
+	$clone->{$KEY_REQ_SEIP} = $self->{$KEY_REQ_SEIP};
+	$clone->{$KEY_REQ_SEDO} = $self->{$KEY_REQ_SEDO};
+	$clone->{$KEY_REQ_SEPO} = $self->{$KEY_REQ_SEPO};
+	$clone->{$KEY_REQ_CLIP} = $self->{$KEY_REQ_CLIP};
+	$clone->{$KEY_REQ_CLDO} = $self->{$KEY_REQ_CLDO};
+	$clone->{$KEY_REQ_CLPO} = $self->{$KEY_REQ_CLPO};
+	$clone->{$KEY_REQ_METH} = $self->{$KEY_REQ_METH};
+	$clone->{$KEY_REQ_URIX} = $self->{$KEY_REQ_URIX};
+	$clone->{$KEY_REQ_PROT} = $self->{$KEY_REQ_PROT};
+	$clone->{$KEY_REQ_REFE} = $self->{$KEY_REQ_REFE};
+	$clone->{$KEY_REQ_AGEN} = $self->{$KEY_REQ_AGEN};
+	
 	return( $clone );
 }
 
 sub make_new_context {
 	my ($self, $context) = @_;
 	ref($context) eq ref($self) or $context = bless( {}, ref($self) );
-
-	$context->{$KEY_URL_PIPI} = $self->{$KEY_URL_PIPI};
-	$context->{$KEY_URL_PIQU} = $self->{$KEY_URL_PIQU};
-	$context->{$KEY_URL_PQPN} = $self->{$KEY_URL_PQPN};
 
 	$context->{$KEY_URL_BASE} = $self->{$KEY_URL_BASE};
 	$context->{$KEY_URL_PATH} = $self->{$KEY_URL_PATH}->clone();
@@ -311,14 +303,17 @@ sub make_new_context {
 	$context->{$KEY_UI_POST} = $self->{$KEY_UI_POST}->clone();
 	$context->{$KEY_UI_COOK} = $self->{$KEY_UI_COOK}->clone();
 
-	$context->{$KEY_UI_METH} = $self->{$KEY_UI_METH};
-	$context->{$KEY_UI_HOST} = $self->{$KEY_UI_HOST};
-	$context->{$KEY_UI_PORT} = $self->{$KEY_UI_PORT};
-	$context->{$KEY_UI_SCRI} = $self->{$KEY_UI_SCRI};
-	$context->{$KEY_UI_REFE} = $self->{$KEY_UI_REFE};
-	$context->{$KEY_UI_AGEN} = $self->{$KEY_UI_AGEN};
-	$context->{$KEY_UI_RADD} = $self->{$KEY_UI_RADD};
-	$context->{$KEY_UI_RHOS} = $self->{$KEY_UI_RHOS};
+	$context->{$KEY_REQ_SEIP} = $self->{$KEY_REQ_SEIP};
+	$context->{$KEY_REQ_SEDO} = $self->{$KEY_REQ_SEDO};
+	$context->{$KEY_REQ_SEPO} = $self->{$KEY_REQ_SEPO};
+	$context->{$KEY_REQ_CLIP} = $self->{$KEY_REQ_CLIP};
+	$context->{$KEY_REQ_CLDO} = $self->{$KEY_REQ_CLDO};
+	$context->{$KEY_REQ_CLPO} = $self->{$KEY_REQ_CLPO};
+	$context->{$KEY_REQ_METH} = $self->{$KEY_REQ_METH};
+	$context->{$KEY_REQ_URIX} = $self->{$KEY_REQ_URIX};
+	$context->{$KEY_REQ_PROT} = $self->{$KEY_REQ_PROT};
+	$context->{$KEY_REQ_REFE} = $self->{$KEY_REQ_REFE};
+	$context->{$KEY_REQ_AGEN} = $self->{$KEY_REQ_AGEN};
 
 	return( $context );
 }
@@ -338,72 +333,6 @@ information becomes part of the user input, particularly the "user path" and
 "user query".  You normally use the url_as_string() method to do the actual
 assembly of these components, but the various "recall" methods also pay attention
 to them.
-
-=head2 url_path_is_in_path_info([ VALUE ])
-
-This method is an accessor for the "url path is in path info" boolean property 
-of this object, which it returns.  If VALUE is defined, this property is set 
-to it.  If this property is true then the "url path" property will persist as 
-part of the "path_info" portion of all self-referencing urls.
-This property defaults to true.
-
-=cut
-
-######################################################################
-
-sub url_path_is_in_path_info {
-	my ($self, $new_value) = @_;
-	if( defined( $new_value ) ) {
-		$self->{$KEY_URL_PIPI} = $new_value;
-	}
-	return( $self->{$KEY_URL_PIPI} );
-}
-
-######################################################################
-
-=head2 url_path_is_in_query([ VALUE ])
-
-This method is an accessor for the "url path is in query" boolean property 
-of this object, which it returns.  If VALUE is defined, this property is set 
-to it.  If this property is true then the "url path" property will persist as 
-part of the "query_string" portion of all self-referencing urls.
-This property defaults to false.
-
-=cut
-
-######################################################################
-
-sub url_path_is_in_query {
-	my ($self, $new_value) = @_;
-	if( defined( $new_value ) ) {
-		$self->{$KEY_URL_PIQU} = $new_value;
-	}
-	return( $self->{$KEY_URL_PIQU} );
-}
-
-######################################################################
-
-=head2 url_path_query_param_name([ VALUE ])
-
-This method is an accessor for the "url path query param name" scalar property 
-of this object, which it returns.  If VALUE is defined, this property is set 
-to it.  If the url path persists as part of a query string, this method defines 
-the name of the query parameter that the url path is the value for.
-This property defaults to 'path'.
-
-=cut
-
-######################################################################
-
-sub url_path_query_param_name {
-	my ($self, $new_value) = @_;
-	if( defined( $new_value ) ) {
-		$self->{$KEY_URL_PQPN} = $new_value;
-	}
-	return( $self->{$KEY_URL_PQPN} );
-}
-
-######################################################################
 
 =head2 url_base([ VALUE ])
 
@@ -553,15 +482,13 @@ sub url_query_param {
 
 This method assembles the various "url *" properties of this object into a
 complete HTTP url and returns it as a string.  That is, it returns the cumulative
-string representation of those properties.  This consists of a url_base(),
-"path info", "query string", and would look like "base[info][?query]".
-For example, "http://aardvark.net/main.pl/lookup/title?name=plant&cost=low".
-Depending on your settings, the url path may be in the path_info or the 
-query_string or none or both.  If the optional argument CHANGE_VECTOR is true 
-then the result of applying it to the url path is used for the url path.  
-The above example showed the url path, "/lookup/title", in the path_info.  
-If it were in query_string instead then the url would look like 
-"http://aardvark.net/main.pl?path=/lookup/title&name=plant&cost=low".
+string representation of those properties.  This consists of a url_base(), "path
+info", "query string", and would look like "base[info][?query]". For example,
+"http://aardvark.net/main.pl/lookup/title?name=plant&cost=low". As of release
+0-45, the url path is always in the path_info; previous to that release, it could
+optionally have been in the query_string instead. If the optional argument
+CHANGE_VECTOR is true then the result of applying it to the url path is used for
+the url path.
 
 =cut
 
@@ -577,21 +504,11 @@ sub url_as_string {
 # This private method contains common code for some url-string-making methods. 
 # The two arguments refer to the path and query information that the new url 
 # will have.  This method combines these with the url base as appropriate, 
-# taking into account the settings for where the path should go.
+# and as of release 0-45 the path always goes in the path_info.
 
 sub _make_an_url {
-	my ($self, $query, $path) = @_;
-	my ($base, $path_info, $query_string);
-	$base = $self->{$KEY_URL_BASE};
-	if( $self->{$KEY_URL_PIPI} ) {
-		$path_info = $path;
-		$query_string = $query;
-	}
-	if( $self->{$KEY_URL_PIQU} ) {
-		$path_info = '';
-		$query_string = "$self->{$KEY_URL_PQPN}=$path".
-			($query ? "&$query" : '');
-	}
+	my ($self, $query_string, $path_info) = @_;
+	my $base = $self->{$KEY_URL_BASE};
 	return( $base.$path_info.($query_string ? "?$query_string" : '') );
 }
 
@@ -972,96 +889,175 @@ Four of the request properties are more special and are mentioned above in the
 "user input" section.
 Under a CGI environment these would correspond to various %ENV keys.
 
-=head2 request_method([ VALUE ])
+=head2 server_ip([ VALUE ])
 
-This method is an accessor for the "request method" scalar property of this object,
-which it returns.  If VALUE is defined, this property is set to it.
+This method is an accessor for the "server ip" scalar property of this object,
+which it returns.  If VALUE is defined, this property is set to it.  
+During a valid TCP/IP connection, this property refers to the IP address of the 
+host machine, which this program is running on.
 
-=head2 virtual_host([ VALUE ])
+=head2 server_domain([ VALUE ])
 
-This method is an accessor for the "virtual host" scalar property of this object,
-which it returns.  If VALUE is defined, this property is set to it.
+This method is an accessor for the "server domain" scalar property of this object,
+which it returns.  If VALUE is defined, this property is set to it.  
+This property refers to the tcp host domain, if any, that was resolved to the 
+server IP.  It would be provided in the TCP request header named "Host".  
+Often, multiple domains will resolve to the same IP address, in which case this 
+"Host" header is needed to tell what website the client really wanted.
 
 =head2 server_port([ VALUE ])
 
 This method is an accessor for the "server port" scalar property of this object,
-which it returns.  If VALUE is defined, this property is set to it.
+which it returns.  If VALUE is defined, this property is set to it.  
+During a valid TCP/IP connection, this property refers to the tcp port on the 
+host machine that this program or its parent service is listening on.  
+Port 80 is the standard one used for HTTP services.
 
-=head2 script_name([ VALUE ])
+=head2 client_ip([ VALUE ])
 
-This method is an accessor for the "script name" scalar property of this object,
+This method is an accessor for the "client ip" scalar property of this object,
+which it returns.  If VALUE is defined, this property is set to it.  
+During a valid TCP/IP connection, this property refers to the IP address of the 
+client machine, which is normally what the web-browsing user is sitting at, 
+though it could be a proxy or a robot instead.
+
+=head2 client_domain([ VALUE ])
+
+This method is an accessor for the "client domain" scalar property of this object,
+which it returns.  If VALUE is defined, this property is set to it.  
+This property often is not set, but if it is then it refers to internet domain 
+for the ISP that the web-browsing user is employing, or it is the domain for the 
+machine that the web robot is on.
+
+=head2 client_port([ VALUE ])
+
+This method is an accessor for the "client port" scalar property of this object,
 which it returns.  If VALUE is defined, this property is set to it.
+During a valid TCP/IP connection, this property refers to the tcp port on the 
+client machine that the web browser or robot is using for this connection, and it 
+is also how the web server can differentiate between multiple clients talking with 
+it on the same server port.  Web browsers often use multiple client ports at once 
+in order to request multiple files (eg, images) at once.
+
+=head2 request_method([ VALUE ])
+
+This method is an accessor for the "request method" scalar property of this object,
+which it returns.  If VALUE is defined, this property is set to it.  
+This property is a string such as ['GET','POST','HEAD','PUT'] and refers to the 
+type of http operation that the client wants to do.  It would be provided as the 
+first word of the first line of the HTTP request headers.  If the request method 
+is POST then the server should expect an HTTP body; if the method is GET or HEAD 
+then the server should expect no HTTP body.  If the method is GET or POST then 
+the client expects an HTTP response with both headers and body; if the method is 
+HEAD then the client expects only the response headers.
+
+=head2 request_uri([ VALUE ])
+
+This method is an accessor for the "request uri" scalar property of this object,
+which it returns.  If VALUE is defined, this property is set to it.  
+This property is a string such as ["/", "/one/two.html", "/cgi/getit.pl/five", 
+"/cgi/getit.pl?six=seven"] and refers to the name of the resource on the server 
+that the client wants returned.  It would be provided as the second word of the 
+first line of the HTTP request headers.  Under an ordinary web file server such 
+as Apache, the "request path" would be split into 3 main pieces with names like: 
+"script name" ("/" or "/cgi/getit.pl"), "path info" ("/five"), "query string" 
+("six=seven").
+
+=head2 request_protocol([ VALUE ])
+
+This method is an accessor for the "request protocol" scalar property of this object,
+which it returns.  If VALUE is defined, this property is set to it.
+This property is a string like ["HTTP/1.0", "HTTP/1.1"] and refers to the set of 
+protocols that the client would like to use during this session.  It would be 
+provided as the third word of the first line of the HTTP request headers.
 
 =head2 referer([ VALUE ])
 
 This method is an accessor for the "referer" scalar property of this object,
 which it returns.  If VALUE is defined, this property is set to it.
+This property refers to the complete url of the web page that the user was 
+viewing before coming to the current url; most likely, said "referer" 
+page contains a hyperlink leading to the current request url.  This "refering 
+url" string would be provided in the TCP request header named "Referer".
 
 =head2 user_agent([ VALUE ])
 
 This method is an accessor for the "user agent" scalar property of this object,
 which it returns.  If VALUE is defined, this property is set to it.
-
-=head2 remote_addr([ VALUE ])
-
-This method is an accessor for the "remote addr" scalar property of this object,
-which it returns.  If VALUE is defined, this property is set to it.
-
-=head2 remote_host([ VALUE ])
-
-This method is an accessor for the "remote host" scalar property of this object,
-which it returns.  If VALUE is defined, this property is set to it.
+This property refers to the name that the client user's "agent" or "web 
+browser" or robot identifies itself to the server as; this identifier tends to 
+include the agent's brand, version, and o/s platform.  An example is 
+"Mozilla/4.08 (Macintosh; U; PPC, Nav)".  It would be provided in the TCP 
+request header named "User-Agent".
 
 =cut
 
 ######################################################################
 
-sub request_method {
+sub server_ip {
 	my ($self, $new_value) = @_;
-	if( defined( $new_value ) ) { $self->{$KEY_UI_METH} = $new_value; }
-	return( $self->{$KEY_UI_METH} );
+	if( defined( $new_value ) ) { $self->{$KEY_REQ_SEIP} = $new_value; }
+	return( $self->{$KEY_REQ_SEIP} );
 }
 
-sub virtual_host {
+sub server_domain {
 	my ($self, $new_value) = @_;
-	if( defined( $new_value ) ) { $self->{$KEY_UI_HOST} = $new_value; }
-	return( $self->{$KEY_UI_HOST} );
+	if( defined( $new_value ) ) { $self->{$KEY_REQ_SEDO} = $new_value; }
+	return( $self->{$KEY_REQ_SEDO} );
 }
 
 sub server_port {
 	my ($self, $new_value) = @_;
-	if( defined( $new_value ) ) { $self->{$KEY_UI_PORT} = $new_value; }
-	return( $self->{$KEY_UI_PORT} );
+	if( defined( $new_value ) ) { $self->{$KEY_REQ_SEPO} = $new_value; }
+	return( $self->{$KEY_REQ_SEPO} );
 }
 
-sub script_name {
+sub client_ip {
 	my ($self, $new_value) = @_;
-	if( defined( $new_value ) ) { $self->{$KEY_UI_SCRI} = $new_value; }
-	return( $self->{$KEY_UI_SCRI} );
+	if( defined( $new_value ) ) { $self->{$KEY_REQ_CLIP} = $new_value; }
+	return( $self->{$KEY_REQ_CLIP} );
+}
+
+sub client_domain {
+	my ($self, $new_value) = @_;
+	if( defined( $new_value ) ) { $self->{$KEY_REQ_CLDO} = $new_value; }
+	return( $self->{$KEY_REQ_CLDO} );
+}
+
+sub client_port {
+	my ($self, $new_value) = @_;
+	if( defined( $new_value ) ) { $self->{$KEY_REQ_CLPO} = $new_value; }
+	return( $self->{$KEY_REQ_CLPO} );
+}
+
+sub request_method {
+	my ($self, $new_value) = @_;
+	if( defined( $new_value ) ) { $self->{$KEY_REQ_METH} = $new_value; }
+	return( $self->{$KEY_REQ_METH} );
+}
+
+sub request_uri {
+	my ($self, $new_value) = @_;
+	if( defined( $new_value ) ) { $self->{$KEY_REQ_URIX} = $new_value; }
+	return( $self->{$KEY_REQ_URIX} );
+}
+
+sub request_protocol {
+	my ($self, $new_value) = @_;
+	if( defined( $new_value ) ) { $self->{$KEY_REQ_PROT} = $new_value; }
+	return( $self->{$KEY_REQ_PROT} );
 }
 
 sub referer {
 	my ($self, $new_value) = @_;
-	if( defined( $new_value ) ) { $self->{$KEY_UI_REFE} = $new_value; }
-	return( $self->{$KEY_UI_REFE} );
+	if( defined( $new_value ) ) { $self->{$KEY_REQ_REFE} = $new_value; }
+	return( $self->{$KEY_REQ_REFE} );
 }
 
 sub user_agent {
 	my ($self, $new_value) = @_;
-	if( defined( $new_value ) ) { $self->{$KEY_UI_AGEN} = $new_value; }
-	return( $self->{$KEY_UI_AGEN} );
-}
-
-sub remote_addr {
-	my ($self, $new_value) = @_;
-	if( defined( $new_value ) ) { $self->{$KEY_UI_RADD} = $new_value; }
-	return( $self->{$KEY_UI_RADD} );
-}
-
-sub remote_host {
-	my ($self, $new_value) = @_;
-	if( defined( $new_value ) ) { $self->{$KEY_UI_RHOS} = $new_value; }
-	return( $self->{$KEY_UI_RHOS} );
+	if( defined( $new_value ) ) { $self->{$KEY_REQ_AGEN} = $new_value; }
+	return( $self->{$KEY_REQ_AGEN} );
 }
 
 ######################################################################

@@ -66,7 +66,7 @@ __endquote
 
 $globals->current_user_path_level( 1 );
 $globals->set_prefs( \%CONFIG );
-$globals->call_component( 'CGI::WPM::GuestBook' );
+$globals->call_component( 'DemoGuestBook' );
 
 $io->send_user_output( $globals );
 

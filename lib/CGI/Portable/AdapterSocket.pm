@@ -17,7 +17,7 @@ require 5.004;
 
 use strict;
 use vars qw($VERSION);
-$VERSION = '0.43';
+$VERSION = '0.45';
 
 ######################################################################
 
@@ -33,7 +33,7 @@ $VERSION = '0.43';
 
 =head2 Nonstandard Modules
 
-	CGI::Portable 0.43
+	CGI::Portable 0.45
 
 =cut
 
@@ -88,7 +88,7 @@ use IO::Socket;
 		close $client;
 
 		printf "%s http://%s:%s%s %s\n", $content->request_method, 
-			$content->virtual_host, $content->server_port, 
+			$content->server_domain, $content->server_port, 
 			$content->user_path_string, $content->http_status_code;
 	}
 
@@ -146,11 +146,18 @@ them for yourself later.
 sub fetch_user_input {
 	my ($self, $globals, $client) = @_;
 
-	$globals->remote_addr( $client->peerhost() || '127.0.0.1' );  # number
-	$globals->remote_host( $client->peeraddr() || 'localhost' );  # domain
-	$globals->virtual_host( $client->sockaddr() || 'localhost' );  # domain
+	$globals->server_ip( $client->sockhost() || '127.0.0.1' );  # number
+	$globals->server_domain( $client->sockaddr() || 'localhost' );  # domain
 	$globals->server_port( $client->sockport() || 80 );
- 
+	$globals->client_ip( $client->peerhost() || '127.0.0.1' );  # number
+	$globals->client_domain( $client->peeraddr() || $client->peerhost() || 
+		'localhost' );  # domain
+	$globals->client_port( $client->peerport() );
+
+	my $host = $globals->server_domain();
+	my $port = $globals->server_port();
+	$globals->url_base( 'http://'.$host.($port != 80 ? ":$port" : '') );
+
 	my $endl = "\015\012";  # cr + lf
 	local $\ = $endl.$endl;
 	local $/ = $endl.$endl;
@@ -158,7 +165,9 @@ sub fetch_user_input {
 	my ($request, @headers_in) = grep( /\w/, split( $endl, $raw_http_headers ) );
 
 	my ($method, $uri, $protocol) = grep( /\S/, split( /\s/, $request ) );
-	$globals->request_method( $method );
+	$globals->request_method( $method || 'GET' );
+	$globals->request_uri( $uri || '/' );
+	$globals->request_protocol( $protocol || 'HTTP/1.0' );
 	my ($path, $query) = split( /\?/, $uri );
 	$globals->user_path( $self->_uri_unescape( $path ) );
 	$globals->user_query( $query );
@@ -169,7 +178,7 @@ sub fetch_user_input {
 		$key = lc( $key );
 		$key eq 'host' and do {
 			my ($hdomain, $hport) = split( ":", $value );
-			$hdomain and $globals->virtual_host( $hdomain );
+			$hdomain and $globals->server_domain( $hdomain );
 			$hport and $globals->server_port( $hport );
 		} and next;
 		$key eq 'referer' and 
@@ -185,16 +194,6 @@ sub fetch_user_input {
 		read( $client, $raw_http_body, $content_length );
 		chomp( $raw_http_body );
 		$globals->user_post( $raw_http_body );
-	}
-
-	my $host = $globals->virtual_host();
-	my $port = $globals->server_port();
-	$globals->url_base( 'http://'.$host.($port != 80 ? ":$port" : '') );
-
-	if( $globals->url_path_is_in_query() ) {
-		my $_qpn = $globals->url_path_query_param_name();
-		$globals->user_path( lc( $globals->user_query_param( $_qpn ) ) );
-		$globals->get_user_query_ref()->delete( $_qpn );
 	}
 
 	return( $raw_http_headers, $raw_http_body );  # for debugging

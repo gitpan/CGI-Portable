@@ -1,13 +1,13 @@
 =head1 NAME
 
-CGI::WPM::Usage - Demo of CGI::Portable that tracks web site usage details, 
+DemoUsage - Demo of CGI::Portable that tracks web site usage details, 
 as well as e-mail backups of usage counts to the site owner.
 
 =cut
 
 ######################################################################
 
-package CGI::WPM::Usage;
+package DemoUsage;
 require 5.004;
 
 # Copyright (c) 1999-2001, Darren R. Duncan. All rights reserved. This module is
@@ -18,7 +18,7 @@ require 5.004;
 
 use strict;
 use vars qw($VERSION @ISA);
-$VERSION = '0.44';
+$VERSION = '0.45';
 
 ######################################################################
 
@@ -36,16 +36,13 @@ $VERSION = '0.44';
 
 =head2 Nonstandard Modules
 
-	CGI::Portable 0.43
-	CGI::WPM::Base 0.44
+	CGI::Portable 0.45
 
 =cut
 
 ######################################################################
 
-use CGI::Portable 0.43;
-use CGI::WPM::Base 0.44;
-@ISA = qw(CGI::WPM::Base);
+use CGI::Portable 0.45;
 
 ######################################################################
 
@@ -81,14 +78,14 @@ use CGI::WPM::Base 0.44;
 	$content->current_user_path_level( 1 );
 	$content->navigate_file_path( 'content' );
 	$content->set_prefs( 'content_prefs.pl' );
-	$content->call_component( 'CGI::WPM::MultiPage' );
+	$content->call_component( 'DemoMultiPage' );
 	$globals->take_context_output( $content );
 
 	my $usage = $globals->make_new_context();
 	$usage->http_redirect_url( $globals->http_redirect_url() );
 	$usage->navigate_file_path( $globals->is_debug() ? 'usage_debug' : 'usage' );
 	$usage->set_prefs( '../usage_prefs.pl' );
-	$usage->call_component( 'CGI::WPM::Usage' );
+	$usage->call_component( 'DemoUsage' );
 	$globals->take_context_output( $usage, 1, 1 );
 
 	if( $globals->is_debug() ) {
@@ -109,8 +106,8 @@ __endquote
 
 =head2 Content of settings file "content_prefs.pl"
 
-I<Please see the POD for CGI::WPM::MultiPage for this file; that Synopsis POD is 
-being made in conjunction with the POD for CGI::WPM::Usage.>
+I<Please see the POD for DemoMultiPage for this file; that Synopsis POD is 
+being made in conjunction with the POD for DemoUsage.>
 
 =head2 Content of settings file "usage_prefs.pl", tracking as much as possible
 
@@ -277,7 +274,19 @@ my $RKEY_DISCARDS        = 'discards'; # if ref url matches these, filter junk
 my $RKEY_SEARCH_ENGINES  = 'search_engines'; # search engines and kw param names
 
 ######################################################################
-# This is provided so CGI::WPM::Base->main() can call it.
+
+sub main {
+	my ($class, $globals) = @_;
+	my $self = bless( {}, ref($class) || $class );
+
+	UNIVERSAL::isa( $globals, 'CGI::Portable' ) or 
+		die "initializer is not a valid CGI::Portable object";
+
+	$self->{$KEY_SITE_GLOBALS} = $globals;
+	$self->main_dispatch();
+}
+
+######################################################################
 
 sub main_dispatch {
 	my $self = shift( @_ );
@@ -308,7 +317,7 @@ sub email_and_reset_counts_if_new_day {
 	$rh_prefs->{$PKEY_EMAIL_LOGS} or return( 1 );
 
 	my $dcm_file = 
-		CGI::WPM::Usage::CountFile->new( $globals, $rh_prefs->{$PKEY_FN_DCM} );
+		DemoUsage::CountFile->new( $globals, $rh_prefs->{$PKEY_FN_DCM} );
 	$dcm_file->open_and_lock( 1 ) or return( undef );
 	$dcm_file->read_all_records();
 	if( $dcm_file->key_was_incremented_today( 
@@ -335,7 +344,7 @@ sub email_and_reset_counts_if_new_day {
 		foreach my $filename (@{$ra_filenames}) {
 			$filename or next;
 			my $count_file = 
-				CGI::WPM::Usage::CountFile->new( $globals, $filename );
+				DemoUsage::CountFile->new( $globals, $filename );
 			$count_file->open_and_lock( 1 ) or do {
 				push( @mail_body, "\n\n".$globals->get_error()."\n" );
 				next;
@@ -537,7 +546,7 @@ sub update_one_count_file {
 	push( @keys_to_inc, $rh_prefs->{$PKEY_TOKEN_TOTAL} );
 
 	my $count_file = 
-		CGI::WPM::Usage::CountFile->new( $globals, $filename );
+		DemoUsage::CountFile->new( $globals, $filename );
 	$count_file->open_and_lock( 1 ) or return( undef );
 	$count_file->read_all_records();
 
@@ -650,7 +659,7 @@ sub today_date_utc {
 
 ######################################################################
 
-package CGI::WPM::Usage::CountFile;
+package DemoUsage::CountFile;
 use Fcntl qw(:DEFAULT :flock);
 use Symbol;
 
@@ -869,7 +878,6 @@ Address comments, suggestions, and bug reports to B<perl@DarrenDuncan.net>.
 
 =head1 SEE ALSO
 
-perl(1), CGI::Portable, CGI::WPM::Base, Net::SMTP, Fcntl, Symbol, 
-CGI::Portable::AdapterCGI.
+perl(1), CGI::Portable, Net::SMTP, Fcntl, Symbol, CGI::Portable::AdapterCGI.
 
 =cut

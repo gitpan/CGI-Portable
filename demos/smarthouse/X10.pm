@@ -26,7 +26,7 @@ sub main {
 	 			{ name => $_, src => $globals->url_as_string( $_ ), } 
 	 			} qw( menu detail )] );
 			$globals->page_title( 'Smart House of 2001 by Darren Duncan' );
-			$globals->set_page_body( "<H2>Your Browser Doesn't Do Frames</H2>" );
+			$globals->set_page_body( "<H1>Your Browser Doesn't Do Frames</H1>" );
 	 		last SWITCH;
 	 	}
 	
@@ -45,7 +45,7 @@ sub main {
 		}
 	
 		$globals->set_page_body( 
-			"<H2>Bad Frame Address of '$current_frame' - BAD</H2>" );
+			"<H1>Bad Frame Address of '$current_frame' - BAD</H1>" );
 	}
 	 	
 	$globals->http_window_target( $current_frame );
@@ -71,7 +71,7 @@ sub menu_frame {
 		push( @menu_html, "<A HREF=\"$menu_url\">$menu_name</A>" );
 	}
 	
-	$globals->set_page_body( "<H2>Device List</H2>\n", 
+	$globals->set_page_body( "<H1>Device List</H1>\n", 
 		"<P>", join( "<BR>\n", @menu_html ), "</P>\n" );
 }
 
@@ -88,7 +88,7 @@ sub detail_frame {
 	 	
 		unless( $current_device ) {
 			$globals->set_page_body( <<__endquote );
-<H2>Welcome</H2>
+<H1>Welcome</H1>
 <P>Welcome to the Smart House of 2001 by Darren Duncan.  Please choose a device 
 that you wish to control from the menu on the left.</P>
 __endquote
@@ -99,7 +99,7 @@ __endquote
 
 		unless( ref( $rh_handler ) eq 'HASH' ) {
 			$globals->set_page_body( <<__endquote );
-<H2>Bad Menu Choice</H2>
+<H1>Bad Menu Choice</H1>
 <P>The device you chose from the menu, '$current_device', doesn't seem to be in 
 the list of devices that we know about.  If you entered that url manually then 
 please choose from the menu instead.  If you did choose from the menu then there 
@@ -115,7 +115,7 @@ __endquote
 		$device_context->call_component( $rh_handler->{'mod_name'} );
 		$globals->take_context_output( $device_context );
 		
-		$globals->prepend_page_body( "<H2>Device Control</H2>\n", 
+		$globals->prepend_page_body( "<H1>Device Control</H1>\n", 
 			"<P><STRONG>", $rh_handler->{'menu_name'}, "</STRONG></P>\n" );
 	}
 }

@@ -17,7 +17,7 @@ require 5.004;
 
 use strict;
 use vars qw($VERSION @ISA);
-$VERSION = '0.43';
+$VERSION = '0.45';
 
 ######################################################################
 
@@ -33,17 +33,17 @@ $VERSION = '0.43';
 
 =head2 Nonstandard Modules
 
-	CGI::Portable::Files 0.43
-	CGI::Portable::Request 0.43
-	CGI::Portable::Response 0.43
+	CGI::Portable::Files 0.45
+	CGI::Portable::Request 0.45
+	CGI::Portable::Response 0.45
 
 =cut
 
 ######################################################################
 
-use CGI::Portable::Files 0.43;
-use CGI::Portable::Request 0.43;
-use CGI::Portable::Response 0.43;
+use CGI::Portable::Files 0.45;
+use CGI::Portable::Request 0.45;
+use CGI::Portable::Response 0.45;
 @ISA = qw( CGI::Portable::Files CGI::Portable::Request CGI::Portable::Response );
 
 ######################################################################
@@ -117,7 +117,7 @@ use CGI::Portable::Response 0.43;
 		close $client;
 
 		printf "%s http://%s:%s%s %s\n", $content->request_method, 
-			$content->virtual_host, $content->server_port, 
+			$content->server_domain, $content->server_port, 
 			$content->user_path_string, $content->http_status_code;
 	}
 
@@ -189,7 +189,7 @@ use CGI::Portable::Response 0.43;
 
 =head2 Content of fat main program component "Aardvark.pm"
 
-I<This module acts sort of like CGI::WPM::MultiPage.>
+I<This module acts sort of like DemoMultiPage.>
 
 	package Aardvark;
 	use strict;
@@ -227,7 +227,7 @@ I<This module acts sort of like CGI::WPM::MultiPage.>
 
 =head2 Content of component module "Tiger.pm"
 
-I<This module acts sort of like CGI::WPM::MailForm without the emailing.>
+I<This module acts sort of like DemoMailForm without the emailing.>
 
 	package Tiger;
 	use strict;
@@ -252,10 +252,10 @@ I<This module acts sort of like CGI::WPM::MailForm without the emailing.>
 		$form->field_definitions( $ra_field_defs );
 		$form->user_input( $globals->user_post() );
 		$globals->set_page_body(
-			'<H2>Here Are Some Questions</H2>',
+			'<H1>Here Are Some Questions</H1>',
 			$form->make_html_input_form( 1 ),
 			'<HR>',
-			'<H2>Answers From Last Time If Any</H2>',
+			'<H1>Answers From Last Time If Any</H1>',
 			$form->new_form() ? '' : $form->make_html_input_echo( 1 ),
 		);
 	}
@@ -264,7 +264,7 @@ I<This module acts sort of like CGI::WPM::MailForm without the emailing.>
 
 =head2 Content of component module "Owl.pm"
 
-I<This module acts sort of like CGI::WPM::Redirect.>
+I<This module acts sort of like DemoRedirect.>
 
 	package Owl;
 	use strict;
@@ -281,7 +281,7 @@ I<This module acts sort of like CGI::WPM::Redirect.>
 
 =head2 Content of component module "Camel.pm"
 
-I<This module acts sort of like CGI::WPM::Static.>
+I<This module acts sort of like DemoStatic.>
 
 	package Camel;
 	use strict;
@@ -766,7 +766,7 @@ sub _make_call_component_error_page {
 	$self->page_title( 'Error Getting Screen' );
 
 	$self->set_page_body( <<__endquote );
-<H2 ALIGN="center">@{[$self->page_title()]}</H2>
+<H1>@{[$self->page_title()]}</H1>
 
 <P>I'm sorry, but an error occurred while getting the requested screen.  
 We were unable to use the application component that was in charge of 
@@ -862,7 +862,7 @@ This method will search for text like in the above formats, specifically the par
 '<A HREF="http://www.aardvark.net/it.pl/pics/green">green pics</A>' or 
 '<A HREF="http://www.aardvark.net/it.pl/jump?url=http://www.cpan.org">CPAN</A>'.  
 New urls are constructed in a similar fashion to what url_as_string() makes, and 
-incorporates your existing url base, query string, path location setting, and so
+incorporates your existing url base, query string, and so
 on.  Any query string you provide in the source text is added to the url query 
 in the output.  This specialized search and replace can not be done with 
 search_and_replace_page_body() since that would only replace the '__url_path__' 
@@ -879,9 +879,8 @@ sub search_and_replace_url_path_tokens {
 	my $ra_page_body = $self->get_page_body_ref();
 	my $body = join( '', @{$ra_page_body} );
 
-	my $_ple = $self->url_base().($self->url_path_is_in_query() ? 
-		'?'.$self->url_path_query_param_name().'=' : '');
-	my $_pri = $self->url_path_is_in_query() ? '&' : '?';
+	my $_ple = $self->url_base(); # SIMPLIFIED THIS 0-45
+	my $_pri = '?'; # SIMPLIFIED THIS 0-45
 	my $_que = $self->url_query_string();
 	$_que and $_que = "&$_que";
 	$body =~ s/"$token=([^&^"]*)&?(.*?)"/"$_ple\1$_pri\2$_que"/g;
@@ -1085,7 +1084,7 @@ Address comments, suggestions, and bug reports to B<perl@DarrenDuncan.net>.
 
 =head1 SEE ALSO
 
-perl(1), CGI::Portable::*, mod_perl, Apache, CGI::WPM::*, 
+perl(1), CGI::Portable::*, mod_perl, Apache, Demo*, 
 HTML::FormTemplate, CGI, CGI::Screen, CGI::MxScreen, 
 CGI::Application, CGI::BuildPage, CGI::Response, HTML::Mason.
 

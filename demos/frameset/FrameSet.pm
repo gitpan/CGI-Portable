@@ -16,7 +16,7 @@ sub main {
 	 			} qw( upper_left upper_right lower_left lower_right )] );
 			$globals->set_page_title( 'This Is The FrameSet Demo' );
 			$globals->set_page_style_code( 'BODY {background-color: white}' );
-			$globals->set_page_body( "<H2>Your Browser Doesn't Do Frames</H2>" );
+			$globals->set_page_body( "<H1>Your Browser Doesn't Do Frames</H1>" );
 	 		last SWITCH;
 	 	}
 	 	
@@ -24,30 +24,30 @@ sub main {
 	
 		if( $current_frame eq 'upper_left' ) {
 			$globals->set_page_style_code( 'BODY {background-color: red}' );
-			$globals->set_page_body( '<H2>The Upper-Left Red Corner</H2>' );
+			$globals->set_page_body( '<H1>The Upper-Left Red Corner</H1>' );
 			last SWITCH;
 		}
 	
 		if( $current_frame eq 'upper_right' ) {
 			$globals->set_page_style_code( 'BODY {background-color: green}' );
-			$globals->set_page_body( '<H2>The Upper-Right Green Corner</H2>' );
+			$globals->set_page_body( '<H1>The Upper-Right Green Corner</H1>' );
 			last SWITCH;
 		}
 	
 		if( $current_frame eq 'lower_left' ) {
 			$globals->set_page_style_code( 'BODY {background-color: blue}' );
-			$globals->set_page_body( '<H2>The Lower-Left Blue Corner</H2>' );
+			$globals->set_page_body( '<H1>The Lower-Left Blue Corner</H1>' );
 			last SWITCH;
 		}
 	
 		if( $current_frame eq 'lower_right' ) {
 			$globals->set_page_style_code( 'BODY {background-color: yellow}' );
-			$globals->set_page_body( '<H2>The Lower-Right Yellow Corner</H2>' );
+			$globals->set_page_body( '<H1>The Lower-Right Yellow Corner</H1>' );
 			last SWITCH;
 		}
 	
 		$globals->set_page_body( 
-			"<H2>Bad Frame Address of '$current_frame' - BAD</H2>" );
+			"<H1>Bad Frame Address of '$current_frame' - BAD</H1>" );
 	}
 }
 

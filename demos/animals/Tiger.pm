@@ -21,10 +21,10 @@ sub main {
 	$form->field_definitions( $ra_field_defs );
 	$form->user_input( $globals->user_post() );
 	$globals->set_page_body(
-		'<H2>Here Are Some Questions</H2>',
+		'<H1>Here Are Some Questions</H1>',
 		$form->make_html_input_form( 1 ),
 		'<HR>',
-		'<H2>Answers From Last Time If Any</H2>',
+		'<H1>Answers From Last Time If Any</H1>',
 		$form->new_form() ? '' : $form->make_html_input_echo( 1 ),
 	);
 }

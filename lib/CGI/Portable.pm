@@ -9,15 +9,18 @@ CGI::Portable - Framework for server-generic web apps
 package CGI::Portable;
 require 5.004;
 
-# Copyright (c) 1999-2001, Darren R. Duncan. All rights reserved. This module is
-# free software; you can redistribute it and/or modify it under the same terms as
-# Perl itself.  However, I do request that this copyright information remain
-# attached to the file.  If you modify this module and redistribute a changed
-# version then please attach a note listing the modifications.
+# Copyright (c) 1999-2003, Darren R. Duncan.  All rights reserved.  This module
+# is free software; you can redistribute it and/or modify it under the same terms
+# as Perl itself.  However, I do request that this copyright information and
+# credits remain attached to the file.  If you modify this module and
+# redistribute a changed version then please attach a note listing the
+# modifications.  This module is available "as-is" and the author can not be held
+# accountable for any problems resulting from its use.
 
 use strict;
+use warnings;
 use vars qw($VERSION @ISA);
-$VERSION = '0.46';
+$VERSION = '0.461';
 
 ######################################################################
 
@@ -33,17 +36,17 @@ $VERSION = '0.46';
 
 =head2 Nonstandard Modules
 
-	CGI::Portable::Files 0.46
-	CGI::Portable::Request 0.46
-	CGI::Portable::Response 0.46
+	CGI::Portable::Files 0.461
+	CGI::Portable::Request 0.471
+	CGI::Portable::Response 0.461
 
 =cut
 
 ######################################################################
 
-use CGI::Portable::Files 0.46;
-use CGI::Portable::Request 0.46;
-use CGI::Portable::Response 0.46;
+use CGI::Portable::Files 0.461;
+use CGI::Portable::Request 0.471;
+use CGI::Portable::Response 0.461;
 @ISA = qw( CGI::Portable::Files CGI::Portable::Request CGI::Portable::Response );
 
 ######################################################################
@@ -54,6 +57,7 @@ use CGI::Portable::Response 0.46;
 
 	#!/usr/bin/perl
 	use strict;
+	use warnings;
 
 	require CGI::Portable;
 	my $globals = CGI::Portable->new();
@@ -78,6 +82,7 @@ use CGI::Portable::Response 0.46;
 
 	#!/usr/bin/perl
 	use strict;
+	use warnings;
 
 	print "[Server $0 starting up]\n";
 
@@ -193,13 +198,14 @@ I<This module acts sort of like CGI::Portable::AppMultiScreen.>
 
 	package Aardvark;
 	use strict;
+	use warnings;
 	use CGI::Portable;
 
 	sub main {
 		my ($class, $globals) = @_;
 		my $users_choice = $globals->current_user_path_element();
 		my $rh_screens = $globals->pref( 'screens' );
-		
+	
 		if( my $rh_screen = $rh_screens->{$users_choice} ) {
 			my $inner = $globals->make_new_context();
 			$inner->inc_user_path_level();
@@ -208,7 +214,7 @@ I<This module acts sort of like CGI::Portable::AppMultiScreen.>
 			$inner->set_prefs( $rh_screen->{mod_prefs} );
 			$inner->call_component( $rh_screen->{mod_name} );
 			$globals->take_context_output( $inner );
-		
+	
 		} else {
 			$globals->set_page_body( "<p>Please choose a screen to view.</p>" );
 			foreach my $key (keys %{$rh_screens}) {
@@ -217,7 +223,7 @@ I<This module acts sort of like CGI::Portable::AppMultiScreen.>
 				$globals->append_page_body( "<br /><a href=\"$url\">$label</a>" );
 			}
 		}
-		
+	
 		$globals->page_title( $globals->pref( 'title' ) );
 		$globals->prepend_page_body( "<h1>".$globals->page_title()."</h1>\n" );
 		$globals->append_page_body( $globals->pref( 'credits' ) );
@@ -231,6 +237,7 @@ I<This module acts sort of like DemoMailForm without the emailing.>
 
 	package Tiger;
 	use strict;
+	use warnings;
 	use CGI::Portable;
 	use HTML::FormTemplate;
 
@@ -268,6 +275,7 @@ I<This module acts sort of like DemoRedirect.>
 
 	package Owl;
 	use strict;
+	use warnings;
 	use CGI::Portable;
 
 	sub main {
@@ -285,6 +293,7 @@ I<This module acts sort of like DemoStatic.>
 
 	package Camel;
 	use strict;
+	use warnings;
 	use CGI::Portable;
 
 	sub main {
@@ -324,6 +333,7 @@ I<This module acts sort of like nothing I've ever seen.>
 
 	package Panda;
 	use strict;
+	use warnings;
 	use CGI::Portable;
 
 	sub main {
@@ -1045,16 +1055,21 @@ __END__
 
 =head1 AUTHOR
 
-Copyright (c) 1999-2001, Darren R. Duncan. All rights reserved. This module is
-free software; you can redistribute it and/or modify it under the same terms as
-Perl itself.  However, I do request that this copyright information remain
-attached to the file.  If you modify this module and redistribute a changed
-version then please attach a note listing the modifications.
+Copyright (c) 1999-2003, Darren R. Duncan.  All rights reserved.  This module
+is free software; you can redistribute it and/or modify it under the same terms
+as Perl itself.  However, I do request that this copyright information and
+credits remain attached to the file.  If you modify this module and
+redistribute a changed version then please attach a note listing the
+modifications.  This module is available "as-is" and the author can not be held
+accountable for any problems resulting from its use.
 
 I am always interested in knowing how my work helps others, so if you put this
-module to use in any of your own code then please send me the URL.  Also, if you
-make modifications to the module because it doesn't work the way you need, please
-send me a copy so that I can roll desirable changes into the main release.
+module to use in any of your own products or services then I would appreciate
+(but not require) it if you send me the website url for said product or
+service, so I know who you are.  Also, if you make non-proprietary changes to
+the module because it doesn't work the way you need, and you are willing to
+make these freely available, then please send me a copy so that I can roll
+desirable changes into the main release.
 
 Address comments, suggestions, and bug reports to B<perl@DarrenDuncan.net>.
 

@@ -1,5 +1,6 @@
 package DrawImage;
 use strict;
+use warnings;
 use CGI::Portable;
 
 my $PIC_SUBPATH = 'thepic';

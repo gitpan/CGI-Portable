@@ -11,6 +11,7 @@
 
 package LM465;
 use strict;
+use warnings;
 use CGI::Portable;
 use HTML::FormTemplate;
 

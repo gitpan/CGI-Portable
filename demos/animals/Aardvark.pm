@@ -1,5 +1,6 @@
 package Aardvark;
 use strict;
+use warnings;
 use CGI::Portable;
 
 sub main {

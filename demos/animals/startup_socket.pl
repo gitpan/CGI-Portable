@@ -1,5 +1,6 @@
 #!/usr/bin/perl
 use strict;
+use warnings;
 use lib '/home/darren/perl_lib';
 
 print "[Server $0 starting up]\n";

@@ -1,5 +1,6 @@
 package FrameSet;
 use strict;
+use warnings;
 use CGI::Portable;
 
 sub main {

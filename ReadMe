@@ -76,30 +76,29 @@ and is a very solid release, so I see no reason to support anything older.
 
 Modules in this distribution require modules in these following distributions:
 
-File-VirtualPath-1.0.tar.gz
+File-VirtualPath-1.011.tar.gz
 	- by Darren Duncan (DUNCAND)
-	- File::VirtualPath 1.0 is required by:
-		- CGI::Portable (stores file-system and url related paths)
+	- File::VirtualPath 1.011 is required by:
+		- CGI::Portable::Files (stores file-system related paths)
+		- CGI::Portable::Request (stores url related paths)
 
-HTML-EasyTags-1.05.tar.gz
+CGI-MultiValuedHash-1.081.tar.gz
 	- by Darren Duncan (DUNCAND)
-	- HTML::EasyTags 1.05 is required by:
-		- CGI::Portable (assembles the pieces of a new HTML page)
+	- CGI::MultiValuedHash 1.081 is required by:
+		- CGI::Portable::Request (stores and url-decodes user queries, posts, cookies)
 
-MultiValuedHash-1.0703.tar.gz
+HTML-EasyTags-1.071.tar.gz
 	- by Darren Duncan (DUNCAND)
-	- Data::MultiValuedHash 1.07 is required by:
-		- CGI::Portable (stores new cookies prior to output)
-	- CGI::MultiValuedHash 1.07 is required by:
-		- CGI::Portable (stores and url-decodes user queries, posts, cookies)
+	- HTML::EasyTags 1.071 is required by:
+		- CGI::Portable::Response (assembles the pieces of a new HTML page)
 
 mod_perl-1.24_01.tar.gz (older versions may work):
 	- Apache 1.27 is required by:
 		- CGI::Portable::AdapterCGI (when running under mod_perl)
 
-HTML-FormTemplate-2.01.tar.gz
+HTML-FormTemplate-2.021.tar.gz
 	- by Darren Duncan (DUNCAND)
-	- HTML::FormTemplate 2.01 is required by:
+	- HTML::FormTemplate 2.021 is required by:
 		- DemoMailForm (for making input forms and form reports)
 		- DemoGuestBook (for making input forms and form reports)
 
@@ -117,10 +116,10 @@ INSTALLATION
 To install these modules, cd to the directory that contains all of the extracted 
 distribution files, including this ReadMe file, and type the following:
 
-        perl Makefile.PL
-        make
-        make test
-        make install
+	perl Makefile.PL
+	make
+	make test
+	make install
 
 The last step probably won't work if you are not the administrator of your 
 machine; in that case you either need to get your administrator to install this 
@@ -129,14 +128,15 @@ for you, or put it in a your own local directory instead.
 The Makefile.PL can do this for you if you substitute something like the 
 following for the first line above:
 
-        perl Makefile.PL PREFIX=/tmp/myperl5
-        
+	perl Makefile.PL PREFIX=/tmp/myperl5
+
 or:
 
-        perl Makefile.PL PREFIX=/home/me/myperl5
+	perl Makefile.PL PREFIX=/home/me/myperl5
 
-If you are on a Mac system and/or you are otherwise having problems with the 
-Makefile, you can still install this module the old fashioned way, by copying.
+If you are on a Mac system that is older than Mac OS X (Mac OS 9 or earlier)
+and/or you are otherwise having problems with the Makefile, you can still
+install this module the old fashioned way, by copying.
 
 Every file in the "lib" folder of this distribution goes in its corresponding 
 location within the "lib" folder that came with your Perl 5 distribution.
@@ -145,14 +145,14 @@ Or alternately, put them anywhere you want, but you will need to have that
 location added to your include path by your main program using something like 
 this:
 
-        use lib '/home/me/myperl5/lib';
+	use lib '/home/me/myperl5/lib';
 
-Then you would want to run the included test program to make sure the module is 
-installed correctly.  Call it with:
+Then you would want to run the included test programs to make sure the modules
+are installed correctly.  Call them like this:
 
-        perl test.pl
+	perl -w t/CGI-Portable-Framework.t
 
-Any existing POD is embedded in the module itself.  The Makefile probably 
+Any existing POD is embedded in the modules themselves.  The Makefile probably 
 extracted it for you in the usual manner, or you can run a POD extractor on it 
 yourself to the same effect.  You can also find an HTMLized copy of the POD on 
 CPAN and other public source archives; I link to one copy of it on my web site.
@@ -186,16 +186,21 @@ TO DO
 
 AUTHOR
 
-Copyright (c) 1999-2001, Darren R. Duncan. All rights reserved. These modules are
-free software; you can redistribute them and/or modify them under the same terms
-as Perl itself.  However, I do request that their copyright information remains
-attached to the files.  If you modify this module and redistribute a changed
-version then please attach a note listing the modifications.
+Copyright (c) 1999-2003, Darren R. Duncan.  All rights reserved.  This module
+is free software; you can redistribute it and/or modify it under the same terms
+as Perl itself.  However, I do request that this copyright information and
+credits remain attached to the file.  If you modify this module and
+redistribute a changed version then please attach a note listing the
+modifications.  This module is available "as-is" and the author can not be held
+accountable for any problems resulting from its use.
 
 I am always interested in knowing how my work helps others, so if you put this
-module to use in any of your own code then please send me the URL.  Also, if you
-make modifications to the module because it doesn't work the way you need, please
-send me a copy so that I can roll desirable changes into the main release.
+module to use in any of your own products or services then I would appreciate
+(but not require) it if you send me the website url for said product or
+service, so I know who you are.  Also, if you make non-proprietary changes to
+the module because it doesn't work the way you need, and you are willing to
+make these freely available, then please send me a copy so that I can roll
+desirable changes into the main release.
 
 Address comments, suggestions, and bug reports to perl@DarrenDuncan.net.
 

@@ -11,6 +11,7 @@
 
 package X10;
 use strict;
+use warnings;
 use CGI::Portable;
 
 sub main {

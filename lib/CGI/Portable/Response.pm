@@ -9,15 +9,18 @@ CGI::Portable::Response - Stores user output; HTTP headers/body, HTML page piece
 package CGI::Portable::Response;
 require 5.004;
 
-# Copyright (c) 1999-2001, Darren R. Duncan. All rights reserved. This module is
-# free software; you can redistribute it and/or modify it under the same terms as
-# Perl itself.  However, I do request that this copyright information remain
-# attached to the file.  If you modify this module and redistribute a changed
-# version then please attach a note listing the modifications.
+# Copyright (c) 1999-2003, Darren R. Duncan.  All rights reserved.  This module
+# is free software; you can redistribute it and/or modify it under the same terms
+# as Perl itself.  However, I do request that this copyright information and
+# credits remain attached to the file.  If you modify this module and
+# redistribute a changed version then please attach a note listing the
+# modifications.  This module is available "as-is" and the author can not be held
+# accountable for any problems resulting from its use.
 
 use strict;
+use warnings;
 use vars qw($VERSION);
-$VERSION = '0.46';
+$VERSION = '0.461';
 
 ######################################################################
 
@@ -33,7 +36,7 @@ $VERSION = '0.46';
 
 =head2 Nonstandard Modules
 
-	HTML::EasyTags 1.06  -- only required in page_as_string()
+	HTML::EasyTags 1.071  -- only required in page_as_string()
 
 =head1 SYNOPSIS
 
@@ -295,7 +298,7 @@ sub take_context_output {
 		defined( $context->{$KEY_PAGE_AUTH} ) and 
 			$self->{$KEY_PAGE_AUTH} = $context->{$KEY_PAGE_AUTH};
 	}
-	
+
 	if( $replace_lists ) {
 		@{$context->{$KEY_HTTP_COOK}} and 
 			$self->{$KEY_HTTP_COOK} = [@{$context->{$KEY_HTTP_COOK}}];
@@ -1284,16 +1287,21 @@ __END__
 
 =head1 AUTHOR
 
-Copyright (c) 1999-2001, Darren R. Duncan. All rights reserved. This module is
-free software; you can redistribute it and/or modify it under the same terms as
-Perl itself.  However, I do request that this copyright information remain
-attached to the file.  If you modify this module and redistribute a changed
-version then please attach a note listing the modifications.
+Copyright (c) 1999-2003, Darren R. Duncan.  All rights reserved.  This module
+is free software; you can redistribute it and/or modify it under the same terms
+as Perl itself.  However, I do request that this copyright information and
+credits remain attached to the file.  If you modify this module and
+redistribute a changed version then please attach a note listing the
+modifications.  This module is available "as-is" and the author can not be held
+accountable for any problems resulting from its use.
 
 I am always interested in knowing how my work helps others, so if you put this
-module to use in any of your own code then please send me the URL.  Also, if you
-make modifications to the module because it doesn't work the way you need, please
-send me a copy so that I can roll desirable changes into the main release.
+module to use in any of your own products or services then I would appreciate
+(but not require) it if you send me the website url for said product or
+service, so I know who you are.  Also, if you make non-proprietary changes to
+the module because it doesn't work the way you need, and you are willing to
+make these freely available, then please send me a copy so that I can roll
+desirable changes into the main release.
 
 Address comments, suggestions, and bug reports to B<perl@DarrenDuncan.net>.
 

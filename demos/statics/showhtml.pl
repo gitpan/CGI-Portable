@@ -1,5 +1,6 @@
 #!/usr/bin/perl
 use strict;
+use warnings;
 use lib '/home/darren/perl_lib';
 
 require CGI::Portable;

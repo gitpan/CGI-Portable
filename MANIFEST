@@ -53,4 +53,4 @@ lib/CGI/Portable/Response.pm
 Makefile.PL
 MANIFEST
 ReadMe
-test.pl
+t/CGI-Portable-Framework.t

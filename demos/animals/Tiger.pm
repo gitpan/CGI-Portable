@@ -1,5 +1,6 @@
 package Tiger;
 use strict;
+use warnings;
 use CGI::Portable;
 use HTML::FormTemplate;
 

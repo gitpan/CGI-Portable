@@ -3,13 +3,12 @@ use ExtUtils::MakeMaker;
 # the contents of the Makefile that is written.
 WriteMakefile(
 	NAME	=> 'CGI::Portable',
-	VERSION => 0.47,
+	VERSION => 0.471,
 	PREREQ_PM => {
-		'File::VirtualPath' => 1.0,
-		'HTML::EasyTags' => 1.05,
-		'Data::MultiValuedHash' => 1.07,
-		'CGI::MultiValuedHash' => 1.07,
-		'HTML::FormTemplate' => 2.01,  # for Demo* modules only
+		'File::VirtualPath' => 1.011,
+		'CGI::MultiValuedHash' => 1.081,
+		'HTML::EasyTags' => 1.071,
+		'HTML::FormTemplate' => 2.021,  # for Demo* modules only
 		'Net::SMTP' => 1,  # I don't know what version; for Demo* only
 		'Apache' => 1,  # I don't know what version; for AdapterCGI under mod_perl
 		'IO::Socket' => 1,  # I don't know what version; for AdapterSocket

@@ -1,0 +1,177 @@
+             FRAMEWORK FOR PORTABLE WEB APPLICATIONS
+----------------------------------------------------------------------
+
+by Darren Duncan <perl@DarrenDuncan.net>
+
+CONTENTS
+
+* Preface
+* Keeping Up To Date
+* Requirements
+* Installation
+* Support
+* To Do
+* Author
+
+PREFACE
+
+This distribution features the Perl 5 module named "CGI::Portable".
+
+It also includes 10 other modules that are designed to be used with it; these
+10 are all in the temporary name space CGI::WPM::*.  Eight of them are
+demo "application components", one performs user input and output, and one
+encapsulates a file format for counting events.  By looking at those you should
+have a better idea what CGI::Portable can do for you.
+
+This distribution now has a "demos" folder containing 40 files and folders 
+which are ready-to-use example scripts and data files that exercise 
+CGI::Portable and all of the CGI::WPM::* modules.  Many of these are exactly 
+the same as the *new* Synopsis POD for particular modules.  Some have minor 
+adjustments or demonstrate the Synopsis examples that make use of the most 
+features of the particular modules.  Many demos have extra files in them 
+that never appeared in Synopsis.  It is my hope that these demos will 
+make it an order of magnitude easier for you to adopt my modules and put 
+them to work in a productive manner.  The provided demos include: a multi-page 
+web site with usage tracking, guest books, mail and survey forms, static html 
+and plain text pages, segmented text file display, redirection, and a few 
+other strange modules that don't do anything useful but play with features.
+
+All of my modules have complete POD inside of them, so please refer to that for a
+description of the module itself.  Although the POD with this set isn't as
+complete as I would like, it should still be suitable.  Mostly what is lacking 
+is descriptions of each "preference" and what effect it has.  Hopefully the 
+detailed Synopsis and demos will be self-explanatory on what the prefs do.
+	
+This Read Me document concerns itself mainly with installation and support
+issues, and also includes any "To Do" lists.
+
+KEEPING UP TO DATE
+
+My module set is constantly under development.  You should be able to find the
+newest versions at my website, "http://www.DarrenDuncan.net", on the page called
+"Perl Libraries I Made" (name subject to change).  They can also be found on CPAN
+under the author name of "DUNCAND".  
+
+I am inclined to update the copies on my web site more often, but those
+intermediate versions are more likely to have been tested less, and the modules
+may be updated day by day without increasing the version numbers.  However, the
+copies on CPAN are guaranteed to have unique version numbers when the module has
+changed.
+
+REQUIREMENTS
+
+All of my modules require Perl 5.004 or newer, even though only some of them need
+it, in the interest of consistency.  That said, Perl 5.004 is already 3 years 
+old, is available as a binary on practically every OS that supports Perl at all, 
+and is a very solid release, so I see no reason to support anything older.
+
+Modules in this distribution require modules in these following distributions:
+
+File-VirtualPath-1.0.tar.gz
+	- by Darren Duncan (DUNCAND)
+	- File::VirtualPath 1.0 is required by:
+		- CGI::Portable (stores file-system and url related paths)
+
+HTML-EasyTags-1.04.tar.gz
+	- by Darren Duncan (DUNCAND)
+	- HTML::EasyTags 1.04 is required by:
+		- CGI::Portable (assembles the pieces of a new HTML page)
+
+MultiValuedHash-1.07.tar.gz
+	- by Darren Duncan (DUNCAND)
+	- Data::MultiValuedHash 1.07 is required by:
+		- CGI::Portable (stores new cookies prior to output)
+	- CGI::MultiValuedHash 1.07 is required by:
+		- CGI::Portable (stores and url-decodes user queries, posts, cookies)
+
+HTML-FormTemplate-2.0.tar.gz
+	- by Darren Duncan (DUNCAND)
+	- HTML::FormTemplate 2.0 is required by:
+		- CGI::WPM::MailForm (for making input forms and form reports)
+		- CGI::WPM::GuestBook (for making input forms and form reports)
+
+libnet-1.0703.tar.gz (older versions may work):
+	- by Graham Barr (GBARR)
+	- Net::SMTP 2.15 is required by:
+		- CGI::WPM::MailForm (when sending e-mails of form data)
+		- CGI::WPM::GuestBook (when sending e-mails of form data)
+		- CGI::WPM::Usage (when sending e-mails of usage data)
+
+libwww-perl-5.48.tar.gz (older versions may work):
+	- by Gisle Aas (GAAS)
+	- HTTP::Headers 1.37 is required by:
+		- CGI::WPM::SimpleUserIO (when outputting http headers to the user)
+
+mod_perl-1.24_01.tar.gz (older versions may work):
+	- Apache 1.27 is required by:
+		- CGI::WPM::SimpleUserIO (when running under mod_perl)
+
+INSTALLATION
+
+To install this module, cd to the directory that contains all of the extracted 
+distribution files, including this ReadMe file, and type the following:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+The last step probably won't work if you are not the administrator of your 
+machine; in that case you either need to get your administrator to install this 
+for you, or put it in a your own local directory instead.
+
+If you are on a Mac system and/or you are otherwise having problems with the 
+Makefile, you can still install this module the old fashioned way, by copying.
+
+The file "Portable.pm" goes inside the "CGI" folder which is in the "lib" 
+folder that came with your Perl 5 distribution.  All of the other .pm modules 
+go inside the temporary folder "WPM", which is inside "CGI", which is in the 
+"lib" folder that came with your Perl 5 distribution.
+
+Or alternately, put it anywhere you want, but you will need to have that 
+location added to your include path by your main program using something like 
+this:
+
+	use lib '/users/me/www_files/lib';
+
+Then you would want to run the included test program to make sure the module is 
+installed correctly.  Call it with:
+
+	perl test.pl
+
+Any existing POD is embedded in the module itself.  The Makefile probably 
+extracted it for you in the usual manner, or you can run a POD extractor on it 
+yourself to the same effect.  You can also find an HTMLized copy of the POD on 
+CPAN and other public source archives; I link to one copy of it on my web site.
+
+SUPPORT
+
+Currently I don't have any support arranged with other people, lists, newsgroups,
+or otherwise.  Feel free to ask me if you can't figure things out on your own, or
+another person whom you know has used this.  I may start a mailing list for 
+support issues later, so that users of my modules can help each other with them.
+
+TO DO
+
+	* Add a battery of ok / not ok tests.
+	* Improve the documentation.
+	* I have few more ideas in this regard, but am open to suggestions.
+	* Now all of my pre-conceived modules for public release are done, so all 
+	I've got left to do in that regards is improve the existing ones.
+
+AUTHOR
+
+Copyright (c) 1999-2001, Darren R. Duncan. All rights reserved. These modules are
+free software; you can redistribute them and/or modify them under the same terms
+as Perl itself.  However, I do request that their copyright information remains
+attached to the files.  If you modify this module and redistribute a changed
+version then please attach a note listing the modifications.
+
+I am always interested in knowing how my work helps others, so if you put this
+module to use in any of your own code then please send me the URL.  Also, if you
+make modifications to the module because it doesn't work the way you need, please
+send me a copy so that I can roll desirable changes into the main release.
+
+Address comments, suggestions, and bug reports to perl@DarrenDuncan.net.
+
+Share and Enjoy!

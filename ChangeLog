@@ -1,0 +1,247 @@
+2001-05-04   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 0.41.
+	
+	* This release is the first one following successful registrations with 
+	"The Perl 5 Module List".  The updated entry would look like this:
+
+CGI::
+::Portable        adpO Framework for server-agnostic web apps       DUNCAND
+	
+	* This is the first release of CGI::Portable, which has been renamed from 
+	HTML::Application.  There are several changes to the module itself.
+	This release also includes all of my CGI::WPM::* modules, which have not been 
+	renamed, to serve as demonstrations of CGI::Portable in use.  Their code has 
+	been updated a bit.  Similarly, this distribution has been renamed to 
+	CGI-Portable from HTML-Application and duncand-prerelease.
+	
+	* This distribution now has a "demos" folder containing 40 files and folders 
+	which are ready-to-use example scripts and data files that exercise 
+	CGI::Portable and all of the CGI::WPM::* modules.  Many of these are exactly 
+	the same as the *new* Synopsis POD for particular modules.  Some have minor 
+	adjustments or demonstrate the Synopsis examples that make use of the most 
+	features of the particular modules.  Many demos have extra files in them 
+	that never appeared in Synopsis.  It is my hope that these demos will 
+	make it an order of magnitude easier for you to adopt my modules and put 
+	them to work in a productive manner.  The provided demos include: a multi-page 
+	web site with usage tracking, guest books, mail and survey forms, static html 
+	and plain text pages, segmented text file display, redirection, and a few 
+	other strange modules that don't do anything useful but play with features.
+	
+	* All of the CGI::WPM::* modules except CountFile had their POD updated, 
+	most notably with their Synopsis section.  The new Synopsis should each be 
+	complete working programs now, although some of the other data files they 
+	call on may not exist unless you make them.
+	
+	* All modules in this distribution are at version 0.41 whether or not there 
+	was any functionality change.
+	
+	* Updated these methods of CGI::Portable to permit more descriptive error 
+	messages: resolve_prefs_node_to_array(), resolve_prefs_node_to_hash().  
+	Previously these methods always reported a nonexistant file or directory 
+	(whatever is in $!) even if the file did exist but had a different problem.  
+	The new versions will distinguish a successful runtime that returns something 
+	other than a hash/array ref, and will distinguish an existing file that just 
+	doesn't compile or has a runtime error.
+	
+	* Updated methods add_virtual_filename_error(), add_physical_filename_error() 
+	to support custom reason strings for file-related errors as an extra method 
+	argument.  Previously the "reason" was always the content of $!.
+	
+	* Modified method call_component() so that it now makes error screens itself 
+	upon error conditions that it discovers, including failure of the component 
+	to compile or run, or previously unhandled errors, probably related to prefs.  
+	As a result, the calling structure of this method is simplified; you simply 
+	take_context_output() and/or send the output as you usually do, without 
+	needing extra code to report error conditions.  (You can still make a custom 
+	error screen if you want.)  The second argument to call_component() was also 
+	removed, and the method will now always make an error screen and return if 
+	there is an unresolved error message.  Likewise to the simplified calling 
+	code, the called component doesn't need code to make an error screen for 
+	problems occuring prior to its invocation, and is thereby simplified.
+
+	* Added method search_and_replace_url_path_tokens() to CGI::Portable that 
+	handles a special kind of search and replace that 
+	search_and_replace_page_body() can't handle, since it deals with processing 
+	and replacing text near the token being searched for rather than just the 
+	token itself.  This method makes it easier to embed dynamic self-referencing 
+	urls inside static screen content files used by your app.
+	
+	* Added seven new methods to CGI::Portable which handle a special set of 
+	"global preferences", each of which gets its own accessor method, which can 
+	be set once and used all over your program.  They are: 
+	default_application_title(), default_maintainer_name(), 
+	default_maintainer_email_address(), default_maintainer_email_screen_url_path(), 
+	default_smtp_host(), default_smtp_timeout(), maintainer_email_html().  
+	The updated call_component() uses this information in its error screens, and 
+	the various CGI::WPM::* modules use it in many places as well.  During 
+	release 0.4, this global info was passed using the miscellaneous objects 
+	property, which was a rather user-unfriendly means in comparison; scripts 
+	written to use release 0.4 will have to be updated accordingly.
+	
+	* CGI::Portable received several updates to its pod besides the appropriate 
+	method updates, most notably in the Name, Synopsis, Description, 
+	Similar Modules, A Different Overview.
+	
+	* Added a couple methods to CGI::WPM::SimpleUserIO which will considerably 
+	reduce the size of your config shell if you use them: the method 
+	give_user_input_to_cgi_portable() will take a CGI::Portable object and feed 
+	it all the user input possible at once; the method 
+	send_user_output_from_cgi_portable() will likewise take a CGI::Portable 
+	object and send its output to the user all at once.
+	
+	* CGI::WPM::Base has been reduced to half its size as all but these 3 methods 
+	were removed: main(), main_dispatch(), _get_amendment_message().  The code 
+	to check for pre-existing logged error conditions was also removed.
+	
+	* Updated CGI::WPM::GuestBook in the following ways: 1. The private method 
+	get_question_field_defs() had a lot of redundant code removed, reducing the 
+	method to half its previous size; for one thing, it makes use of 
+	CGI::Portable's resolve_prefs_node_to_array() method now instead of doing a 
+	poorer job of it manually.  2. Added preference "sign_by_default" which 
+	allows you to choose whether the signing or reading mode is the default 
+	when one isn't specified.  3. Added self-referencing links in the signing 
+	mode that takes one to the reading mode; the reverse had already existed; so 
+	now the module has built-in links between all of its modes.  4. Added 
+	preference "msg_list_show_email" which if true will display the email 
+	addresses of book signers in the reading mode; the default of not showing 
+	the emails is what always happened before, even though they were stored in 
+	the message file.  5. Minor update to the screen showing a successful 
+	message was just posted where the recipient's email is now shown.  
+	6. Updated the functionality relating to the simplified Boulder data files 
+	(used to be called SequentialFile by me) where nonexistant files are only 
+	created if they are for storing messages; they are now not created when they 
+	were supposed to hold field definitions, since this is an error.
+	
+	* Updated CGI::WPM::MailForm in the same ways as #s 1, 5, 6 of GuestBook; 
+	regarding #6, MailForm would only ever read from such files anyway.
+	
+	* Updated CGI::WPM::Usage in the following ways: 1. Removed preference 
+	'use_def_engines'; it no longer applies because there is no longer any list 
+	of search engines built into the module.  To attempt such a thing here is an 
+	impossible task considering how many there are and people's varying opinions 
+	on what should be grouped there.  So now if you want search engine 
+	differentiation in referrer listings then you can provide a complete list 
+	yourself via the already existing 'search_engines' preference.
+	2. Removed preference 'site_urls' since it had existed to make a big deal of 
+	something that is better automated and not worried about anyway.  From now on, 
+	a referring url is said to be self-referencing if its base portion matches 
+	the return value of CGI::Portable's base_url() method.  While a few self urls 
+	will undoubtedly end up in the normal referrer list, the majority will be 
+	caught, and the ones slipping through are easy to identify in the list. 
+	3. As a result of these changes, CGI::WPM::Usage is now a tenth smaller.
+	
+2001-04-23   Darren Duncan <perl@DarrenDuncan.net>
+
+	* duncand-prerelease 0.4, the last version of any distribution, prior to 
+	this one, to include the CGI::WPM::* modules, was released.
+	
+2001-04-23   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 0.4.
+	
+	* This is the second release of HTML::Application as a distinct module.  
+	It follows more extensive usability testing which resulted in a few added 
+	features and bug fixes.  As a result of the new testing, this module is being 
+	moved to beta status from alpha.
+	
+	* Fixed SYNOPSIS POD in "Aardvark" module relating to the $inner context; some 
+	methods are now called following make_new_context() instead of before.
+	
+	* Fixed bug in private method _make_an_url(), which is used by 
+	url_as_string() and recall_url(), where query parameters were not being 
+	replicated when url_path_is_in_path_info() was true; now they are.
+	
+	* Fixed design flaw in make_new_context() where it had been calling 
+	initialize() to give default values to the new object before copying over the 
+	non default ones; now initialize() is not called and all object properties 
+	are either set or copied explicitely.  The flaw being fixed relates to 
+	unpleasantries when a subclass overrides the initialize() method.
+	
+	* Added new method take_context_output() which is designed to complement 
+	make_new_context().  This new method copies output values from the new 
+	context back to the parent object.
+	
+	* Added new utility method search_and_replace_page_body() which takes a hash 
+	of tokens (or regexps) to search for in the html page body and text to 
+	replace them with; this method implements search-and-replace functionality.
+
+	* This module has become 5K larger including documentation.
+
+2001-04-20   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 0.38.
+	
+	* This release is the first one anticipating official registrations with 
+	"The Perl 5 Module List".  The updated entry would look like this:
+
+HTML::
+::Application     adpO Framework for complex portable web apps      DUNCAND
+	
+	* This release contains the first appearance of my HTML::Application module.
+	Its code is derived from several related modules which had been constantly 
+	renamed, split, and combined since their first CPAN release in 2000-07-23.  
+	The most recent temporary names for these were "CGI::WPM::Globals", 
+	"CGI::WPM::PageMaker" and "CGI::WPM::WebUserIO".  They were previously 
+	released as parts of the following distributions:
+		- "libdwg": v1.0 r2000-07-23, v1.11 r2000-08-23
+		- "CGI-FormGenerator": v0.9 r2000-09-04, v0.9201 r2000-12-26
+		- "CGI-WebsiteGenerator": v0.3 r2000-09-04, v0.36 r2001-04-10
+		- "duncand-prerelease": v0.37 r2001-04-12
+	
+	* This module requires Perl version 5.004.
+	
+	* It also requires File::VirtualPath 1.0, HTML::EasyTags 1.04, 
+	Data::MultiValuedhash 1.07, and CGI::MultiValuedHash 1.07.  I consider the 
+	first three modules to be stable and well tested, as well as unlikely to 
+	change.  The fourth module is partially tested, but production use of the 
+	other functionality finds it to be working properly.
+	
+	* This release comes with the CPAN standard files "Makefile.PL", "test.pl", 
+	and "MANIFEST", which were all created since the previous release.
+
+	* Note that "test.pl" is incomplete; it only tests that this module will 
+	compile but not that the methods work; it is included so that people can use 
+	the Makefile in the standard way during installation.  This file will be 
+	fleshed out when I have the chance.
+	
+2001-04-12   Darren Duncan <perl@DarrenDuncan.net>
+
+	* duncand-prerelease 0.37, the last version of any distribution to include
+	CGI::WPM::Globals, was released.
+	
+2000-07-23   Darren Duncan <perl@DarrenDuncan.net>
+
+	* libdwg 1.0, the first version of any distribution to include
+	CGI::WPM::Globals and other CGI::WPM::* modules, was released on CPAN.
+	
+2000-05-15   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Completed primary development on these modules, but POD mostly nonexistant.
+
+2000-03-07   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Began development on the final versions of these modules.
+	
+	* Module based on a template created by h2xs 1.18.
+
+1999-07 thru 1999-12
+
+	* Worked on second prototype of code that ended up in these modules.  The 
+	effects of this development, as far as this distribution's own modules go, 
+	were mostly confined to CGI::Portable.
+
+	* As a separate but parallel project, I also implemented a complete and
+generic Threaded Discussion Board object using some of my low level modules *and*
+CGI.pm.  This board is possibly still in use today in a corporate Intranet site.
+
+1999-02 thru 1999-05
+
+	* Created first prototypes of code that ended up in these modules and used 
+in a production environment for a year to generate my web sites. Many present-day
+features were present at that time, including static pages, segmented text pages,
+e-mail forms and guest books with unlimited questions (but were text only),
+redirection, and usage tracking.  The implementation was just a hell of a lot
+uglier.  These modules also used CGI.pm to do some things that have since become 
+implemented by my own more focused modules: HTML::FormTemplate, HTML::EasyTags, 
+Data::MultiValuedHash, CGI::MultiValuedHash, CGI::Portable, CGI::WPM::SimpleUserIO.

@@ -1,3 +1,11 @@
+2003-03-21   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 0.472.
+
+	* The only change in this release was to fix t/CGI-Portable-Framework.t,
+	where I had forgotten to declare (and set) a variable before using it. 
+	This omission had caused "make test" to completely fail.
+
 2003-03-16   Darren Duncan <perl@DarrenDuncan.net>
 
 	* Release 0.471.

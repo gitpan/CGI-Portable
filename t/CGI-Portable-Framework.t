@@ -23,6 +23,9 @@ print "ok 1\n";
 use strict;
 use warnings;
 
+# Set this to 1 to see complete result text for each test
+my $verbose = shift( @ARGV ) ? 1 : 0;  # set from command line
+
 ######################### End of black magic.
 
 # Insert your test code below (better if it prints "ok 13"

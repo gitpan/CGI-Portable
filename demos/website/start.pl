@@ -27,7 +27,7 @@ my $content = $globals->make_new_context();
 $content->current_user_path_level( 1 );
 $content->navigate_file_path( 'content' );
 $content->set_prefs( 'content_prefs.pl' );
-$content->call_component( 'DemoMultiPage' );
+$content->call_component( 'CGI::Portable::AppSplitScreen' );
 $globals->take_context_output( $content );
 
 my $usage = $globals->make_new_context();
@@ -35,18 +35,14 @@ $usage->http_redirect_url( $globals->http_redirect_url() );
 $usage->navigate_file_path( $globals->is_debug() ? 'usage_debug' : 'usage' );
 $usage->set_prefs( '../usage_prefs.pl' );
 $usage->call_component( 'DemoUsage' );
-$globals->take_context_output( $usage, 1, 1 );
+$globals->take_context_output( $usage, 1 );
 
 if( $globals->is_debug() ) {
 	$globals->append_page_body( <<__endquote );
-<P>Debugging is currently turned on.</P>
+<p>Debugging is currently turned on.</p>
 __endquote
 }
 
-$globals->search_and_replace_page_body( { 
-	__mailme_url__ => "__url_path__=/mailme",
-	__external_id__ => "__url_path__=/external&url",
-} );
 $globals->search_and_replace_url_path_tokens( '__url_path__' );
 
 $io->send_user_output( $globals );

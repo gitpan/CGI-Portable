@@ -17,7 +17,7 @@ require 5.004;
 
 use strict;
 use vars qw($VERSION @ISA);
-$VERSION = '0.45';
+$VERSION = '0.46';
 
 ######################################################################
 
@@ -34,14 +34,14 @@ $VERSION = '0.45';
 =head2 Nonstandard Modules
 
 	File::VirtualPath 1.0
-	CGI::Portable::Errors 0.45
+	CGI::Portable::Errors 0.46 (a superclass)
 
 =cut
 
 ######################################################################
 
 use File::VirtualPath 1.0;
-use CGI::Portable::Errors 0.45;
+use CGI::Portable::Errors 0.46;
 @ISA = qw( CGI::Portable::Errors );
 
 ######################################################################
@@ -177,7 +177,7 @@ provided in the optional argument CONTEXT (if CONTEXT is an object of the same
 class); otherwise a brand new object is used.  Only properties recognized by
 CGI::Portable::Files are set in this object; others are not touched.
 
-=head2 take_context_output( CONTEXT[, APPEND_LISTS[, SKIP_SCALARS]] )
+=head2 take_context_output( CONTEXT[, LEAVE_SCALARS[, REPLACE_LISTS]] )
 
 This method takes another CGI::Portable::Files (or subclass) object as its
 CONTEXT argument and copies some of its properties to this object, potentially
@@ -185,13 +185,18 @@ overwriting any versions already in this object.  If CONTEXT is not a valid
 CGI::Portable::Files (or subclass) object then this method returns without
 changing anything.  The properties that get copied are the "output" properties
 that presumably need to work their way back to the user.  In other words, this
-method copies everything that make_new_context() did not. If the optional boolean
-argument APPEND_LISTS is true then any list-type properties, including arrays and
-hashes, get appended to the existing values where possible rather than just
-replacing them.  In the case of hashes, however, keys with the same names are
-still replaced.  If the optional boolean argument SKIP_SCALARS is true then
-scalar properties are not copied over; otherwise they will always replace any
-that are in this object already.
+method copies everything that make_new_context() did not.  This method will 
+never copy any properties which are undefined scalars or empty lists, so a 
+CONTEXT with no "output" properties set will not cause any changes.  If any 
+scalar output properties of CONTEXT are defined, they will overwrite any 
+defined corresponding properties of this object by default; however, if the 
+optional boolean argument LEAVE_SCALARS is true, then the scalar values are 
+only copied if the ones in this object are not defined.  If any list output 
+properties of CONTEXT have elements, then they will be appended to 
+any corresponding ones of this object by default, thereby preserving both 
+(except with hash properties, where like hash keys will overwrite); 
+however, if the optional boolean argument REPLACE_LISTS is true, then any 
+existing list values are overwritten by any copied CONTEXT equivalents.
 
 =cut
 

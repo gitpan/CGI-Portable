@@ -17,7 +17,7 @@ require 5.004;
 
 use strict;
 use vars qw($VERSION);
-$VERSION = '0.45';
+$VERSION = '0.46';
 
 ######################################################################
 
@@ -33,7 +33,7 @@ $VERSION = '0.45';
 
 =head2 Nonstandard Modules
 
-	CGI::Portable 0.45
+	CGI::Portable 0.46
 
 =cut
 

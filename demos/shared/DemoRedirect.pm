@@ -17,7 +17,7 @@ require 5.004;
 
 use strict;
 use vars qw($VERSION @ISA);
-$VERSION = '0.45';
+$VERSION = '0.46';
 
 ######################################################################
 
@@ -33,15 +33,15 @@ $VERSION = '0.45';
 
 =head2 Nonstandard Modules
 
-	CGI::Portable 0.45
-	CGI::Portable::AppStatic 0.45
+	CGI::Portable 0.46
+	CGI::Portable::AppStatic 0.46
 
 =cut
 
 ######################################################################
 
-use CGI::Portable 0.45;
-use CGI::Portable::AppStatic 0.45;
+use CGI::Portable 0.46;
+use CGI::Portable::AppStatic 0.46;
 @ISA = qw(CGI::Portable::AppStatic);
 
 ######################################################################
@@ -131,7 +131,7 @@ sub main {
 	$self->set_static_high_replace( $globals );
 	$self->set_static_attach_unordered( $globals );
 	$self->set_static_attach_ordered( $globals );
-	$self->set_static_miscellaneous( $globals );
+	$self->set_static_search_and_replace( $globals );
 }
 
 ######################################################################
@@ -145,13 +145,13 @@ sub main_dispatch {
 		$globals->page_title( 'No Url Provided' );
 
 		$globals->set_page_body( <<__endquote );
-<H1>@{[$globals->page_title()]}</H1>
+<h1>@{[$globals->page_title()]}</h1>
 
-<P>I'm sorry, but this redirection page requires a query parameter named 
+<p>I'm sorry, but this redirection page requires a query parameter named 
 "$UIPN_DEST_URL", whose value is an url.  No url was provided, so I 
 can't redirect you to it.  If you got this error while clicking 
 on one of the links on this website, then the problem is likely 
-on this end.  In the latter case...</P>
+on this end.  In the latter case...</p>
 
 @{[$self->get_amendment_message()]}
 __endquote
@@ -169,11 +169,11 @@ sub get_amendment_message {
 	my ($self) = shift( @_ );
 	my $globals = $self->{$KEY_SITE_GLOBALS};
 	return( <<__endquote );
-<P>This should be temporary, the result of a transient server problem or an 
+<p>This should be temporary, the result of a transient server problem or an 
 update being performed at the moment.  Click @{[$globals->recall_html('here')]} 
 to automatically try again.  If the problem persists, please try again later, 
 or send an @{[$globals->maintainer_email_html('e-mail')]} message about the 
-problem, so it can be fixed.</P>
+problem, so it can be fixed.</p>
 __endquote
 }
 

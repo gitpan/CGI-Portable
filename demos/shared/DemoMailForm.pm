@@ -18,7 +18,7 @@ require 5.004;
 
 use strict;
 use vars qw($VERSION @ISA);
-$VERSION = '0.45';
+$VERSION = '0.46';
 
 ######################################################################
 
@@ -36,8 +36,8 @@ $VERSION = '0.45';
 
 =head2 Nonstandard Modules
 
-	CGI::Portable 0.45
-	CGI::Portable::AppStatic 0.45
+	CGI::Portable 0.46
+	CGI::Portable::AppStatic 0.46
 	CGI::MultiValuedHash 1.07
 	HTML::FormTemplate 2.01
 
@@ -47,8 +47,8 @@ $VERSION = '0.45';
 
 use Fcntl qw(:DEFAULT :flock);
 use Symbol;
-use CGI::Portable 0.45;
-use CGI::Portable::AppStatic 0.45;
+use CGI::Portable 0.46;
+use CGI::Portable::AppStatic 0.46;
 @ISA = qw(CGI::Portable::AppStatic);
 use CGI::MultiValuedHash 1.07;
 use HTML::FormTemplate 2.01;
@@ -148,10 +148,10 @@ use HTML::FormTemplate 2.01;
 	my %CONFIG = (
 		msg_new_title => 'Leave A Message',  # custom title for new messages
 		msg_new_head => <<__endquote,   # custom heading for new messages
-	<H1>Leave A Message</H1>
-	<P>Please leave a message after the beep.  Answer the questions as faithfully
+	<h1>Leave A Message</h1>
+	<p>Please leave a message after the beep.  Answer the questions as faithfully
 	and truthfully as you can, as we have a lie detector set up and any false 
-	answers will be met with spam.</P>
+	answers will be met with spam.</p>
 	__endquote
 	);
 
@@ -259,7 +259,7 @@ sub main {
 	$self->set_static_high_replace( $globals );
 	$self->set_static_attach_unordered( $globals );
 	$self->set_static_attach_ordered( $globals );
-	$self->set_static_miscellaneous( $globals );
+	$self->set_static_search_and_replace( $globals );
 }
 
 ######################################################################
@@ -346,7 +346,6 @@ sub get_field_definitions {
 		}, {
 			type => 'reset', 
 			label => 'Clear',
-			keep_with_prev => 1,
 		},
 	);
 
@@ -386,15 +385,15 @@ sub no_questions_error {
 	$globals->page_title( "Error Starting MailForm" );
 
 	$globals->set_page_body( <<__endquote );
-<H1>@{[$globals->page_title()]}</H1>
+<h1>@{[$globals->page_title()]}</h1>
 
-<P>I'm sorry, but an error has occurred while trying to start 
+<p>I'm sorry, but an error has occurred while trying to start 
 the Mail Form.  We are missing critical settings information 
 that is required to operate.  Specifically, we don't know what 
 questions we are supposed to ask you.  Here are some details about 
-what caused this problem:</P>
+what caused this problem:</p>
 
-<P>@{[$globals->get_error()]}</P>
+<p>@{[$globals->get_error()]}</p>
 
 @{[$self->get_amendment_message()]}
 __endquote
@@ -411,23 +410,23 @@ sub new_message {
 
 	$globals->set_page_body( 
 		$globals->pref( $PKEY_MSG_NEW_HEAD ) || <<__endquote );
-<H1>@{[$globals->page_title()]}</H1>
+<h1>@{[$globals->page_title()]}</h1>
 
-<P>This form is provided as an easy way for you to send me a private 
+<p>This form is provided as an easy way for you to send me a private 
 e-mail message, when you wish to contact me and/or give me your 
 thoughts on this site.  This is also a good forum to report any bugs 
-you have discovered, so I can fix them as soon as possible.</P>
+you have discovered, so I can fix them as soon as possible.</p>
 __endquote
 
 	$globals->append_page_body( <<__endquote );
-<P>The fields indicated with a '@{[$form->required_field_marker()]}' 
-are required.</P>
+<p>The fields indicated with a '@{[$form->required_field_marker()]}' 
+are required.</p>
 
 @{$form->make_html_input_form( 1, 1 )}
 
-<P>It may take from 1 to 30 seconds to process this form, so please be 
+<p>It may take from 1 to 30 seconds to process this form, so please be 
 patient and don't click Send multiple times.  A confirmation message 
-will appear if everything worked.</P>
+will appear if everything worked.</p>
 __endquote
 }
 
@@ -440,20 +439,20 @@ sub invalid_input {
 	$globals->page_title( "Information Missing" );
 
 	$globals->set_page_body( <<__endquote );
-<H1>@{[$globals->page_title()]}</H1>
+<h1>@{[$globals->page_title()]}</h1>
 
-<P>Your message could not be sent because some of the fields were not
+<p>Your message could not be sent because some of the fields were not
 correctly filled in, which are indicated with a 
 '@{[$form->bad_input_marker()]}'.  Fields with a 
 '@{[$form->required_field_marker()]}' are required and can not be left 
 empty.  Please make sure you have entered your name and e-mail address 
-correctly, and then try sending it again.</P>
+correctly, and then try sending it again.</p>
 
 @{$form->make_html_input_form( 1, 1 )}
 
-<P>It may take from 1 to 30 seconds to process this form, so please be 
+<p>It may take from 1 to 30 seconds to process this form, so please be 
 patient and don't click Send multiple times.  A confirmation message 
-will appear if everything worked.</P>
+will appear if everything worked.</p>
 __endquote
 }
 
@@ -487,25 +486,25 @@ __endquote
 		$globals->page_title( "Error Sending Mail" );
 
 		$globals->set_page_body( <<__endquote );
-<H1>@{[$globals->page_title()]}</H1>
+<h1>@{[$globals->page_title()]}</h1>
 
-<P>I'm sorry, but an error has occurred while trying to e-mail your 
-message to me.  As a result I will not see it.</P>
+<p>I'm sorry, but an error has occurred while trying to e-mail your 
+message to me.  As a result I will not see it.</p>
 
-<P>This problem can occur if you enter a nonexistant or unreachable 
+<p>This problem can occur if you enter a nonexistant or unreachable 
 e-mail address into the e-mail field, in which case, please enter a 
 working e-mail address and try clicking 'Send' again.  You can check 
-if that is the problem by checking the following error string:</P>
+if that is the problem by checking the following error string:</p>
 
-<P>$err_msg</P>
+<p>$err_msg</p>
 
 @{[$self->get_amendment_message()]}
 
 @{$form->make_html_input_form( 1, 1 )}
 
-<P>It may take from 1 to 30 seconds to process this form, so please be 
+<p>It may take from 1 to 30 seconds to process this form, so please be 
 patient and don't click Send multiple times.  A confirmation message 
-will appear if everything worked.</P>
+will appear if everything worked.</p>
 __endquote
 
 		$globals->add_no_error();
@@ -524,19 +523,19 @@ sub mail_me_ok {
 	$globals->page_title( "Your Message Has Been Sent" );
 
 	$globals->set_page_body( <<__endquote );
-<H1>@{[$globals->page_title()]}</H1>
+<h1>@{[$globals->page_title()]}</h1>
 
-<P>This is what the message said:</P>
+<p>This is what the message said:</p>
 
-<P><STRONG>To:</STRONG> 
+<p><strong>To:</strong> 
 @{[$globals->default_maintainer_name()]}
 &lt;@{[$globals->default_maintainer_email_address()]}&gt;
-<BR><STRONG>From:</STRONG> 
+<br /><strong>From:</strong> 
 @{[$globals->user_post_param( $FFN_NAMEREAL )]} 
 &lt;@{[$globals->user_post_param( $FFN_EMAIL )]}&gt;
-<BR><STRONG>Subject:</STRONG> 
+<br /><strong>Subject:</strong> 
 @{[$globals->pref( $PKEY_EMAIL_SUBJ ) || 
-	$globals->default_application_title().' -- Private Mail Message']}</P>
+	$globals->default_application_title().' -- Private Mail Message']}</p>
 
 @{[$form->make_html_input_echo( 1, 1, $EMPTY_FIELD_ECHO_STRING )]}
 __endquote
@@ -566,15 +565,15 @@ __endquote
 	if( $err_msg ) {
 		$globals->add_error( $err_msg );
 		$globals->append_page_body( <<__endquote );
-<P>However, something went wrong when trying to send you a copy:
-$err_msg.</P>
+<p>However, something went wrong when trying to send you a copy:
+$err_msg.</p>
 __endquote
 		$globals->add_no_error();
 
 	} else {
 		$globals->append_page_body( <<__endquote );
-<P>Also, a copy was successfully sent to you at 
-'@{[$globals->user_post_param( $FFN_EMAIL )]}'.</P>
+<p>Also, a copy was successfully sent to you at 
+'@{[$globals->user_post_param( $FFN_EMAIL )]}'.</p>
 __endquote
 	}
 }
@@ -750,11 +749,11 @@ sub get_amendment_message {
 	my ($self) = shift( @_ );
 	my $globals = $self->{$KEY_SITE_GLOBALS};
 	return( <<__endquote );
-<P>This should be temporary, the result of a transient server problem or an 
+<p>This should be temporary, the result of a transient server problem or an 
 update being performed at the moment.  Click @{[$globals->recall_html('here')]} 
 to automatically try again.  If the problem persists, please try again later, 
 or send an @{[$globals->maintainer_email_html('e-mail')]} message about the 
-problem, so it can be fixed.</P>
+problem, so it can be fixed.</p>
 __endquote
 }
 

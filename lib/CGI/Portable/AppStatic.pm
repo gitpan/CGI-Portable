@@ -1,6 +1,6 @@
 =head1 NAME
 
-CGI::Portable::AppStatic - Define whole response screens within a config file.
+CGI::Portable::AppStatic - Define whole response screens within a config file
 
 =cut
 
@@ -17,7 +17,7 @@ require 5.004;
 
 use strict;
 use vars qw($VERSION);
-$VERSION = '0.45';
+$VERSION = '0.46';
 
 ######################################################################
 
@@ -33,19 +33,82 @@ $VERSION = '0.45';
 
 =head2 Nonstandard Modules
 
-	CGI::Portable 0.45
+	CGI::Portable 0.46
 
 =cut
 
 ######################################################################
 
-use CGI::Portable 0.45;
+use CGI::Portable 0.46;
 
 ######################################################################
 
 =head1 SYNOPSIS
 
-I<This documentation will come in a subsequent version.>
+=head2 Simple program that returns a static HTML page:
+
+	#!/usr/bin/perl
+	use strict;
+
+	require CGI::Portable;
+	my $globals = CGI::Portable->new();
+
+	my %CONFIG = (
+		high_http_status_code => '200 OK',
+		high_http_content_type => 'text/html',
+		high_page_title => 'Simple AppStatic Demo',
+		high_page_author => 'Darren Duncan',
+		high_page_meta => { 
+			keywords => 'HTTP, HTML, Perl, Static', 
+		},
+		high_page_style_code => [
+			'body {background-color: white; background-image: none}', 
+			'h1, h2 {text-align: center}', 
+			'td {text-align: left; vertical-align: top}',
+		],
+		high_page_body => __endquote,
+	<h1>Simple AppStatic Demo</h1>
+	<p>This page is a trivial example of what can be done with CGI::Portable 
+	when you want your script to always return the same screen.  It is more 
+	common, however, that your script would contain many screens of which some 
+	are dynamic and some are static.</p>
+	<h2>Oh, A Table!</h2>
+	<table><tr>
+	<td>Question:</td><td>Answer!</td>
+	</tr><tr>
+	<td>Another Question:</td>
+	<td>This is a really really long answer.  It just keeps going on and on and 
+	on and on and on and on and on and on and on.  However, the short question 
+	should stay top aligned with the long answer due to the stylesheet.</td>
+	</tr></table>
+	__endquote
+	);
+
+	$globals->set_prefs( \%CONFIG );
+	$globals->call_component( 'CGI::Portable::AppStatic' );
+
+	require CGI::Portable::AdapterCGI;
+	my $io = CGI::Portable::AdapterCGI->new();
+	$io->send_user_output( $globals );
+
+	1;
+
+=head2 Simple program that returns an HTTP redirection header:
+
+	my %CONFIG = (
+		high_http_status_code => '301 Moved',
+		high_http_window_target => 'nyx_demo_file_window', 
+		high_http_redirect_url => 'http://www.nyxmydomain.net/dir/file.html',
+	);
+
+=head2 Simple program that returns a bit of binary data:
+
+	my %CONFIG = (
+		high_http_status_code => '200 OK',
+		high_http_content_type => 'application/xxxencoded',
+		high_http_body => pack( 'H8', '5065726c' ),
+		high_http_body_is_binary => 1,
+	);
 
 =head1 DESCRIPTION
 
@@ -71,7 +134,7 @@ methods to apply a common header or footer or stylesheet to every screen.
 my @SCALAR_PREFS = qw( 
 	http_status_code http_window_target http_content_type
 	http_redirect_url http_body http_body_is_binary
-	page_title page_author
+	page_prologue page_title page_author
 );
 
 # root property/preference names applied as "low/high" list refs:
@@ -116,8 +179,8 @@ this class.  When this method returns then the encapsulated application will
 have finished and you can get its user output from the CGI::Portable object.
 
 This method is simple and intended to be overriden by subclasses.  All it does 
-by itself is invoke the private methods listed under PRIVATE METHODS FOR USE 
-BY SUBCLASSES, which do the actual work.
+by itself is invoke the private methods listed under PRIVATE METHODS FOR USE BY 
+SUBCLASSES, which do the actual work.
 
 =cut
 
@@ -134,7 +197,7 @@ sub main {
 	$self->set_static_high_replace( $globals );
 	$self->set_static_attach_unordered( $globals );
 	$self->set_static_attach_ordered( $globals );
-	$self->set_static_miscellaneous( $globals );
+	$self->set_static_search_and_replace( $globals );
 }
 
 ######################################################################
@@ -159,6 +222,9 @@ possible, and try to preserve existing property values while adding their own.
 The "append" and "prepend" prefixes are only used where the order of the property
 elements is important, such as in the "page body".  The "add" prefix is only used
 where the order is not preserved, such as with the "page meta" tags.
+
+The page_search_and_replace preference is different, having no prefixes, and is 
+applied after all of the other preferences.
 
 This module assumes that the CGI::Portable object passed to it did not have any
 of its output properties set prior to main() being called, so even the "low"
@@ -192,6 +258,7 @@ related functionality.
 
 =head2 These preferences are specifically for HTML pages:
 
+	low_page_prologue - string (override the DOCTYPE tag)
 	low_page_title - string
 	low_page_author - string
 	low_page_meta - hash of meta-tag names and values
@@ -203,6 +270,7 @@ related functionality.
 	low_page_body_attributes - hash
 	low_page_body - array
 
+	high_page_prologue - string (override the DOCTYPE tag)
 	high_page_title - string
 	high_page_author - string
 	high_page_meta - hash of meta-tag names and values
@@ -228,13 +296,7 @@ related functionality.
 	append_page_frameset - array of hashes (each hash is attributes for new FRAME tag)
 	append_page_body - array
 
-=head2 These preferences are miscellaneous:
-
-	page_replace - hash of tokens to search for and what to replace them with
-		- this preference is passed to search_and_replace_page_body() after 
-			all of the other properties have been set.
-		- this preference is deprecated and exists for backwards compatability 
-			with CGI-WPM-Base since no elegant substitute exists yet.
+	page_search_and_replace - hash (keys are tokens to search for; values replace)
 
 =head1 PRIVATE METHODS FOR USE BY SUBCLASSES
 
@@ -346,21 +408,19 @@ sub set_static_attach_ordered {
 
 ######################################################################
 
-=head2 set_static_miscellaneous( GLOBALS )
+=head2 set_static_search_and_replace( GLOBALS )
 
-This method will apply all of the miscellaneous preferences, which are currently 
-deprecated but exist because no elegant replacements exist yet.  These 
-properties are applied after all others mentioned above.
-Specifically, this method implements the "page_replace" preference only.
+This method will apply the page_search_and_replace preference, and should be 
+run later than all of the other methods, to affect their results also.
 
 =cut
 
 ######################################################################
 
-sub set_static_miscellaneous {
+sub set_static_search_and_replace {
 	my ($self, $globals) = @_;
-	my $rh_prefs = $globals->get_prefs_ref();
-	$globals->search_and_replace_page_body( $rh_prefs->{page_replace} );
+	$globals->page_search_and_replace( 
+		$globals->pref( 'page_search_and_replace' ) );
 }
 
 ######################################################################

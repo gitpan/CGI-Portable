@@ -1,77 +1,71 @@
 my $rh_preferences = { 
-	prepend_page_body => undef,
-	append_page_body => <<__endquote,
-<P><EM>This site is a simple example of what can be done with CGI::Portable and 
-the Dynamic Website Generator collection of Perl 5 modules, copyright (c) 
-1999-2001, Darren R. Duncan.</EM></P>
-__endquote
 	add_page_style_code => [
-		'BODY {background-color: white; background-image: none}'
+		'body {background-color: white; background-image: none}', 
+		'h1, h2 {text-align: center}', 
+		'td {text-align: left; vertical-align: top}',
 	],
-	vrp_handlers => {
-		external => {
-			wpm_module => 'DemoRedirect',
-			wpm_prefs => { low_http_window_target => 'external_link_window' },
+	delegate_list => [
+		{
+			module_name => 'CGI::Portable::AppStatic',
+			preferences => 'menu_prefs.pl',
+			leave_scalars => 1,
 		},
-		frontdoor => {
-			wpm_module => 'DemoStatic',
-			wpm_prefs => { filename => 'frontdoor.html' },
-		},
-		resume => {
-			wpm_module => 'DemoStatic',
-			wpm_prefs => { filename => 'resume.html' },
-		},
-		mysites => {
-			wpm_module => 'DemoStatic',
-			wpm_prefs => { filename => 'mysites.html' },
-		},
-		mailme => {
-			wpm_module => 'DemoMailForm',
-			wpm_prefs => {},
-		},
-		guestbook => {
-			wpm_module => 'DemoGuestBook',
-			wpm_prefs => {
-				fn_messages => 'guestbook_messages.txt',
-				custom_fd => 1,
-				field_defn => 'guestbook_questions.txt',
-				fd_in_seqf => 1,
+		{
+			module_name => 'CGI::Portable::AppMultiScreen',
+			preferences => {
+				prepend_page_body => "\n<hr />\n",
+				delegate_list => {
+					external => {
+						module_name => 'DemoRedirect',
+						preferences => { low_http_window_target => 'external_link_window' },
+					},
+					frontdoor => {
+						module_name => 'DemoStatic',
+						preferences => { filename => 'frontdoor.html' },
+					},
+					resume => {
+						module_name => 'DemoStatic',
+						preferences => { filename => 'resume.html' },
+					},
+					mysites => {
+						module_name => 'DemoStatic',
+						preferences => { filename => 'mysites.html' },
+					},
+					mailme => {
+						module_name => 'DemoMailForm',
+						preferences => {},
+					},
+					guestbook => {
+						module_name => 'DemoGuestBook',
+						preferences => {
+							custom_fd => 1,
+							field_defn => 'guestbook_questions.txt',
+							fd_in_seqf => 1,
+							fn_messages => 'guestbook_messages.txt',
+						},
+					},
+					links => {
+						module_name => 'DemoStatic',
+						preferences => { filename => 'links.html' },
+					},
+				},
+				default_delegate => 'frontdoor',
+				append_page_body => "\n<hr />\n",
 			},
 		},
-		links => {
-			wpm_module => 'DemoStatic',
-			wpm_prefs => { filename => 'links.html' },
-		},
-	},
-	def_handler => 'frontdoor',
-	menu_items => [
 		{
-			menu_name => 'Front Door',
-			menu_path => '',
-			is_active => 1,
-		}, 1, {
-			menu_name => 'Resume',
-			menu_path => 'resume',
-			is_active => 1,
-		}, {
-			menu_name => 'Web Sites I Made',
-			menu_path => 'mysites',
-			is_active => 1,
-		}, 1, {
-			menu_name => 'E-mail Me',
-			menu_path => 'mailme',
-			is_active => 1,
-		}, {
-			menu_name => 'Guest Book',
-			menu_path => 'guestbook',
-			is_active => 1,
-		}, 1, {
-			menu_name => 'Other Links',
-			menu_path => 'links',
-			is_active => 1,
+			module_name => 'CGI::Portable::AppStatic',
+			preferences => 'menu_prefs.pl',
+			leave_scalars => 1,
 		},
 	],
-	menu_cols => 4,
-	menu_showdiv => 0,
-	page_showdiv => 1,
+	append_page_body => <<__endquote,
+<p><em>This site is a simple example of what can be done with CGI::Portable and 
+the Dynamic Website Generator collection of Perl 5 modules, copyright (c) 
+1999-2001, Darren R. Duncan.</em></p>
+__endquote
+	page_search_and_replace => {
+		__mailme_url__ => "__url_path__=/mailme",
+		__external_id__ => "__url_path__=/external&url",
+	},
 };

@@ -18,7 +18,7 @@ require 5.004;
 
 use strict;
 use vars qw($VERSION @ISA);
-$VERSION = '0.45';
+$VERSION = '0.46';
 
 ######################################################################
 
@@ -36,13 +36,13 @@ $VERSION = '0.45';
 
 =head2 Nonstandard Modules
 
-	CGI::Portable 0.45
+	CGI::Portable 0.46
 
 =cut
 
 ######################################################################
 
-use CGI::Portable 0.45;
+use CGI::Portable 0.46;
 
 ######################################################################
 
@@ -78,7 +78,7 @@ use CGI::Portable 0.45;
 	$content->current_user_path_level( 1 );
 	$content->navigate_file_path( 'content' );
 	$content->set_prefs( 'content_prefs.pl' );
-	$content->call_component( 'DemoMultiPage' );
+	$content->call_component( 'CGI::Portable::AppSplitScreen' );
 	$globals->take_context_output( $content );
 
 	my $usage = $globals->make_new_context();
@@ -86,18 +86,14 @@ use CGI::Portable 0.45;
 	$usage->navigate_file_path( $globals->is_debug() ? 'usage_debug' : 'usage' );
 	$usage->set_prefs( '../usage_prefs.pl' );
 	$usage->call_component( 'DemoUsage' );
-	$globals->take_context_output( $usage, 1, 1 );
+	$globals->take_context_output( $usage, 1 );
 
 	if( $globals->is_debug() ) {
 		$globals->append_page_body( <<__endquote );
-<P>Debugging is currently turned on.</P>
+<p>Debugging is currently turned on.</p>
 __endquote
 	}
 
-	$globals->search_and_replace_page_body( { 
-		__mailme_url__ => "__url_path__=/mailme",
-		__external_id__ => "__url_path__=/external&url",
-	} );
 	$globals->search_and_replace_url_path_tokens( '__url_path__' );
 
 	$io->send_user_output( $globals );
@@ -106,8 +102,7 @@ __endquote
 
 =head2 Content of settings file "content_prefs.pl"
 
-I<Please see the POD for DemoMultiPage for this file; that Synopsis POD is 
-being made in conjunction with the POD for DemoUsage.>
+I<Please see the included demo called "website" for this file.>
 
 =head2 Content of settings file "usage_prefs.pl", tracking as much as possible
 
@@ -497,7 +492,7 @@ sub update_referrer_counts {
 		
 		# else check if the referring domain is a search engine
 		foreach my $dom_frag (keys %{$rh_engines}) {
-			if( ".$domain." =~ m|[/\.]$dom_frag\.|i ) { # CHANGED THIS LINE 0.43
+			if( ".$domain." =~ m|[/\.]$dom_frag\.|i ) { # CHANGED THIS LINE 0-43
 				my $se_query = CGI::MultiValuedHash->new( 1, $query );
 				my @se_keywords;
 				
@@ -511,7 +506,7 @@ sub update_referrer_counts {
 				foreach my $kw (@se_keywords) {
 					$kw =~ s/^[^a-zA-Z0-9]+//;  # remove framing junk
 					$kw =~ s/[^a-zA-Z0-9]+$//;
-					$kw = lc( $kw ); # ADDED THIS LINE 0.43
+					$kw = lc( $kw ); # ADDED THIS LINE 0-43
 				}
 
 				# save both the file name and the search words used

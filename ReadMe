@@ -16,10 +16,10 @@ CONTENTS
 PREFACE
 
 This distribution features the Perl 5 module named "CGI::Portable" as well as 
-7 other modules that are required by it: [CGI::Portable::Errors, Files, Request, 
-Response, AdapterCGI, AdapterSocket, AppStatic].  That is, the first 4 are 
-subclassed by CGI::Portable, and the last 3 are recommended for use but not 
-required.
+9 other modules that are required by it: [CGI::Portable::Errors, Files, Request, 
+Response, AdapterCGI, AdapterSocket, AppStatic, AppMultiScreen, AppSplitScreen].  
+That is, the first 4 are subclassed by CGI::Portable, and the last 5 are 
+recommended for use but not required.
 
 All of my modules have complete POD inside of them, so please refer to that for a
 description of the module itself.
@@ -27,7 +27,7 @@ description of the module itself.
 This Read Me document concerns itself mainly with installation and support
 issues, and also includes any "To Do" lists.
 
-This distribution also includes 7 other modules, in the temporary name space 
+This distribution also includes 6 other modules, in the temporary name space 
 Demo*, that are designed to be used with CGI::Portable.  Each of these is 
 included as a demo "application component", and by looking at them, you should 
 have a better idea what CGI::Portable can do for you.  Unlike ordinary demos, 
@@ -36,7 +36,8 @@ production environments.  For all intents and purposes, you should treat them
 like "scripts" rather than "modules" as far as when you use them, due to their 
 more proprietary nature.
 
-This distribution now has a "demos" folder containing 52 files and folders 
+This distribution now has a "demos" folder containing 60 files and folders 
+(including the above 6 in a folder named "shared") 
 which are ready-to-use example scripts and data files that exercise 
 CGI::Portable and all of the Demo* modules.  Many of these are exactly 
 the same as the *new* Synopsis POD for particular modules.  Some have minor 
@@ -49,7 +50,9 @@ web site with usage tracking, guest books, mail and survey forms, static html
 and plain text pages, segmented text file display, redirection, and a few 
 other strange modules that don't do anything useful but play with features.  
 Any actual modules in the demos folder are very immature and should not be used 
-as is; rather, learn from them.  They intentionally have no POD.
+as is; rather, learn from them.  They intentionally have no POD.  However, the 
+modules mentioned in the previous paragraph, in the "shared" folder, are more 
+mature and are ok to use productively, with the caveat that they will change.
 
 KEEPING UP TO DATE
 

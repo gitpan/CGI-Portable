@@ -17,7 +17,7 @@ require 5.004;
 
 use strict;
 use vars qw($VERSION);
-$VERSION = '0.45';
+$VERSION = '0.46';
 
 ######################################################################
 
@@ -33,7 +33,7 @@ $VERSION = '0.45';
 
 =head2 Nonstandard Modules
 
-	HTML::EasyTags 1.05  -- only required in page_as_string()
+	HTML::EasyTags 1.06  -- only required in page_as_string()
 
 =head1 SYNOPSIS
 
@@ -81,6 +81,7 @@ my $KEY_HTTP_BODY = 'http_body';  # string - stores raw HTTP body if wanted
 my $KEY_HTTP_BINA = 'http_bina';  # boolean - true if HTTP body is binary
 
 # These properties will be combined into the output page if it is text/html
+my $KEY_PAGE_PROL = 'page_prol';  # string - prologue tag or "doctype" at top
 my $KEY_PAGE_TITL = 'page_titl';  # string - new HTML title
 my $KEY_PAGE_AUTH = 'page_auth';  # string - new HTML author
 my $KEY_PAGE_META = 'page_meta';  # hash - new HTML meta keys/values
@@ -137,7 +138,7 @@ provided in the optional argument CONTEXT (if CONTEXT is an object of the same
 class); otherwise a brand new object is used.  Only properties recognized by
 CGI::Portable::Response are set in this object; others are not touched.
 
-=head2 take_context_output( CONTEXT[, APPEND_LISTS[, SKIP_SCALARS]] )
+=head2 take_context_output( CONTEXT[, LEAVE_SCALARS[, REPLACE_LISTS]] )
 
 This method takes another CGI::Portable::Response (or subclass) object as its
 CONTEXT argument and copies some of its properties to this object, potentially
@@ -145,13 +146,18 @@ overwriting any versions already in this object.  If CONTEXT is not a valid
 CGI::Portable::Response (or subclass) object then this method returns without
 changing anything.  The properties that get copied are the "output" properties
 that presumably need to work their way back to the user.  In other words, this
-method copies everything that make_new_context() did not. If the optional boolean
-argument APPEND_LISTS is true then any list-type properties, including arrays and
-hashes, get appended to the existing values where possible rather than just
-replacing them.  In the case of hashes, however, keys with the same names are
-still replaced.  If the optional boolean argument SKIP_SCALARS is true then
-scalar properties are not copied over; otherwise they will always replace any
-that are in this object already.
+method copies everything that make_new_context() did not.  This method will 
+never copy any properties which are undefined scalars or empty lists, so a 
+CONTEXT with no "output" properties set will not cause any changes.  If any 
+scalar output properties of CONTEXT are defined, they will overwrite any 
+defined corresponding properties of this object by default; however, if the 
+optional boolean argument LEAVE_SCALARS is true, then the scalar values are 
+only copied if the ones in this object are not defined.  If any list output 
+properties of CONTEXT have elements, then they will be appended to 
+any corresponding ones of this object by default, thereby preserving both 
+(except with hash properties, where like hash keys will overwrite); 
+however, if the optional boolean argument REPLACE_LISTS is true, then any 
+existing list values are overwritten by any copied CONTEXT equivalents.
 
 =cut
 
@@ -176,6 +182,7 @@ sub initialize {
 	$self->{$KEY_HTTP_BODY} = undef;
 	$self->{$KEY_HTTP_BINA} = undef;
 
+	$self->{$KEY_PAGE_PROL} = undef;
 	$self->{$KEY_PAGE_TITL} = undef;
 	$self->{$KEY_PAGE_AUTH} = undef;
 	$self->{$KEY_PAGE_META} = {};
@@ -201,6 +208,7 @@ sub clone {
 	$clone->{$KEY_HTTP_BODY} = $self->{$KEY_HTTP_BODY};
 	$clone->{$KEY_HTTP_BINA} = $self->{$KEY_HTTP_BINA};
 
+	$clone->{$KEY_PAGE_PROL} = $self->{$KEY_PAGE_PROL};
 	$clone->{$KEY_PAGE_TITL} = $self->{$KEY_PAGE_TITL};
 	$clone->{$KEY_PAGE_AUTH} = $self->{$KEY_PAGE_AUTH};
 	$clone->{$KEY_PAGE_META} = {%{$self->{$KEY_PAGE_META}}};
@@ -228,6 +236,7 @@ sub make_new_context {
 	$context->{$KEY_HTTP_BODY} = undef;
 	$context->{$KEY_HTTP_BINA} = undef;
 
+	$context->{$KEY_PAGE_PROL} = undef;
 	$context->{$KEY_PAGE_TITL} = undef;
 	$context->{$KEY_PAGE_AUTH} = undef;
 	$context->{$KEY_PAGE_META} = {};
@@ -243,21 +252,74 @@ sub make_new_context {
 }
 
 sub take_context_output {
-	my ($self, $context, $append_lists, $skip_scalars) = @_;
+	my ($self, $context, $leave_scalars, $replace_lists) = @_;
 	UNIVERSAL::isa( $context, 'CGI::Portable::Response' ) or return( 0 );
 
-	unless( $skip_scalars ) {
-		$self->{$KEY_HTTP_STAT} = $context->{$KEY_HTTP_STAT};
-		$self->{$KEY_HTTP_WITA} = $context->{$KEY_HTTP_WITA};
-		$self->{$KEY_HTTP_COTY} = $context->{$KEY_HTTP_COTY};
-		$self->{$KEY_HTTP_REDI} = $context->{$KEY_HTTP_REDI};
-		$self->{$KEY_HTTP_BODY} = $context->{$KEY_HTTP_BODY};
-		$self->{$KEY_HTTP_BINA} = $context->{$KEY_HTTP_BINA};
-		$self->{$KEY_PAGE_TITL} = $context->{$KEY_PAGE_TITL};
-		$self->{$KEY_PAGE_AUTH} = $context->{$KEY_PAGE_AUTH};
+	if( $leave_scalars ) {
+		defined( $self->{$KEY_HTTP_STAT} ) or 
+			$self->{$KEY_HTTP_STAT} = $context->{$KEY_HTTP_STAT};
+		defined( $self->{$KEY_HTTP_WITA} ) or 
+			$self->{$KEY_HTTP_WITA} = $context->{$KEY_HTTP_WITA};
+		defined( $self->{$KEY_HTTP_COTY} ) or 
+			$self->{$KEY_HTTP_COTY} = $context->{$KEY_HTTP_COTY};
+		defined( $self->{$KEY_HTTP_REDI} ) or 
+			$self->{$KEY_HTTP_REDI} = $context->{$KEY_HTTP_REDI};
+		defined( $self->{$KEY_HTTP_BODY} ) or 
+			$self->{$KEY_HTTP_BODY} = $context->{$KEY_HTTP_BODY};
+		defined( $self->{$KEY_HTTP_BINA} ) or 
+			$self->{$KEY_HTTP_BINA} = $context->{$KEY_HTTP_BINA};
+		defined( $self->{$KEY_PAGE_PROL} ) or 
+			$self->{$KEY_PAGE_PROL} = $context->{$KEY_PAGE_PROL};
+		defined( $self->{$KEY_PAGE_TITL} ) or 
+			$self->{$KEY_PAGE_TITL} = $context->{$KEY_PAGE_TITL};
+		defined( $self->{$KEY_PAGE_AUTH} ) or 
+			$self->{$KEY_PAGE_AUTH} = $context->{$KEY_PAGE_AUTH};
+
+	} else {
+		defined( $context->{$KEY_HTTP_STAT} ) and 
+			$self->{$KEY_HTTP_STAT} = $context->{$KEY_HTTP_STAT};
+		defined( $context->{$KEY_HTTP_WITA} ) and 
+			$self->{$KEY_HTTP_WITA} = $context->{$KEY_HTTP_WITA};
+		defined( $context->{$KEY_HTTP_COTY} ) and 
+			$self->{$KEY_HTTP_COTY} = $context->{$KEY_HTTP_COTY};
+		defined( $context->{$KEY_HTTP_REDI} ) and 
+			$self->{$KEY_HTTP_REDI} = $context->{$KEY_HTTP_REDI};
+		defined( $context->{$KEY_HTTP_BODY} ) and 
+			$self->{$KEY_HTTP_BODY} = $context->{$KEY_HTTP_BODY};
+		defined( $context->{$KEY_HTTP_BINA} ) and 
+			$self->{$KEY_HTTP_BINA} = $context->{$KEY_HTTP_BINA};
+		defined( $context->{$KEY_PAGE_PROL} ) and 
+			$self->{$KEY_PAGE_PROL} = $context->{$KEY_PAGE_PROL};
+		defined( $context->{$KEY_PAGE_TITL} ) and 
+			$self->{$KEY_PAGE_TITL} = $context->{$KEY_PAGE_TITL};
+		defined( $context->{$KEY_PAGE_AUTH} ) and 
+			$self->{$KEY_PAGE_AUTH} = $context->{$KEY_PAGE_AUTH};
 	}
 	
-	if( $append_lists ) {
+	if( $replace_lists ) {
+		@{$context->{$KEY_HTTP_COOK}} and 
+			$self->{$KEY_HTTP_COOK} = [@{$context->{$KEY_HTTP_COOK}}];
+		@{$context->{$KEY_PAGE_CSSR}} and 
+			$self->{$KEY_PAGE_CSSR} = [@{$context->{$KEY_PAGE_CSSR}}];
+		@{$context->{$KEY_PAGE_CSSC}} and 
+			$self->{$KEY_PAGE_CSSC} = [@{$context->{$KEY_PAGE_CSSC}}];
+		@{$context->{$KEY_PAGE_HEAD}} and 
+			$self->{$KEY_PAGE_HEAD} = [@{$context->{$KEY_PAGE_HEAD}}];
+		@{$context->{$KEY_PAGE_FRAM}} and $self->{$KEY_PAGE_FRAM} = 
+			[map { {%{$_}} } @{$context->{$KEY_PAGE_FRAM}}];
+		@{$context->{$KEY_PAGE_BODY}} and 
+			$self->{$KEY_PAGE_BODY} = [@{$context->{$KEY_PAGE_BODY}}];
+
+		%{$context->{$KEY_HTTP_HEAD}} and 
+			$self->{$KEY_HTTP_HEAD} = {%{$context->{$KEY_HTTP_HEAD}}};
+		%{$context->{$KEY_PAGE_META}} and 
+			$self->{$KEY_PAGE_META} = {%{$context->{$KEY_PAGE_META}}};
+		%{$context->{$KEY_PAGE_FATR}} and 
+			$self->{$KEY_PAGE_FATR} = {%{$context->{$KEY_PAGE_FATR}}};
+		%{$context->{$KEY_PAGE_BATR}} and 
+			$self->{$KEY_PAGE_BATR} = {%{$context->{$KEY_PAGE_BATR}}};
+
+	} else {
 		push( @{$self->{$KEY_HTTP_COOK}}, @{$context->{$KEY_HTTP_COOK}} );
 		push( @{$self->{$KEY_PAGE_CSSR}}, @{$context->{$KEY_PAGE_CSSR}} );
 		push( @{$self->{$KEY_PAGE_CSSC}}, @{$context->{$KEY_PAGE_CSSC}} );
@@ -274,20 +336,6 @@ sub take_context_output {
 			values %{$context->{$KEY_PAGE_FATR}};
 		@{$self->{$KEY_PAGE_BATR}}{keys %{$context->{$KEY_PAGE_BATR}}} = 
 			values %{$context->{$KEY_PAGE_BATR}};
-
-	} else {
-		$self->{$KEY_HTTP_COOK} = [@{$context->{$KEY_HTTP_COOK}}];
-		$self->{$KEY_PAGE_CSSR} = [@{$context->{$KEY_PAGE_CSSR}}];
-		$self->{$KEY_PAGE_CSSC} = [@{$context->{$KEY_PAGE_CSSC}}];
-		$self->{$KEY_PAGE_HEAD} = [@{$context->{$KEY_PAGE_HEAD}}];
-		$self->{$KEY_PAGE_FRAM} = 
-			[map { {%{$_}} } @{$context->{$KEY_PAGE_FRAM}}];
-		$self->{$KEY_PAGE_BODY} = [@{$context->{$KEY_PAGE_BODY}}];
-
-		$self->{$KEY_HTTP_HEAD} = {%{$context->{$KEY_HTTP_HEAD}}};
-		$self->{$KEY_PAGE_META} = {%{$context->{$KEY_PAGE_META}}};
-		$self->{$KEY_PAGE_FATR} = {%{$context->{$KEY_PAGE_FATR}}};
-		$self->{$KEY_PAGE_BATR} = {%{$context->{$KEY_PAGE_BATR}}};
 	}
 }
 
@@ -570,6 +618,29 @@ sub http_body_is_binary {
 These methods are designed to accumulate and assemble the components of a new 
 HTML page, complete with body, title, meta tags, and cascading style sheets.  
 See the DESCRIPTION for more details.
+
+=head2 page_prologue([ VALUE ])
+
+This method is an accessor for the "page prologue" scalar property of this object, 
+which it returns.  If VALUE is defined, this property is set to it.  
+This property is used as the very first thing in a new HTML page, appearing above 
+the opening <HTML> tag.  The property starts out undefined, and unless you set it 
+then the default proglogue tag defined by HTML::EasyTags is used instead.  
+This property doesn't have any effect unless your HTML::EasyTags is v1-06 or later.
+
+=cut
+
+######################################################################
+
+sub page_prologue {
+	my ($self, $new_value) = @_;
+	if( defined( $new_value ) ) {
+		$self->{$KEY_PAGE_PROL} = $new_value;
+	}
+	return( $self->{$KEY_PAGE_PROL} );
+}
+
+######################################################################
 
 =head2 page_title([ VALUE ])
 
@@ -1121,6 +1192,37 @@ sub prepend_page_body {
 
 ######################################################################
 
+=head2 page_search_and_replace( DO_THIS )
+
+This method performs a customizable search-and-replace of this object's "page *"
+properties.  The argument DO_THIS is a hash ref whose keys are tokens to look for
+and the corresponding values are what to replace the tokens with.  Tokens can be
+any Perl 5 regular expression and they are applied using "s/[find]/[replace]/g". 
+Perl will automatically throw an exception if your regular expressions don't
+compile, so you should check them for validity before use.  If DO_THIS is not a
+valid hash ref then this method returns without changing anything.  Currently,
+this method only affects the "page body" property, which is the most common
+activity, but in subsequent releases it may process more properties.
+
+=cut
+
+######################################################################
+
+sub page_search_and_replace {
+	my ($self, $do_this) = @_;
+	ref( $do_this ) eq 'HASH' or return( undef );
+	my $body = join( '', @{$self->{$KEY_PAGE_BODY}} );
+
+	foreach my $find_val (keys %{$do_this}) {
+		my $replace_val = $do_this->{$find_val};
+		$body =~ s/$find_val/$replace_val/g;
+	}
+
+	@{$self->{$KEY_PAGE_BODY}} = ($body);
+}
+
+######################################################################
+
 =head2 page_as_string()
 
 This method assembles the various "page *" properties of this object into a 
@@ -1141,6 +1243,9 @@ sub page_as_string {
 	require HTML::EasyTags;
 	my $html = HTML::EasyTags->new();
 
+	# This line is a no-op unless HTML::EasyTags is v1-06 or later.
+	$self->{$KEY_PAGE_PROL} and $html->prologue_tag( $self->{$KEY_PAGE_PROL} );
+
 	$self->{$KEY_PAGE_AUTH} and $author = 
 		$html->link( rev => 'made', href => "mailto:$self->{$KEY_PAGE_AUTH}" );
 
@@ -1152,8 +1257,8 @@ sub page_as_string {
 		$html->link_group( rel => 'stylesheet', type => 'text/css', 
 		href => $self->{$KEY_PAGE_CSSR} );
 
-	@{$self->{$KEY_PAGE_CSSC}} and $css_code = 
-		$html->style( $html->comment_tag( $self->{$KEY_PAGE_CSSC} ) );
+	@{$self->{$KEY_PAGE_CSSC}} and $css_code = $html->style( 
+		{ type => 'text/css' }, $html->comment_tag( $self->{$KEY_PAGE_CSSC} ) );
 
 	if( %{$self->{$KEY_PAGE_FATR}} or @{$self->{$KEY_PAGE_FRAM}} ) {
 		my @frames = map { $html->frame( $_ ) } @{$self->{$KEY_PAGE_FRAM}};

@@ -18,7 +18,7 @@ require 5.004;
 
 use strict;
 use vars qw($VERSION @ISA);
-$VERSION = '0.45';
+$VERSION = '0.46';
 
 ######################################################################
 
@@ -34,16 +34,16 @@ $VERSION = '0.45';
 
 =head2 Nonstandard Modules
 
-	CGI::Portable 0.45
-	CGI::Portable::AppStatic 0.45
-	DemoStatic 0.45
+	CGI::Portable 0.46
+	CGI::Portable::AppStatic 0.46
+	DemoStatic 0.46
 
 =cut
 
 ######################################################################
 
-use CGI::Portable 0.45;
-use CGI::Portable::AppStatic 0.45;
+use CGI::Portable 0.46;
+use CGI::Portable::AppStatic 0.46;
 @ISA = qw(CGI::Portable::AppStatic);
 
 ######################################################################
@@ -170,7 +170,7 @@ sub main {
 	$self->set_static_high_replace( $globals );
 	$self->set_static_attach_unordered( $globals );
 	$self->set_static_attach_ordered( $globals );
-	$self->set_static_miscellaneous( $globals );
+	$self->set_static_search_and_replace( $globals );
 }
 
 ######################################################################
@@ -216,7 +216,7 @@ sub get_curr_seg_content {
 	$is_multi_segmented and $wpm_context->navigate_file_path( $base );
 	$wpm_context->set_prefs( $wpm_prefs );
 	$wpm_context->call_component( 'DemoStatic' );
-	$globals->take_context_output( $wpm_context );
+	$globals->take_context_output( $wpm_context, 1 );
 }
 
 ######################################################################
@@ -235,31 +235,31 @@ sub attach_document_navbar {
 		if( $seg_num == $curr_seg_num ) {
 			push( @seg_list_html, "$seg_num\n" );
 		} else {
-			my $curr_seg_html = "<A HREF=\"$common_url\">$seg_num</A>\n";
+			my $curr_seg_html = "<a href=\"$common_url\">$seg_num</a>\n";
 			$curr_seg_html =~ s/$seg_token/$seg_num/g;
 			push( @seg_list_html, $curr_seg_html );
 		}
 	}
 	
 	my $prev_seg_html = ($curr_seg_num == 1) ? "Previous\n" :
-		"<A HREF=\"$common_url\">Previous</A>\n";
+		"<a href=\"$common_url\">Previous</a>\n";
 	$prev_seg_html =~ s/$seg_token/$curr_seg_num-1/ge;
 	
 	my $next_seg_html = ($curr_seg_num == $segments) ? "Next\n" :
-		"<A HREF=\"$common_url\">Next</A>\n";
+		"<a href=\"$common_url\">Next</a>\n";
 	$next_seg_html =~ s/$seg_token/$curr_seg_num+1/ge;
 	
 	my $document_navbar =
 		<<__endquote.
-<TABLE BORDER=0 CELLSPACING=0 CELLPADDING=10><TR>
- <TD>$prev_seg_html</TD><TD ALIGN="center">
+<table><tr>
+ <td>$prev_seg_html</td><td>
 __endquote
 
 		join( ' | ', @seg_list_html ).
 
 		<<__endquote;
- </TD><TD>$next_seg_html</TD>
-</TR></TABLE>
+ </td><td>$next_seg_html</td>
+</tr></table>
 __endquote
 
 	$globals->prepend_page_body( [$document_navbar] );
@@ -285,11 +285,11 @@ sub attach_document_header {
 	$globals->page_title( $title );
 
 	$globals->prepend_page_body( <<__endquote );
-<H1>@{[$globals->page_title()]}</H1>
+<h1>@{[$globals->page_title()]}</h1>
 
-<P>Author: $author<BR>
-Created: $created<BR>
-Updated: $updated</P>
+<p>Author: $author<br />
+Created: $created<br />
+Updated: $updated</p>
 __endquote
 }
 

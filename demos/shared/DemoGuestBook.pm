@@ -18,7 +18,7 @@ require 5.004;
 
 use strict;
 use vars qw($VERSION @ISA);
-$VERSION = '0.45';
+$VERSION = '0.46';
 
 ######################################################################
 
@@ -36,8 +36,8 @@ $VERSION = '0.45';
 
 =head2 Nonstandard Modules
 
-	CGI::Portable 0.45
-	CGI::Portable::AppStatic 0.45
+	CGI::Portable 0.46
+	CGI::Portable::AppStatic 0.46
 	CGI::MultiValuedHash 1.07
 	HTML::FormTemplate 2.01
 
@@ -47,8 +47,8 @@ $VERSION = '0.45';
 
 use Fcntl qw(:DEFAULT :flock);
 use Symbol;
-use CGI::Portable 0.45;
-use CGI::Portable::AppStatic 0.45;
+use CGI::Portable 0.46;
+use CGI::Portable::AppStatic 0.46;
 @ISA = qw(CGI::Portable::AppStatic);
 use CGI::MultiValuedHash 1.07;
 use HTML::FormTemplate 2.01;
@@ -166,16 +166,16 @@ use HTML::FormTemplate 2.01;
 		fn_messages => 'guestbook_messages.txt',
 		msg_new_title => 'Leave A Message',  # custom title for new messages
 		msg_new_head => <<__endquote,   # custom heading for new messages
-	<H1>Leave A Message</H1>
-	<P>Please leave a message after the beep.  Answer the questions as faithfully
+	<h1>Leave A Message</h1>
+	<p>Please leave a message after the beep.  Answer the questions as faithfully
 	and truthfully as you can, as we have a lie detector set up and any false 
-	answers will be met with spam.</P>
+	answers will be met with spam.</p>
 	__endquote
 		msg_list_title => 'Previous Reflections',  # custom title when reading
 		msg_list_head => <<__endquote,   # custom heading for reading
-	<H1>Wise Words That You Never Wrote</H1>
-	<P>Here are the messages that previous visitors wrote.  Please stay awhile 
-	and soak in the goodness.  You never know what you don't read.</P>
+	<h1>Wise Words That You Never Wrote</h1>
+	<p>Here are the messages that previous visitors wrote.  Please stay awhile 
+	and soak in the goodness.  You never know what you don't read.</p>
 	__endquote
 	);
 
@@ -317,7 +317,7 @@ sub main {
 	$self->set_static_high_replace( $globals );
 	$self->set_static_attach_unordered( $globals );
 	$self->set_static_attach_ordered( $globals );
-	$self->set_static_miscellaneous( $globals );
+	$self->set_static_search_and_replace( $globals );
 }
 
 ######################################################################
@@ -366,7 +366,7 @@ sub main_dispatch {
 		}
 	}
 
-	$globals->search_and_replace_page_body( {
+	$globals->page_search_and_replace( {
 		$TOKEN_SIGN => $globals->url_as_string( $VRP_SIGN ),
 		$TOKEN_READ => $globals->url_as_string( $VRP_READ ),
 	} );
@@ -416,7 +416,6 @@ sub get_field_definitions {
 		}, {
 			type => 'reset', 
 			label => 'Clear',
-			keep_with_prev => 1,
 		},
 	);
 
@@ -456,15 +455,15 @@ sub no_questions_error {
 	$globals->page_title( "Error Starting GuestBook" );
 
 	$globals->set_page_body( <<__endquote );
-<H1>@{[$globals->page_title()]}</H1>
+<h1>@{[$globals->page_title()]}</h1>
 
-<P>I'm sorry, but an error has occurred while trying to start 
+<p>I'm sorry, but an error has occurred while trying to start 
 the Guest Book.  We are missing critical settings information 
 that is required to operate.  Specifically, we don't know what 
 questions we are supposed to ask you.  Here are some details about 
-what caused this problem:</P>
+what caused this problem:</p>
 
-<P>@{[$globals->get_error()]}</P>
+<p>@{[$globals->get_error()]}</p>
 
 @{[$self->get_amendment_message()]}
 __endquote
@@ -494,13 +493,13 @@ sub read_guest_book {
 		$globals->page_title( "Error Reading GuestBook Postings" );
 
 		$globals->set_page_body( <<__endquote );
-<H1>@{[$globals->page_title()]}</H1>
+<h1>@{[$globals->page_title()]}</h1>
 
-<P>I'm sorry, but an error has occurred while trying to read the 
+<p>I'm sorry, but an error has occurred while trying to read the 
 existing guest book messages from the log file, meaning that I can't 
-show you any.</P>
+show you any.</p>
 
-<P>details: $err_msg</P>
+<p>details: $err_msg</p>
 
 @{[$self->get_amendment_message()]}
 __endquote
@@ -512,11 +511,11 @@ __endquote
 		$globals->page_title( "Empty Guest Book" );
 
 		$globals->set_page_body( <<__endquote );
-<H1>@{[$globals->page_title()]}</H1>
+<h1>@{[$globals->page_title()]}</h1>
 
-<P>The guest book currently has no messages in it, as either none 
+<p>The guest book currently has no messages in it, as either none 
 were successfully posted or they were deleted since then.  You can 
-still <A HREF="$TOKEN_SIGN">sign</A> it yourself, however.</P>
+still <a href="$TOKEN_SIGN">sign</a> it yourself, however.</p>
 __endquote
 
 		return( 1 );
@@ -531,22 +530,22 @@ __endquote
 		my $email = $show_emails ? 
 			'&lt;'.$message->fetch_value( $FFN_EMAIL ).'&gt;' : '';
 		my $submit_date = $message->fetch_value( $LFN_SUBMIT_DATE );
-		push( @message_html, "<H3>From $name_real $email at $submit_date:</H3>" );
+		push( @message_html, "<h3>From $name_real $email at $submit_date:</h3>" );
 		push( @message_html, 
 			$form->make_html_input_echo( 1, 1, $EMPTY_FIELD_ECHO_STRING ) );
-		push( @message_html, "\n<HR>" );
+		push( @message_html, "\n<hr />" );
 	}
-	pop( @message_html );  # get rid of trailing <HR>
+	pop( @message_html );  # get rid of trailing <hr />
 	
 	$globals->set_page_body( \@message_html );		
 	
 	$globals->prepend_page_body( <<__endquote );
-<P>You may also <A HREF="$TOKEN_SIGN">sign</A> 
-this guest book yourself, if you wish.</P>
+<p>You may also <a href="$TOKEN_SIGN">sign</a> 
+this guest book yourself, if you wish.</p>
 __endquote
 	$globals->append_page_body( <<__endquote );
-<P>You may also <A HREF="$TOKEN_SIGN">sign</A> 
-this guest book yourself, if you wish.</P>
+<p>You may also <a href="$TOKEN_SIGN">sign</a> 
+this guest book yourself, if you wish.</p>
 __endquote
 
 	$globals->page_title( $globals->pref( $PKEY_MSG_LIST_TITLE ) || 
@@ -554,9 +553,9 @@ __endquote
 
 	$globals->prepend_page_body( 
 		$globals->pref( $PKEY_MSG_LIST_HEAD ) || <<__endquote );
-<H1>@{[$globals->page_title()]}</H1>
+<h1>@{[$globals->page_title()]}</h1>
 
-<P>Messages are ordered from newest to oldest.  
+<p>Messages are ordered from newest to oldest.</p>
 __endquote
 
 	return( 1 );
@@ -573,24 +572,24 @@ sub new_message {
 
 	$globals->set_page_body( 
 		$globals->pref( $PKEY_MSG_NEW_HEAD ) || <<__endquote );
-<H1>@{[$globals->page_title()]}</H1>
+<h1>@{[$globals->page_title()]}</h1>
 
-<P>This form is provided as an easy way for you to give feedback 
+<p>This form is provided as an easy way for you to give feedback 
 concerning this web site, and at the same time, let everyone else 
-know what you think.</P>
+know what you think.</p>
 __endquote
 
 	$globals->append_page_body( <<__endquote );
-<P>The fields indicated with a '@{[$form->required_field_marker()]}' 
-are required.</P>
+<p>The fields indicated with a '@{[$form->required_field_marker()]}' 
+are required.</p>
 
 @{$form->make_html_input_form( 1, 1 )}
 
-<P>It may take from 1 to 30 seconds to process this form, so please be 
+<p>It may take from 1 to 30 seconds to process this form, so please be 
 patient and don't click Send multiple times.  A confirmation message 
-will appear if everything worked.</P>
+will appear if everything worked.</p>
 
-<P>You may also <A HREF="$TOKEN_READ">read</A> the existing messages.</P>
+<p>You may also <a href="$TOKEN_READ">read</a> the existing messages.</p>
 __endquote
 }
 
@@ -603,22 +602,22 @@ sub invalid_input {
 	$globals->page_title( "Information Missing" );
 
 	$globals->set_page_body( <<__endquote );
-<H1>@{[$globals->page_title()]}</H1>
+<h1>@{[$globals->page_title()]}</h1>
 
-<P>Your submission could not be added to the guest book because some 
+<p>Your submission could not be added to the guest book because some 
 of the fields were not correctly filled in, which are indicated with a 
 '@{[$form->bad_input_marker()]}'.  Fields with a 
 '@{[$form->required_field_marker()]}' are required and can not be left 
 empty.  Please make sure you have entered your name and e-mail address 
-correctly, and then try sending it again.</P>
+correctly, and then try sending it again.</p>
 
 @{$form->make_html_input_form( 1, 1 )}
 
-<P>It may take from 1 to 30 seconds to process this form, so please be 
+<p>It may take from 1 to 30 seconds to process this form, so please be 
 patient and don't click Send multiple times.  A confirmation message 
-will appear if everything worked.</P>
+will appear if everything worked.</p>
 
-<P>You may also <A HREF="$TOKEN_READ">read</A> the existing messages.</P>
+<p>You may also <a href="$TOKEN_READ">read</a> the existing messages.</p>
 __endquote
 }
 
@@ -652,28 +651,28 @@ __endquote
 		$globals->page_title( "Error Sending Mail" );
 
 		$globals->set_page_body( <<__endquote );
-<H1>@{[$globals->page_title()]}</H1>
+<h1>@{[$globals->page_title()]}</h1>
 
-<P>I'm sorry, but an error has occurred while trying to e-mail your 
+<p>I'm sorry, but an error has occurred while trying to e-mail your 
 message to me.  It also hasn't been added to the guest book.  As a 
-result, no one will see it.</P>
+result, no one will see it.</p>
 
-<P>This problem can occur if you enter a nonexistant or unreachable 
+<p>This problem can occur if you enter a nonexistant or unreachable 
 e-mail address into the e-mail field, in which case, please enter a 
 working e-mail address and try clicking 'Send' again.  You can check 
-if that is the problem by checking the following error string:</P>
+if that is the problem by checking the following error string:</p>
 
-<P>$err_msg</P>
+<p>$err_msg</p>
 
 @{[$self->get_amendment_message()]}
 
 @{$form->make_html_input_form( 1, 1 )}
 
-<P>It may take from 1 to 30 seconds to process this form, so please be 
+<p>It may take from 1 to 30 seconds to process this form, so please be 
 patient and don't click Send multiple times.  A confirmation message 
-will appear if everything worked.</P>
+will appear if everything worked.</p>
 
-<P>You may also <A HREF="$TOKEN_READ">read</A> the existing messages.</P>
+<p>You may also <a href="$TOKEN_READ">read</a> the existing messages.</p>
 __endquote
 
 		$globals->add_no_error();
@@ -703,24 +702,24 @@ sub sign_guest_book {
 		$globals->page_title( "Error Writing to Guest Book" );
 
 		$globals->set_page_body( <<__endquote );
-<H1>@{[$globals->page_title()]}</H1>
+<h1>@{[$globals->page_title()]}</h1>
 
-<P>I'm sorry, but an error has occurred while trying to write your 
+<p>I'm sorry, but an error has occurred while trying to write your 
 message into the guest book.  As a result it will not appear when
 the guest book is viewed by others.  However, the message was
-e-mailed to me.</P>
+e-mailed to me.</p>
 
-<P>details: $err_msg</P>
+<p>details: $err_msg</p>
 
 @{[$self->get_amendment_message()]}
 
 @{$form->make_html_input_form( 1, 1 )}
 
-<P>It may take from 1 to 30 seconds to process this form, so please be 
+<p>It may take from 1 to 30 seconds to process this form, so please be 
 patient and don't click Send multiple times.  A confirmation message 
-will appear if everything worked.</P>
+will appear if everything worked.</p>
 
-<P>You may also <A HREF="$TOKEN_READ">read</A> the existing messages.</P>
+<p>You may also <a href="$TOKEN_READ">read</a> the existing messages.</p>
 __endquote
 
 		$globals->add_no_error();
@@ -739,24 +738,24 @@ sub mail_me_and_sign_guest_ok {
 	$globals->page_title( "Your Message Has Been Added" );
 
 	$globals->set_page_body( <<__endquote );
-<H1>@{[$globals->page_title()]}</H1>
+<h1>@{[$globals->page_title()]}</h1>
 
-<P>Your message has been added to this guest book, and a copy was 
-e-mailed to me as well.  This is what the copy e-mailed to me said:</P>
+<p>Your message has been added to this guest book, and a copy was 
+e-mailed to me as well.  This is what the copy e-mailed to me said:</p>
 
-<P><STRONG>To:</STRONG> 
+<p><strong>To:</strong> 
 @{[$globals->default_maintainer_name()]}
 &lt;@{[$globals->default_maintainer_email_address()]}&gt;
-<BR><STRONG>From:</STRONG> 
+<br /><strong>From:</strong> 
 @{[$globals->user_post_param( $FFN_NAMEREAL )]} 
 &lt;@{[$globals->user_post_param( $FFN_EMAIL )]}&gt;
-<BR><STRONG>Subject:</STRONG> 
+<br /><strong>Subject:</strong> 
 @{[$globals->pref( $PKEY_EMAIL_SUBJ ) || 
-	$globals->default_application_title().' -- GuestBook Message']}</P>
+	$globals->default_application_title().' -- GuestBook Message']}</p>
 
 @{[$form->make_html_input_echo( 1, 1, $EMPTY_FIELD_ECHO_STRING )]}
 
-<P>You may also <A HREF="$TOKEN_READ">read</A> the existing messages.</P>
+<p>You may also <a href="$TOKEN_READ">read</a> the existing messages.</p>
 __endquote
 }
 
@@ -784,15 +783,15 @@ __endquote
 	if( $err_msg ) {
 		$globals->add_error( $err_msg );
 		$globals->append_page_body( <<__endquote );
-<P>However, something went wrong when trying to send you a copy:
-$err_msg.</P>
+<p>However, something went wrong when trying to send you a copy:
+$err_msg.</p>
 __endquote
 		$globals->add_no_error();
 
 	} else {
 		$globals->append_page_body( <<__endquote );
-<P>Also, a copy was successfully sent to you at 
-'@{[$globals->user_post_param( $FFN_EMAIL )]}'.</P>
+<p>Also, a copy was successfully sent to you at 
+'@{[$globals->user_post_param( $FFN_EMAIL )]}'.</p>
 __endquote
 	}
 }
@@ -995,11 +994,11 @@ sub get_amendment_message {
 	my ($self) = shift( @_ );
 	my $globals = $self->{$KEY_SITE_GLOBALS};
 	return( <<__endquote );
-<P>This should be temporary, the result of a transient server problem or an 
+<p>This should be temporary, the result of a transient server problem or an 
 update being performed at the moment.  Click @{[$globals->recall_html('here')]} 
 to automatically try again.  If the problem persists, please try again later, 
 or send an @{[$globals->maintainer_email_html('e-mail')]} message about the 
-problem, so it can be fixed.</P>
+problem, so it can be fixed.</p>
 __endquote
 }
 

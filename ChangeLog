@@ -1,3 +1,79 @@
+2001-09-30   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 0.46.
+	
+	* IMPORTANT: Rewrote the take_context_output() methods in all 
+	CGI::Portable::* modules that had them: Errors, Files, Request, Response, 
+	suffixless.  Be aware that the changed methods have a different default 
+	behaviour than before, as well as that they take a different argument set.  
+	You should check any of your code which calls this method, because it may 
+	very well break if it used any arguments or depended on specific behaviour.
+	Specifically, the new arguments [CONTEXT, LEAVE_SCALARS, REPLACE_LISTS] 
+	replace the old arguments [CONTEXT, APPEND_LISTS, SKIP_SCALARS].  The new 
+	default behaviours regarding when CONTEXT properties overwrite SELF 
+	properties have been changed so that they more closely match what one would 
+	intuitively expect to happen.  No longer will null properties overwrite 
+	properties with values.  Also, lists are now combined by default rather than 
+	replaced, which works well when you have multiple "application components" 
+	subcontracted to make different regions of the same screens; previously, the 
+	last component would overwrite earlier ones by default.  Scalar properties 
+	in "taken" CONTEXTs still will overwrite ones in SELF by default, but this 
+	time only if they aren't null.  See the method's own POD for more.
+	
+	* Added method page_search_and_replace() to CGI::Portable::Response, which 
+	replaces the search_and_replace_page_body() method in CGI::Portable; the 
+	latter was deleted.  Correspondingly, the deprecated preference named 
+	"page_replace" that was handled by CGI::Portable::AppStatic has been renamed 
+	to "page_search_and_replace".  The renamed preference works the same as 
+	before, and should be permanent.  Also, added property and method 
+	page_prologue() to Response and a corresponding "low/high_page_prologue" 
+	properties to AppStatic.  The new method and properties have no effect 
+	unless your HTML::EasyTags install is 1-06 or later.
+	
+	* Added module CGI::Portable::AppMultiScreen, an "application component" 
+	that lets you easily define a group of screens that are related, delegate 
+	the construction of each screen to separate "components", and simplify the 
+	creation of links between the screens.  The module is subclassed from 
+	AppStatic.  This module has complete POD so you can get a good description 
+	by reading that documentation.  This module is meant as a non-proprietary 
+	replacement for DemoMultiPage; the latter module was deleted.  The 
+	preferences handled by DemoMultiPage were renamed as follows: "vrp_handlers" 
+	to "delegate_list", "def_handler" to "default_delegate", "wpm_module" to 
+	"module_name", "wpm_prefs" to "preferences", "wpm_subdir" to "file_subdir".  
+	The new module does not have any replacement for the older "menu_items" and 
+	related preferences for generating html menus of hyperlinks between the 
+	various screens, and it will not get any due to the proprietary nature of 
+	such a task.  If you used "menu_items" before then you will need to make the 
+	hyperlinks yourself and attach them to the pages.  It really isn't that 
+	difficult; see the "website" demo for an example of how to do it now.
+	
+	* Added module CGI::Portable::AppSplitScreen, an "application component" 
+	that lets you easily divide a response screen into multiple regions and 
+	then delegate the construction of each region to separate "components".  
+	You define the regions within the standard "preferences", and no other 
+	input is required.  The module is subclassed from AppStatic.  This module 
+	has complete POD so you can get a good description by reading that 
+	documentation.  Before this module became available, you would have had to 
+	do your own programming for such simple tasks as adding page headers or 
+	footers that are stored in a different file of their own; now such 
+	activities can be done with nothing more than ordinary config files.
+
+	* Updated CGI::Portable::AdapterCGI so that it will always read posted data 
+	up to Content-length bytes.  While it never got more than that before, 
+	it had also refused to read content if there was more than 100K of it.  
+	This change brings more behaviour partity with AdapterSocket.
+	
+	* Small update to the search_and_replace_url_path_tokens() method of 
+	CGI::Portable so that it didn't leave a trailing "?" on urls when there was 
+	no query string.
+	
+	* Various small updates were made to the demo modules to keep them up to 
+	date with the main module changes, above, so they don't break.
+	
+	* Various small updates were made so that the output of the modules is 
+	better compliant with XHTML.  All HTML now has lowercased tags, among other 
+	things.  However, it should continue to work with older web browsers.
+
 2001-08-26   Darren Duncan <perl@DarrenDuncan.net>
 
 	* Release 0.45.
@@ -472,4 +548,5 @@ e-mail forms and guest books with unlimited questions (but were text only),
 redirection, and usage tracking.  The implementation was just a hell of a lot
 uglier.  These modules also used CGI.pm to do some things that have since become 
 implemented by my own more focused modules: HTML::FormTemplate, HTML::EasyTags, 
-Data::MultiValuedHash, CGI::MultiValuedHash, CGI::Portable, CGI::WPM::SimpleUserIO.
+Data::MultiValuedHash, CGI::MultiValuedHash, CGI::Portable, 
+CGI::Portable::Request, CGI::Portable::AdapterCGI.

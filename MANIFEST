@@ -24,7 +24,6 @@ demos/segtext/jv_world/jv_world_005.txt
 demos/segtext/splitup.pl
 demos/shared/DemoGuestBook.pm
 demos/shared/DemoMailForm.pm
-demos/shared/DemoMultiPage.pm
 demos/shared/DemoRedirect.pm
 demos/shared/DemoSegTextDoc.pm
 demos/shared/DemoStatic.pm
@@ -37,6 +36,7 @@ demos/website/content/content_prefs.pl
 demos/website/content/frontdoor.html
 demos/website/content/guestbook_questions.txt
 demos/website/content/links.html
+demos/website/content/menu_prefs.pl
 demos/website/content/mysites.html
 demos/website/content/resume.html
 demos/website/start.pl
@@ -44,6 +44,8 @@ demos/website/usage_prefs.pl
 lib/CGI/Portable.pm
 lib/CGI/Portable/AdapterCGI.pm
 lib/CGI/Portable/AdapterSocket.pm
+lib/CGI/Portable/AppMultiScreen.pm
+lib/CGI/Portable/AppSplitScreen.pm
 lib/CGI/Portable/AppStatic.pm
 lib/CGI/Portable/Errors.pm
 lib/CGI/Portable/Files.pm

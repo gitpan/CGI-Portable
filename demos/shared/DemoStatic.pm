@@ -17,7 +17,7 @@ require 5.004;
 
 use strict;
 use vars qw($VERSION @ISA);
-$VERSION = '0.45';
+$VERSION = '0.46';
 
 ######################################################################
 
@@ -33,15 +33,15 @@ $VERSION = '0.45';
 
 =head2 Nonstandard Modules
 
-	CGI::Portable 0.45
-	CGI::Portable::AppStatic 0.45
+	CGI::Portable 0.46
+	CGI::Portable::AppStatic 0.46
 
 =cut
 
 ######################################################################
 
-use CGI::Portable 0.45;
-use CGI::Portable::AppStatic 0.45;
+use CGI::Portable 0.46;
+use CGI::Portable::AppStatic 0.46;
 @ISA = qw(CGI::Portable::AppStatic);
 
 ######################################################################
@@ -138,7 +138,7 @@ sub main {
 	$self->set_static_high_replace( $globals );
 	$self->set_static_attach_unordered( $globals );
 	$self->set_static_attach_ordered( $globals );
-	$self->set_static_miscellaneous( $globals );
+	$self->set_static_search_and_replace( $globals );
 }
 
 ######################################################################
@@ -174,11 +174,11 @@ sub main_dispatch {
 			$file_content =~ s/</&lt;/g;
 		
 			$globals->set_page_body( 
-				[ "\n<PRE>\n", $file_content, "\n</PRE>\n" ] );
+				[ "\n<pre>\n", $file_content, "\n</pre>\n" ] );
 		
-		} elsif( $file_content =~ m|<BODY[^>]*>(.*)</BODY>|si ) {
+		} elsif( $file_content =~ m|<body[^>]*>(.*)</body>|si ) {
 			$globals->set_page_body( $1 );
-			if( $file_content =~ m|<TITLE>(.*)</TITLE>|si ) {
+			if( $file_content =~ m|<title>(.*)</title>|si ) {
 				$globals->page_title( $1 );
 			}
 		} else {
@@ -189,14 +189,14 @@ sub main_dispatch {
 	if( $globals->get_error() ) {
 		$globals->page_title( 'Error Opening Page' );
 		$globals->set_page_body( <<__endquote );
-<H1>@{[$globals->page_title()]}</H1>
+<h1>@{[$globals->page_title()]}</h1>
 
-<P>I'm sorry, but an error has occurred while trying to open 
-the page you requested, which is in the file "$filename".</P>  
+<p>I'm sorry, but an error has occurred while trying to open 
+the page you requested, which is in the file "$filename".</p>  
 
 @{[$self->get_amendment_message()]}
 
-<P>Details: @{[$globals->get_error()]}</P>
+<p>Details: @{[$globals->get_error()]}</p>
 __endquote
 
 		$globals->add_no_error();
@@ -209,11 +209,11 @@ sub get_amendment_message {
 	my ($self) = shift( @_ );
 	my $globals = $self->{$KEY_SITE_GLOBALS};
 	return( <<__endquote );
-<P>This should be temporary, the result of a transient server problem or an 
+<p>This should be temporary, the result of a transient server problem or an 
 update being performed at the moment.  Click @{[$globals->recall_html('here')]} 
 to automatically try again.  If the problem persists, please try again later, 
 or send an @{[$globals->maintainer_email_html('e-mail')]} message about the 
-problem, so it can be fixed.</P>
+problem, so it can be fixed.</p>
 __endquote
 }
 

@@ -1,6 +1,6 @@
 =head1 NAME
 
-CGI::Portable - Framework for server-agnostic web apps.
+CGI::Portable - Framework for server-generic web apps
 
 =cut
 
@@ -17,7 +17,7 @@ require 5.004;
 
 use strict;
 use vars qw($VERSION @ISA);
-$VERSION = '0.45';
+$VERSION = '0.46';
 
 ######################################################################
 
@@ -33,17 +33,17 @@ $VERSION = '0.45';
 
 =head2 Nonstandard Modules
 
-	CGI::Portable::Files 0.45
-	CGI::Portable::Request 0.45
-	CGI::Portable::Response 0.45
+	CGI::Portable::Files 0.46
+	CGI::Portable::Request 0.46
+	CGI::Portable::Response 0.46
 
 =cut
 
 ######################################################################
 
-use CGI::Portable::Files 0.45;
-use CGI::Portable::Request 0.45;
-use CGI::Portable::Response 0.45;
+use CGI::Portable::Files 0.46;
+use CGI::Portable::Request 0.46;
+use CGI::Portable::Response 0.46;
 @ISA = qw( CGI::Portable::Files CGI::Portable::Request CGI::Portable::Response );
 
 ######################################################################
@@ -127,7 +127,7 @@ use CGI::Portable::Response 0.45;
 
 	my $rh_prefs = {
 		title => 'Welcome to Aardvark',
-		credits => '<P>This program copyright 2001 Darren Duncan.</P>',
+		credits => '<p>This program copyright 2001 Darren Duncan.</p>',
 		screens => {
 			one => {
 				'link' => 'Fill Out A Form',
@@ -189,7 +189,7 @@ use CGI::Portable::Response 0.45;
 
 =head2 Content of fat main program component "Aardvark.pm"
 
-I<This module acts sort of like DemoMultiPage.>
+I<This module acts sort of like CGI::Portable::AppMultiScreen.>
 
 	package Aardvark;
 	use strict;
@@ -210,16 +210,16 @@ I<This module acts sort of like DemoMultiPage.>
 			$globals->take_context_output( $inner );
 		
 		} else {
-			$globals->set_page_body( "<P>Please choose a screen to view.</P>" );
+			$globals->set_page_body( "<p>Please choose a screen to view.</p>" );
 			foreach my $key (keys %{$rh_screens}) {
 				my $label = $rh_screens->{$key}->{link};
 				my $url = $globals->url_as_string( $key );
-				$globals->append_page_body( "<BR><A HREF=\"$url\">$label</A>" );
+				$globals->append_page_body( "<br /><a href=\"$url\">$label</a>" );
 			}
 		}
 		
 		$globals->page_title( $globals->pref( 'title' ) );
-		$globals->prepend_page_body( "<H1>".$globals->page_title()."</H1>\n" );
+		$globals->prepend_page_body( "<h1>".$globals->page_title()."</h1>\n" );
 		$globals->append_page_body( $globals->pref( 'credits' ) );
 	}
 
@@ -252,10 +252,10 @@ I<This module acts sort of like DemoMailForm without the emailing.>
 		$form->field_definitions( $ra_field_defs );
 		$form->user_input( $globals->user_post() );
 		$globals->set_page_body(
-			'<H1>Here Are Some Questions</H1>',
+			'<h1>Here Are Some Questions</h1>',
 			$form->make_html_input_form( 1 ),
-			'<HR>',
-			'<H1>Answers From Last Time If Any</H1>',
+			'<hr />',
+			'<h1>Answers From Last Time If Any</h1>',
 			$form->new_form() ? '' : $form->make_html_input_echo( 1 ),
 		);
 	}
@@ -329,17 +329,17 @@ I<This module acts sort of like nothing I've ever seen.>
 	sub main {
 		my ($class, $globals) = @_;
 		$globals->set_page_body( <<__endquote );
-	<P>Food: @{[$globals->pref( 'food' )]}
-	<BR>Color: @{[$globals->pref( 'color' )]}
-	<BR>Size: @{[$globals->pref( 'size' )]}</P>
-	<P>Now let's look at some files; take your pick:
+	<p>Food: @{[$globals->pref( 'food' )]}
+	<br />Color: @{[$globals->pref( 'color' )]}
+	<br />Size: @{[$globals->pref( 'size' )]}</p>
+	<p>Now let's look at some files; take your pick:
 	__endquote
 		$globals->navigate_url_path( $globals->pref( 'file_reader' ) );
 		foreach my $frag (@{$globals->pref( 'files' )}) {
 			my $url = $globals->url_as_string( $frag );
-			$globals->append_page_body( "<BR><A HREF=\"$url\">$frag</A>" );
+			$globals->append_page_body( "<br /><a href=\"$url\">$frag</a>" );
 		}
-		$globals->append_page_body( "</P>" );
+		$globals->append_page_body( "</p>" );
 	}
 
 	1;
@@ -665,7 +665,7 @@ sub make_new_context {
 
 ######################################################################
 
-=head2 take_context_output( CONTEXT[, APPEND_LISTS[, SKIP_SCALARS]] )
+=head2 take_context_output( CONTEXT[, LEAVE_SCALARS[, REPLACE_LISTS]] )
 
 This method takes another CGI::Portable (or subclass) object as its
 CONTEXT argument and copies some of its properties to this object, potentially
@@ -673,28 +673,33 @@ overwriting any versions already in this object.  If CONTEXT is not a valid
 CGI::Portable (or subclass) object then this method returns without
 changing anything.  The properties that get copied are the "output" properties
 that presumably need to work their way back to the user.  In other words, this
-method copies everything that make_new_context() did not. If the optional boolean
-argument APPEND_LISTS is true then any list-type properties, including arrays and
-hashes, get appended to the existing values where possible rather than just
-replacing them.  In the case of hashes, however, keys with the same names are
-still replaced.  If the optional boolean argument SKIP_SCALARS is true then
-scalar properties are not copied over; otherwise they will always replace any
-that are in this object already.
+method copies everything that make_new_context() did not.  This method will 
+never copy any properties which are undefined scalars or empty lists, so a 
+CONTEXT with no "output" properties set will not cause any changes.  If any 
+scalar output properties of CONTEXT are defined, they will overwrite any 
+defined corresponding properties of this object by default; however, if the 
+optional boolean argument LEAVE_SCALARS is true, then the scalar values are 
+only copied if the ones in this object are not defined.  If any list output 
+properties of CONTEXT have elements, then they will be appended to 
+any corresponding ones of this object by default, thereby preserving both 
+(except with hash properties, where like hash keys will overwrite); 
+however, if the optional boolean argument REPLACE_LISTS is true, then any 
+existing list values are overwritten by any copied CONTEXT equivalents.
 
 =cut
 
 ######################################################################
 
 sub take_context_output {
-	my ($self, $context, $append_lists, $skip_scalars) = @_;
+	my ($self, $context, $leave_scalars, $replace_lists) = @_;
 	UNIVERSAL::isa( $context, 'CGI::Portable' ) or return( 0 );
 
 	$self->CGI::Portable::Files::take_context_output( 
-		$context, $append_lists, $skip_scalars );
+		$context, $leave_scalars, $replace_lists );
 	$self->CGI::Portable::Request::take_context_output( 
-		$context, $append_lists, $skip_scalars );
+		$context, $leave_scalars, $replace_lists );
 	$self->CGI::Portable::Response::take_context_output( 
-		$context, $append_lists, $skip_scalars );
+		$context, $leave_scalars, $replace_lists );
 }
 
 ######################################################################
@@ -766,19 +771,19 @@ sub _make_call_component_error_page {
 	$self->page_title( 'Error Getting Screen' );
 
 	$self->set_page_body( <<__endquote );
-<H1>@{[$self->page_title()]}</H1>
+<h1>@{[$self->page_title()]}</h1>
 
-<P>I'm sorry, but an error occurred while getting the requested screen.  
+<p>I'm sorry, but an error occurred while getting the requested screen.  
 We were unable to use the application component that was in charge of 
-producing the screen content, named '$comp_name'.
+producing the screen content, named '$comp_name'.</p>
 
-<P>This should be temporary, the result of a transient server problem or an 
+<p>This should be temporary, the result of a transient server problem or an 
 update being performed at the moment.  Click @{[$self->recall_html('here')]} 
 to automatically try again.  If the problem persists, please try again later, 
 or send an @{[$self->maintainer_email_html('e-mail')]} message about the 
-problem, so it can be fixed.</P>
+problem, so it can be fixed.</p>
 
-<P>Detail: @{[$self->get_error()]}</P>
+<p>Detail: @{[$self->get_error()]}</p>
 __endquote
 
 	$self->add_no_error();
@@ -814,38 +819,8 @@ sub is_debug {
 
 =head1 METHODS FOR SEARCH AND REPLACE
 
-These methods handle miscellaneous functionality that may be useful.
-
-=head2 search_and_replace_page_body( DO_THIS )
-
-This method performs a customizable search-and-replace of this object's "page
-body" property.  The argument DO_THIS is a hash ref whose keys are tokens to look
-for and the corresponding values are what to replace the tokens with.  Tokens can
-be any Perl 5 regular expression and they are applied using
-"s/[find]/[replace]/g".  Perl will automatically throw an exception if your
-regular expressions don't compile, so you should check them for validity before
-use.  If DO_THIS is not a valid hash ref then this method returns without 
-changing anything.
-
-=cut
-
-######################################################################
-
-sub search_and_replace_page_body {
-	my ($self, $do_this) = @_;
-	ref( $do_this ) eq 'HASH' or return( undef );
-	my $ra_page_body = $self->get_page_body_ref();
-	my $body = join( '', @{$ra_page_body} );
-
-	foreach my $find_val (keys %{$do_this}) {
-		my $replace_val = $do_this->{$find_val};
-		$body =~ s/$find_val/$replace_val/g;
-	}
-
-	@{$ra_page_body} = ($body);
-}
-
-######################################################################
+This method supplements the page_search_and_replace() method in 
+CGI::Portable::Response with a more proprietary solution.
 
 =head2 search_and_replace_url_path_tokens([ TOKEN ])
 
@@ -854,18 +829,18 @@ body" property.  The nature of this search and replace allows you to to embed
 "url paths" in static portions of your application, such as data files, and then 
 replace them with complete self-referencing urls that go to the application 
 screen that each url path corresponds to.  How it works is that your data files 
-are formatted like '<A HREF="__url_path__=/pics/green">green pics</A>' or 
-'<A HREF="__url_path__=../texts">texts page</A>' or 
-'<A HREF="__url_path__=/jump&url=http://www.cpan.org">CPAN</A>' and the scalar 
+are formatted like '<a href="__url_path__=/pics/green">green pics</a>' or 
+'<a href="__url_path__=../texts">texts page</a>' or 
+'<a href="__url_path__=/jump&url=http://www.cpan.org">CPAN</a>' and the scalar 
 argument TOKEN is equal to '__url_path__' (that is its default value also).  
 This method will search for text like in the above formats, specifically the parts between the double-quotes, and substitute in self-referencing urls like 
-'<A HREF="http://www.aardvark.net/it.pl/pics/green">green pics</A>' or 
-'<A HREF="http://www.aardvark.net/it.pl/jump?url=http://www.cpan.org">CPAN</A>'.  
+'<a href="http://www.aardvark.net/it.pl/pics/green">green pics</a>' or 
+'<a href="http://www.aardvark.net/it.pl/jump?url=http://www.cpan.org">CPAN</a>'.  
 New urls are constructed in a similar fashion to what url_as_string() makes, and 
 incorporates your existing url base, query string, and so
 on.  Any query string you provide in the source text is added to the url query 
 in the output.  This specialized search and replace can not be done with 
-search_and_replace_page_body() since that would only replace the '__url_path__' 
+page_search_and_replace() since that would only replace the '__url_path__' 
 part and leave the rest.  The regular expression that is searched for looks 
 sort of like /"TOKEN=([^&^"]*)&?(.*?)"/.
 
@@ -884,7 +859,8 @@ sub search_and_replace_url_path_tokens {
 	my $_que = $self->url_query_string();
 	$_que and $_que = "&$_que";
 	$body =~ s/"$token=([^&^"]*)&?(.*?)"/"$_ple\1$_pri\2$_que"/g;
-	$body =~ s/\?&/\?/g; # ADDED THIS LINE 0.43
+	$body =~ s/\?&/\?/g; # ADDED THIS LINE 0-43
+	$body =~ s/\?"/"/g; # ADDED THIS LINE 0-46
 
 	@{$ra_page_body} = ($body);
 }
@@ -1019,8 +995,8 @@ sub maintainer_email_html {
 	my $addy = $self->default_maintainer_email_address();
 	my $path = $self->default_maintainer_email_screen_url_path();
 	return( defined( $path ) ? 
-		"<A HREF=\"@{[$self->url_as_string( $path )]}\">$label</A> ($addy)" : 
-		"<A HREF=\"mailto:$addy\">$label</A> ($addy)" );
+		"<a href=\"@{[$self->url_as_string( $path )]}\">$label</a> ($addy)" : 
+		"<a href=\"mailto:$addy\">$label</a> ($addy)" );
 }
 
 ######################################################################

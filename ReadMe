@@ -15,11 +15,10 @@ CONTENTS
 
 PREFACE
 
-This distribution features the Perl 5 module named "CGI::Portable" as well as 
-9 other modules that are required by it: [CGI::Portable::Errors, Files, Request, 
-Response, AdapterCGI, AdapterSocket, AppStatic, AppMultiScreen, AppSplitScreen].  
-That is, the first 4 are subclassed by CGI::Portable, and the last 5 are 
-recommended for use but not required.
+This distribution features the Perl 5 module named "CGI::Portable" as well as
+these 5 other modules that are recommended for use with it:
+CGI::Portable::Adapter[CGI|Socket],
+CGI::Portable::App[Static|MultiScreen|SplitScreen].
 
 All of my modules have complete POD inside of them, so please refer to that for a
 description of the module itself.
@@ -36,23 +35,22 @@ production environments.  For all intents and purposes, you should treat them
 like "scripts" rather than "modules" as far as when you use them, due to their 
 more proprietary nature.
 
-This distribution now has a "demos" folder containing 59 files and folders 
-(including the above 5 in a folder named "shared") 
-which are ready-to-use example scripts and data files that exercise 
-CGI::Portable and all of the Demo* modules.  Many of these are exactly 
-the same as the *new* Synopsis POD for particular modules.  Some have minor 
-adjustments or demonstrate the Synopsis examples that make use of the most 
-features of the particular modules.  Many demos have extra files in them 
-that never appeared in Synopsis.  It is my hope that these demos will 
-make it an order of magnitude easier for you to adopt my modules and put 
-them to work in a productive manner.  The provided demos include: a multi-page 
-web site with usage tracking, guest books, mail and survey forms, static html 
-and plain text pages, segmented text file display, redirection, and a few 
-other strange modules that don't do anything useful but play with features.  
-Any actual modules in the demos folder are very immature and should not be used 
-as is; rather, learn from them.  They intentionally have no POD.  However, the 
-modules mentioned in the previous paragraph, in the "shared" folder, are more 
-mature and are ok to use productively, with the caveat that they will change.
+This distribution now has a "demos" folder containing 46 files (including the
+above 5 in a folder named "shared") which are ready-to-use example scripts and
+data files that exercise CGI::Portable and all of the Demo* modules.  Many of
+these are exactly the same as the *new* Synopsis POD for particular modules. 
+Some have minor adjustments or demonstrate the Synopsis examples that make use
+of the most features of the particular modules.  Many demos have extra files in
+them that never appeared in Synopsis.  It is my hope that these demos will make
+it an order of magnitude easier for you to adopt my modules and put them to
+work in a productive manner.  The provided demos include: a multi-page web site
+with usage tracking, guest books, mail and survey forms, static html and plain
+text pages, segmented text file display, redirection, and a few other strange
+modules that don't do anything useful but play with features. Any actual
+modules in the demos folder are very immature and should not be used as is;
+rather, learn from them.  They intentionally have no POD.  However, the modules
+mentioned in the previous paragraph, in the "shared" folder, are more mature
+and are ok to use productively, with the caveat that they will change.
 
 KEEPING UP TO DATE
 
@@ -79,18 +77,18 @@ Modules in this distribution require modules in these following distributions:
 File-VirtualPath-1.011.tar.gz
 	- by Darren Duncan (DUNCAND)
 	- File::VirtualPath 1.011 is required by:
-		- CGI::Portable::Files (stores file-system related paths)
-		- CGI::Portable::Request (stores url related paths)
+		- CGI::Portable (stores file-system related paths)
+		- CGI::Portable (stores url related paths)
 
-CGI-MultiValuedHash-1.081.tar.gz
+CGI-MultiValuedHash-1.09.tar.gz
 	- by Darren Duncan (DUNCAND)
-	- CGI::MultiValuedHash 1.081 is required by:
-		- CGI::Portable::Request (stores and url-decodes user queries, posts, cookies)
+	- CGI::MultiValuedHash 1.09 is required by:
+		- CGI::Portable (stores and url-decodes user queries, posts, cookies)
 
 HTML-EasyTags-1.071.tar.gz
 	- by Darren Duncan (DUNCAND)
 	- HTML::EasyTags 1.071 is required by:
-		- CGI::Portable::Response (assembles the pieces of a new HTML page)
+		- CGI::Portable (assembles the pieces of a new HTML page)
 
 mod_perl-1.24_01.tar.gz (older versions may work):
 	- Apache 1.27 is required by:
@@ -150,7 +148,7 @@ this:
 Then you would want to run the included test programs to make sure the modules
 are installed correctly.  Call them like this:
 
-	perl -w t/CGI-Portable-Framework.t
+	perl -w t/CGI-Portable.t
 
 Any existing POD is embedded in the modules themselves.  The Makefile probably 
 extracted it for you in the usual manner, or you can run a POD extractor on it 
@@ -186,7 +184,7 @@ TO DO
 
 AUTHOR
 
-Copyright (c) 1999-2003, Darren R. Duncan.  All rights reserved.  This module
+Copyright (c) 1999-2004, Darren R. Duncan.  All rights reserved.  This module
 is free software; you can redistribute it and/or modify it under the same terms
 as Perl itself.  However, I do request that this copyright information and
 credits remain attached to the file.  If you modify this module and

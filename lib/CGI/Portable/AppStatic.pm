@@ -9,7 +9,7 @@ CGI::Portable::AppStatic - Define whole response screens within a config file
 package CGI::Portable::AppStatic;
 require 5.004;
 
-# Copyright (c) 1999-2003, Darren R. Duncan.  All rights reserved.  This module
+# Copyright (c) 1999-2004, Darren R. Duncan.  All rights reserved.  This module
 # is free software; you can redistribute it and/or modify it under the same terms
 # as Perl itself.  However, I do request that this copyright information and
 # credits remain attached to the file.  If you modify this module and
@@ -20,7 +20,7 @@ require 5.004;
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.461';
+$VERSION = '0.50';
 
 ######################################################################
 
@@ -36,13 +36,13 @@ $VERSION = '0.461';
 
 =head2 Nonstandard Modules
 
-	CGI::Portable 0.461
+	CGI::Portable 0.50
 
 =cut
 
 ######################################################################
 
-use CGI::Portable 0.461;
+use CGI::Portable 0.50;
 
 ######################################################################
 
@@ -120,7 +120,7 @@ This Perl 5 object class is a simple encapsulated application, or "component",
 that runs in the CGI::Portable environment.  It allows you to define a complete 
 static "program response screen" within the standard "preferences" config file 
 without having to write your own "application" to do it.  Or, to be specific, 
-this module allows you to set any CGI::Portable::Response properties by 
+this module allows you to set any CGI::Portable 'Response' properties by 
 providing a like-named "preference" with each new value, rather than having to 
 explicitely call each appropriate accessor method.  This module is designed to be
 easily subclassed by your own application components, so they can do the same 
@@ -208,7 +208,7 @@ sub main {
 
 =head1 PREFERENCES HANDLED BY THIS MODULE
 
-These preferences have names that are the same as the CGI::Portable::Response
+These preferences have names that are the same as the CGI::Portable 'Response'
 properties that their values are being used to set, except that each has a prefix
 indicating how the value is set.  The prefixes used include any of the following,
 where they make sense for each property: "low", "high", "add", "append",
@@ -434,7 +434,7 @@ __END__
 
 =head1 AUTHOR
 
-Copyright (c) 1999-2003, Darren R. Duncan.  All rights reserved.  This module
+Copyright (c) 1999-2004, Darren R. Duncan.  All rights reserved.  This module
 is free software; you can redistribute it and/or modify it under the same terms
 as Perl itself.  However, I do request that this copyright information and
 credits remain attached to the file.  If you modify this module and
@@ -454,6 +454,6 @@ Address comments, suggestions, and bug reports to B<perl@DarrenDuncan.net>.
 
 =head1 SEE ALSO
 
-perl(1), CGI::Portable, CGI::Portable::Response, CGI::Portable::Files.
+perl(1), CGI::Portable.
 
 =cut

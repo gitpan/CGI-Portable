@@ -27,6 +27,11 @@ demos/shared/DemoMailForm.pm
 demos/shared/DemoRedirect.pm
 demos/shared/DemoTextFile.pm
 demos/shared/DemoUsage.pm
+demos/smarthouse/config.pl
+demos/smarthouse/LM465.pm
+demos/smarthouse/smarthouse_cgi.pl
+demos/smarthouse/smarthouse_socket.pl
+demos/smarthouse/X10.pm
 demos/statics/showhtml.pl
 demos/statics/showself.pl
 demos/statics/static.html
@@ -46,11 +51,8 @@ lib/CGI/Portable/AdapterSocket.pm
 lib/CGI/Portable/AppMultiScreen.pm
 lib/CGI/Portable/AppSplitScreen.pm
 lib/CGI/Portable/AppStatic.pm
-lib/CGI/Portable/Errors.pm
-lib/CGI/Portable/Files.pm
-lib/CGI/Portable/Request.pm
-lib/CGI/Portable/Response.pm
 Makefile.PL
 MANIFEST
 ReadMe
-t/CGI-Portable-Framework.t
+t/CGI-Portable.t
+META.yml                                 Module meta-data (added by MakeMaker)

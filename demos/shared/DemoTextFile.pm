@@ -10,7 +10,7 @@ static html or text file, which can be in multiple segments.
 package DemoTextFile;
 require 5.004;
 
-# Copyright (c) 1999-2003, Darren R. Duncan.  All rights reserved.  This module
+# Copyright (c) 1999-2004, Darren R. Duncan.  All rights reserved.  This module
 # is free software; you can redistribute it and/or modify it under the same terms
 # as Perl itself.  However, I do request that this copyright information and
 # credits remain attached to the file.  If you modify this module and
@@ -21,7 +21,7 @@ require 5.004;
 use strict;
 use warnings;
 use vars qw($VERSION @ISA);
-$VERSION = '0.471';
+$VERSION = '0.50';
 
 ######################################################################
 
@@ -37,15 +37,15 @@ $VERSION = '0.471';
 
 =head2 Nonstandard Modules
 
-	CGI::Portable 0.461
-	CGI::Portable::AppStatic 0.461
+	CGI::Portable 0.50
+	CGI::Portable::AppStatic 0.50
 
 =cut
 
 ######################################################################
 
-use CGI::Portable 0.461;
-use CGI::Portable::AppStatic 0.461;
+use CGI::Portable 0.50;
+use CGI::Portable::AppStatic 0.50;
 @ISA = qw(CGI::Portable::AppStatic);
 
 ######################################################################
@@ -374,7 +374,7 @@ __END__
 
 =head1 AUTHOR
 
-Copyright (c) 1999-2003, Darren R. Duncan.  All rights reserved.  This module
+Copyright (c) 1999-2004, Darren R. Duncan.  All rights reserved.  This module
 is free software; you can redistribute it and/or modify it under the same terms
 as Perl itself.  However, I do request that this copyright information and
 credits remain attached to the file.  If you modify this module and

@@ -3,10 +3,10 @@ use ExtUtils::MakeMaker;
 # the contents of the Makefile that is written.
 WriteMakefile(
 	NAME	=> 'CGI::Portable',
-	VERSION => 0.472,
+	VERSION => 0.50,
 	PREREQ_PM => {
 		'File::VirtualPath' => 1.011,
-		'CGI::MultiValuedHash' => 1.081,
+		'CGI::MultiValuedHash' => 1.09,
 		'HTML::EasyTags' => 1.071,
 		'HTML::FormTemplate' => 2.021,  # for Demo* modules only
 		'Net::SMTP' => 1,  # I don't know what version; for Demo* only

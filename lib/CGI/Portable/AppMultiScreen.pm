@@ -9,7 +9,7 @@ CGI::Portable::AppMultiScreen - Delegate construction, navigation of hierarchica
 package CGI::Portable::AppMultiScreen;
 require 5.004;
 
-# Copyright (c) 1999-2003, Darren R. Duncan.  All rights reserved.  This module
+# Copyright (c) 1999-2004, Darren R. Duncan.  All rights reserved.  This module
 # is free software; you can redistribute it and/or modify it under the same terms
 # as Perl itself.  However, I do request that this copyright information and
 # credits remain attached to the file.  If you modify this module and
@@ -20,7 +20,7 @@ require 5.004;
 use strict;
 use warnings;
 use vars qw($VERSION @ISA);
-$VERSION = '0.461';
+$VERSION = '0.50';
 
 ######################################################################
 
@@ -36,15 +36,15 @@ $VERSION = '0.461';
 
 =head2 Nonstandard Modules
 
-	CGI::Portable 0.461
-	CGI::Portable::AppStatic 0.461 (a superclass)
+	CGI::Portable 0.50
+	CGI::Portable::AppStatic 0.50 (a superclass)
 
 =cut
 
 ######################################################################
 
-use CGI::Portable 0.461;
-use CGI::Portable::AppStatic 0.461;
+use CGI::Portable 0.50;
+use CGI::Portable::AppStatic 0.50;
 @ISA = qw( CGI::Portable::AppStatic );
 
 ######################################################################
@@ -360,6 +360,8 @@ a user error, CGI::Portable's error list is not supplemented.
 sub set_multi_screen_no_delegate_message {
 	my ($self, $globals) = @_;
 
+	$globals->http_status_code( '404 Not Found' );
+
 	$globals->page_title( '404 Page Not Found' );
 
 	$globals->set_page_body( <<__endquote );
@@ -386,7 +388,7 @@ __END__
 
 =head1 AUTHOR
 
-Copyright (c) 1999-2003, Darren R. Duncan.  All rights reserved.  This module
+Copyright (c) 1999-2004, Darren R. Duncan.  All rights reserved.  This module
 is free software; you can redistribute it and/or modify it under the same terms
 as Perl itself.  However, I do request that this copyright information and
 credits remain attached to the file.  If you modify this module and
@@ -406,7 +408,6 @@ Address comments, suggestions, and bug reports to B<perl@DarrenDuncan.net>.
 
 =head1 SEE ALSO
 
-perl(1), CGI::Portable, CGI::Portable::AppStatic, CGI::Portable::Response, 
-CGI::Portable::Files, CGI::Portable::Request, CGI::Portable::AppSplitScreen.
+perl(1), CGI::Portable, CGI::Portable::AppStatic, CGI::Portable::AppSplitScreen.
 
 =cut

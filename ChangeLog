@@ -1,3 +1,41 @@
+2004-06-06   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 0.50.
+
+	* Updated this distribution's external dependencies on CGI::MultiValuedHash
+	to v1.09.  That module's API didn't change, but it had a bug fix.
+
+	* The 4 modules that CGI::Portable subclassed (::Errors, ::Files,
+	::Request, ::Response) in release 0.472 are now merged into it as of
+	release 0.50.  The result of this 5-way merge has a version of 0.50, and
+	can be used identically to the old module.  No new code or features were
+	added.  The new module has all of the old 5's documentation, slightly
+	altered as was necessary for the merger.  Due to the elimination of
+	redundancies, the new module is 17% smaller than the combined size of the
+	old 5.  Every other module in this distribution was also updated to 
+	version 0.50, even though they otherwise had no changes (1 exception).
+
+	* Small feature update in CGI::Portable::AppMultiScreen whereby
+	set_multi_screen_no_delegate_message() now spits out an 'http_status_code'
+	of '404 Not Found' to go with the "screen doesn't exist" error page that it
+	generates.  It used to leave the default status code of '200 OK' to be
+	returned, which is technically wrong even though the user sees the same
+	thing.  As a result of the change, web crawling robots such as search
+	engines should record that an external link pointing to your "doesn't
+	exist" page is broken, and they shouldn't index "doesn't exist" as if it
+	were a valid page, sending more visitors straight to it later.  This
+	shouldn't break anything unless you depended on the old, broken behaviour.
+
+	* Note that if you referenced any of the 4 modules that don't exist by name, 
+	then just substitute 'CGI::Portable' for the old name and your code should 
+	continue to work as before.
+
+	* Besides the aforementioned, this release is completely backwards
+	compatible with the previous one, so you should be able to swap it in
+	without problems.
+
+	* Renamed t/CGI-Portable-Framework.t to t/CGI-Portable.t.
+
 2003-03-21   Darren Duncan <perl@DarrenDuncan.net>
 
 	* Release 0.472.

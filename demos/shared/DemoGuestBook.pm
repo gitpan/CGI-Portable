@@ -10,7 +10,7 @@ book with unlimited questions that also e-mails submissions to the website owner
 package DemoGuestBook;
 require 5.004;
 
-# Copyright (c) 1999-2003, Darren R. Duncan.  All rights reserved.  This module
+# Copyright (c) 1999-2004, Darren R. Duncan.  All rights reserved.  This module
 # is free software; you can redistribute it and/or modify it under the same terms
 # as Perl itself.  However, I do request that this copyright information and
 # credits remain attached to the file.  If you modify this module and
@@ -21,7 +21,7 @@ require 5.004;
 use strict;
 use warnings;
 use vars qw($VERSION @ISA);
-$VERSION = '0.461';
+$VERSION = '0.50';
 
 ######################################################################
 
@@ -39,9 +39,9 @@ $VERSION = '0.461';
 
 =head2 Nonstandard Modules
 
-	CGI::Portable 0.461
-	CGI::Portable::AppStatic 0.461
-	CGI::MultiValuedHash 1.081
+	CGI::Portable 0.50
+	CGI::Portable::AppStatic 0.50
+	CGI::MultiValuedHash 1.09
 	HTML::FormTemplate 2.021
 
 =cut
@@ -50,10 +50,10 @@ $VERSION = '0.461';
 
 use Fcntl qw(:DEFAULT :flock);
 use Symbol;
-use CGI::Portable 0.461;
-use CGI::Portable::AppStatic 0.461;
+use CGI::Portable 0.50;
+use CGI::Portable::AppStatic 0.50;
 @ISA = qw(CGI::Portable::AppStatic);
-use CGI::MultiValuedHash 1.081;
+use CGI::MultiValuedHash 1.09;
 use HTML::FormTemplate 2.021;
 
 ######################################################################
@@ -1013,7 +1013,7 @@ __END__
 
 =head1 AUTHOR
 
-Copyright (c) 1999-2003, Darren R. Duncan.  All rights reserved.  This module
+Copyright (c) 1999-2004, Darren R. Duncan.  All rights reserved.  This module
 is free software; you can redistribute it and/or modify it under the same terms
 as Perl itself.  However, I do request that this copyright information and
 credits remain attached to the file.  If you modify this module and

@@ -1,5 +1,5 @@
 # Before `make install' is performed this script should be runnable with
-# `make test'. After `make install' it should work as `perl t/CGI-Portable-Framework.t'
+# `make test'. After `make install' it should work as `perl t/CGI-Portable.t'
 
 ######################### We start with some black magic to print on failure.
 
@@ -8,16 +8,12 @@
 
 BEGIN { $| = 1; print "1..2\n"; }
 END {print "not ok 1\n" unless $loaded;}
-use CGI::Portable::Errors 0.461;
-use CGI::Portable::Files 0.461;
-use CGI::Portable::Request 0.471;
-use CGI::Portable::Response 0.461;
-use CGI::Portable 0.461;
-use CGI::Portable::AdapterCGI 0.461;
-use CGI::Portable::AdapterSocket 0.461;
-use CGI::Portable::AppStatic 0.461;
-use CGI::Portable::AppMultiScreen 0.461;
-use CGI::Portable::AppSplitScreen 0.461;
+use CGI::Portable 0.50;
+use CGI::Portable::AdapterCGI 0.50;
+use CGI::Portable::AdapterSocket 0.50;
+use CGI::Portable::AppStatic 0.50;
+use CGI::Portable::AppMultiScreen 0.50;
+use CGI::Portable::AppSplitScreen 0.50;
 $loaded = 1;
 print "ok 1\n";
 use strict;
